@@ -1,1 +1,1 @@
-# cs308_team2
+# CS308 Group Project - Team 2 Repository
