@@ -2,7 +2,6 @@ package edu.project.deneme1.ordersystem;
 
 import edu.project.deneme1.product.Product;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ShoppingCart {
 
-    private List<Product> productsAdded = new ArrayList<Product>();
+    private List<Product> productsAdded = new ArrayList<>();
 
     public void addToCart(Product product) {
         productsAdded.add(product);

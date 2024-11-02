@@ -13,14 +13,14 @@ public class ProductController {
     @Autowired
     private Database productRepository;
 
-    @GetMapping("/addproduct/{id}/{name}/{price}/{quantity}/{sold}")
+    @GetMapping("/addproduct/{id}/{name}/{price}/{stock}/{sold}")
     public void addProduct(@PathVariable("id") int id,
                            @PathVariable("name") String name,
                            @PathVariable("price") double price,
-                           @PathVariable("quantity") int quantity,
+                           @PathVariable("stock") int stock,
                            @PathVariable("sold") int sold)
     {
-        Product product = new Product(id, name, price, quantity, sold);
+        Product product = new Product(id, name, price, stock, sold);
         productRepository.save(product);
     }
 
