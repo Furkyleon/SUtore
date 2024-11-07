@@ -26,7 +26,7 @@ from django.contrib.auth import get_user_model
 # @permission_required('accounts.add_product', raise_exception=True)
 def store(request):
      context = {}
-     return render(request, 'store/store.html', context)
+     return render(request, 'store/mainpage.html', context)
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
