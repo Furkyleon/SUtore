@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 const LoginForm = () => {
   return (
     <div className='page-container'>
+
       <h1 className='page-title'>SUtore</h1>
 
       <div className='wrapper'>
