@@ -57,7 +57,7 @@ html, body {
 .hero {
   background-color: #f4f4f4;
   padding: 40px 20px;
-  padding-top: 80px; /* Extra padding to offset the fixed header */
+  padding-top: 50px; /* Extra padding to offset the fixed header */
   border-radius: 10px;
   width: 100%;
   max-width: 100%; /* Prevents overflow */

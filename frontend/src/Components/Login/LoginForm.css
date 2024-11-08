@@ -33,8 +33,8 @@
 .page-title {
     font-size: 48px;
     font-weight: bold;
-    margin-bottom: 30px;
-    margin-top: 30px;
+    /*margin-bottom: 30px;*/
+    margin-top: 20px;
     color:#01236A; /* Adjust color as desired */
 }
 

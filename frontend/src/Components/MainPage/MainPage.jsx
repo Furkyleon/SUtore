@@ -14,8 +14,7 @@ const MainPage = () => {
       <header className="header">
         <nav>
           <ul>
-            <li><a href="#hero">Main Page</a></li>
-            <li><a href="#store">Store</a></li>
+            <li><a href="./">Main Page</a></li>
             <li><a href="./login">Login</a></li>
             <li><a href="./register">Register</a></li>
           </ul>
