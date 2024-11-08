@@ -3,8 +3,8 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .main-page {
@@ -14,24 +14,23 @@ html, body {
   width: 100vw;      /* Full viewport width */
   font-family: Arial, sans-serif;
   color: #333;
-  overflow-x: hidden; /* Prevents horizontal scroll caused by padding/margin */
 }
 
 .header {
-  background-color: rgb(171, 163, 161);
+  background-color: rgb(171, 163, 161); /* Ensure it's distinct from the body */
   color: #fff;
   padding: 20px;
   text-align: center;
-}
-
-.header h1 {
-  margin: 0;
+  position: fixed; /* Pins header to the top of the viewport */
+  top: 0;
+  width: 100%; /* Full width */
+  z-index: 1000; /* Brings header above other content */
 }
 
 .header nav ul {
   list-style: none;
   padding: 0;
-  margin: 5px 0 0;
+  margin: 0;
   display: flex;
   justify-content: center;
 }
@@ -47,55 +46,64 @@ html, body {
 
 .content {
   flex: 1; /* Grow to fill available space */
-  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  padding-top: 80px; /* Offset for fixed header height */
   width: 100%; /* Full width of container */
+  max-width: 100%; /* Prevents overflow */
 }
 
 .hero {
   background-color: #f4f4f4;
   padding: 40px 20px;
+  padding-top: 80px; /* Extra padding to offset the fixed header */
   border-radius: 10px;
-  margin-bottom: 20px;
-  width: 100%; /* Full width of container */
-  box-sizing: border-box; /* Includes padding in width calculation */
+  width: 100%;
+  max-width: 100%; /* Prevents overflow */
+  box-sizing: border-box;
+  min-height: 90vh; /* Takes most of the viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .hero h2 {
-  margin: 0 0 70px;
+  margin: 40px 0 30px;
   color: #01236A;
-  font-size: 6rem;
+  font-size: 7rem;
 }
 
 .hero h3 {
-  margin: 0 0 50px;
+  margin: 0 0 30px;
   color: #000000;
   font-size: 2rem;
 }
 
 .hero button {
-  margin: 0 0 30px;
+  margin: 20px 0 40px;
   background-color: rgb(171, 163, 161);
   color: #fff;
-  padding: 40px 50px;
+  padding: 20px 40px;
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1.5rem;
+  transition: transform 0.2s ease;
 }
 
 .hero button a {
   color: #FFFFFF;
+  text-decoration: none;
 }
 
-.features {
-  margin-top: 20px;
+#store {
   width: 100%; /* Full width of container */
-  box-sizing: border-box; /* Includes padding in width calculation */
+  max-width: 100%; /* Prevents overflow */
+  padding-top: 20px;
+  background-color: #ffffff;
 }
 
 .footer {
@@ -103,5 +111,6 @@ html, body {
   color: #fff;
   text-align: center;
   padding: 10px;
-  width: 100%; /* Full width of container */
+  width: 100%;
+  max-width: 100%; /* Prevents overflow */
 }

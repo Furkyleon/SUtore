@@ -6,15 +6,15 @@
   }
   
   h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    margin-bottom: 40px;
   }
   
   .product-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 30px;
   }
   
   .product-card {
@@ -22,7 +22,8 @@
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
-    width: 200px;
+    margin-bottom: 50px;
+    width: 250px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;

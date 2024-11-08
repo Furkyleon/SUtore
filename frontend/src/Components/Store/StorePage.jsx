@@ -29,7 +29,7 @@ const products = [
 const StorePage = () => {
   return (
     <div className="store-page">
-      <h1>Our Products</h1>
+      <h1>Products</h1>
       <div className="product-list">
         {products.map(product => (
           <div key={product.id} className="product-card">
