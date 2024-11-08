@@ -1,12 +1,12 @@
 .page-container {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .page-title {
     font-size: 48px;
     font-weight: bold;
-    margin-bottom: 120px;
+    margin-bottom: 20px;
     color: #01236A; /* Adjust color as desired */
 }
 
@@ -18,7 +18,7 @@
     border: 2px solid black;
     backdrop-filter: blur(30px);
     background-color: rgb(171, 163, 161);
-    margin-bottom: 100px;
+    margin-bottom: 10px;
 }
 
 .wrapper h1 {
