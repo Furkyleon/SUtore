@@ -3,7 +3,7 @@
 This is a repository for CS 308 Group Project. 
   
 Group users are:
-- Seyyid Ali (Scrum master)
+- Seyyid Ali
 - Mehmet
 - Furkan
 - Ilgın
