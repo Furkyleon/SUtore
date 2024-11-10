@@ -5,6 +5,8 @@ import MainPage from './Components/MainPage/MainPage';
 import StorePage from './Components/Store/StorePage';
 import LoginForm from './Components/Login/LoginForm';
 import RegisterForm from './Components/Register/RegisterForm';
+import Categories from './Components/Categories/CategoriesPage';
+import CategoryPage from './Components/Categories/CategoryPage'; // Import the CategoryPage component
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="/store" element={<StorePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/:categoryName" element={<CategoryPage />} /> {/* Dynamic route for each category */}
       </Routes>
     </Router>
   );

@@ -1,24 +1,57 @@
-// MainPage.jsx
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './MainPage.css';
 import StorePage from '../Store/StorePage';
 
 const MainPage = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-    const handleScroll = () => {
-        document.getElementById('store').scrollIntoView({ behavior: 'smooth' });
-      };
+  const handleScroll = () => {
+    document.getElementById('store').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prevState => !prevState);
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="main-page">
       <header className="header">
-        <nav>
+        <nav className="nav-left">
           <ul>
-            <li><a href="./">Main Page</a></li>
-            <li><a href="./login">Login</a></li>
-            <li><a href="./register">Register</a></li>
+            <li ref={dropdownRef}>
+              <a href="#!" onClick={toggleDropdown}>Categories</a>
+              {isDropdownOpen && (
+                <ul className="dropdown-menu">
+                  <li><a href='/categories/Telephone' >Telephone</a></li>
+                  <li><a href='/categories/TV'>TV</a></li>
+                  <li><a href='/categories/Laptop'>Laptop</a></li>
+                  <li><a href='/categories/White'>White</a></li>
+                  <li><a href='/categories/Acessory'>Accessory</a></li>
+                  <li><a href='/categories/Consoles'>Consoles</a></li>
+                </ul>
+              )}
+            </li>
           </ul>
         </nav>
+
+        <div className="nav-right">
+          <a href="./login">Login</a>
+          <a href="./register">Register</a>
+        </div>
       </header>
 
       <main className="content">
@@ -27,8 +60,6 @@ const MainPage = () => {
           <h3>Store for Sabancı students.</h3>
           <button onClick={handleScroll}><a href="#store">Shop Now!</a></button>
         </section>
-
-        {/* Insert StorePage below the hero section */}
         <section id="store">
           <StorePage />
         </section>
