@@ -30,8 +30,6 @@ html, body {
   z-index: 1000;
 }
 
-
-
 .content {
   flex: 1;
   display: flex;
@@ -95,7 +93,7 @@ html, body {
 }
 
 .footer {
-  background-color: rgb(171, 163, 161);
+  background-color: #01236A;
   color: #fff;
   text-align: center;
   padding: 10px;

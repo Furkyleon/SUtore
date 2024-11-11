@@ -6,7 +6,8 @@ const products = [
     description: "Good telephone.",
     price: "25000 TL",
     image: "/images/1.png",
-    category: "Telephone"
+    category: "Telephone",
+    inCart: false
   },
   {
     id: 9,

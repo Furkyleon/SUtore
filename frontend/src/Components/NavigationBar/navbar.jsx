@@ -1,7 +1,7 @@
 // Navbar.js
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import './navbar.css'; // Create or link to a CSS file for Navbar styling
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import "./navbar.css"; // Create or link to a CSS file for Navbar styling
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,9 +18,9 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -28,16 +28,35 @@ const Navbar = () => {
     <header className="header">
       <nav className="nav-left">
         <ul>
+          <li>
+            <a href="/">Main Page</a>
+          </li>
+        </ul>
+        <ul>
           <li ref={dropdownRef}>
-            <a href="#!" onClick={toggleDropdown}>Categories</a>
+            <a href="#!" onClick={toggleDropdown}>
+              Categories
+            </a>
             {isDropdownOpen && (
               <ul className="dropdown-menu">
-                <li><Link to="/categories/Telephone">Telephone</Link></li>
-                <li><Link to="/categories/TV">TV</Link></li>
-                <li><Link to="/categories/Laptop">Laptop</Link></li>
-                <li><Link to="/categories/White">White</Link></li>
-                <li><Link to="/categories/Accessory">Accessory</Link></li>
-                <li><Link to="/categories/Consoles">Consoles</Link></li>
+                <li>
+                  <Link to="/categories/Telephone">Telephone</Link>
+                </li>
+                <li>
+                  <Link to="/categories/TV">TV</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Laptop">Laptop</Link>
+                </li>
+                <li>
+                  <Link to="/categories/White">White</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Accessory">Accessory</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Consoles">Consoles</Link>
+                </li>
               </ul>
             )}
           </li>

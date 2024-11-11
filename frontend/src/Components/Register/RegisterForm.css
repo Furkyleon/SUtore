@@ -18,6 +18,10 @@ body {
   color: #01236a;
 }
 
+.page-title a {
+  text-decoration: none;
+}
+
 .wrapper {
   width: 420px;
   color: #fff;

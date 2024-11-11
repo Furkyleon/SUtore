@@ -1,72 +1,72 @@
 .cart {
-    width: 150%;
-    margin: 0 auto;
-    padding: 50px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #01236a;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .cart h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #fffdfd;
-  }
-  
-  .cart-items {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 20px;
-  }
-  
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #ffffff;
-  }
-  
-  .item-name {
-    flex: 2;
-    font-weight: bold;
-    color: #ffffff;
-  }
-  
-  .item-quantity,
-  .item-price {
-    flex: 1;
-    text-align: right;
-    color: #ffffff;
-  }
-  
-  .cart-total {
-    text-align: right;
-    font-size: 1.2em;
-    margin-top: 10px;
-    color: #ffffff;
-  }
-  
-  .purchase-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: #fff;
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
-  }
-  
-  .purchase-button:hover {
-    background-color: #45a049;
-  }
-  
-  .empty-cart-message {
-    color: white;
-  }
+  width: 150%;
+  margin: 0 auto;
+  padding: 50px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #01236a;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cart h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fffdfd;
+}
+
+.cart-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ffffff;
+}
+
+.item-name {
+  flex: 2;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.item-quantity,
+.item-price {
+  flex: 1;
+  text-align: right;
+  color: #ffffff;
+}
+
+.cart-total {
+  text-align: right;
+  font-size: 1.2em;
+  margin-top: 10px;
+  color: #ffffff;
+}
+
+.purchase-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.purchase-button:hover {
+  background-color: #45a049;
+}
+
+.empty-cart-message {
+  color: white;
+}
