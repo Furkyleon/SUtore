@@ -1,41 +1,38 @@
-/* CategoriesPage.css */
-
 .categories-page {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .categories-page h1 {
-    color: #01236A;
-    font-size: 3rem;
-    margin-bottom: 20px;
-  }
-  
-  .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .category-item {
-    margin: 15px 0;
-  }
-  
-  .category-item a {
-    color: #333;
-    text-decoration: none;
-    font-size: 1.5rem;
-    padding: 10px 20px;
-    background-color: #f4f4f4;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .category-item a:hover {
-    background-color: rgb(171, 163, 161);
-    color: #fff;
-  }
-  
+  padding: 20px;
+  text-align: center;
+}
+
+.categories-page h1 {
+  color: #01236a;
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.category-item {
+  margin: 15px 0;
+}
+
+.category-item a {
+  color: #333;
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.category-item a:hover {
+  background-color: rgb(171, 163, 161);
+  color: #fff;
+}

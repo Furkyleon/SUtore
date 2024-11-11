@@ -1,14 +1,13 @@
-// src/Components/Categories/CategoriesPage.jsx
-import React from 'react';
-import './CategoriesPage.css';
+import React from "react";
+import "./CategoriesPage.css";
 
 const categories = [
-  { name: 'Telephone', path: '/categories/Telephone' },
-  { name: 'TV', path: '/categories/TV' },
-  { name: 'Laptop', path: '/categories/Laptop' },
-  { name: 'White', path: '/categories/White' },
-  { name: 'Accessory', path: '/categories/Accessory' },
-  { name: 'Consoles', path: '/categories/Consoles' },
+  { name: "Telephone", path: "/categories/telephone" },
+  { name: "TV", path: "/categories/television" },
+  { name: "Laptop", path: "/categories/laptop" },
+  { name: "White", path: "/categories/white" },
+  { name: "Accessory", path: "/categories/accessory" },
+  { name: "Consoles", path: "/categories/consoles" },
 ];
 
 const CategoriesPage = () => {

@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './Components/Layout'; // Import the Layout component
 import MainPage from './Components/MainPage/MainPage';
-import StorePage from './Components/Store/StorePage';
 import LoginForm from './Components/Login/LoginForm';
 import RegisterForm from './Components/Register/RegisterForm';
 import Categories from './Components/Categories/CategoriesPage';
