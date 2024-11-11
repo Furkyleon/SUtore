@@ -1,5 +1,11 @@
 /* ProductPage.css */
 
+html, body {
+    overflow-y: auto; /* Ensure scrolling is enabled */
+    height: auto; /* Avoid setting 100vh, as it can restrict scrolling */
+}
+
+
 .product-page {
     width: 100vw;
     font-family: Arial, sans-serif;
@@ -16,7 +22,7 @@
     padding: 60px;
     background-color: #f9f9f9;
     box-sizing: border-box;
-    min-height: 100vh; /* Full viewport height */
+   min-height: 100vh;
 }
 
   

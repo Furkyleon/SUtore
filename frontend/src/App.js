@@ -7,7 +7,8 @@ import LoginForm from './Components/Login/LoginForm';
 import RegisterForm from './Components/Register/RegisterForm';
 import Categories from './Components/Categories/CategoriesPage';
 import CategoryPage from './Components/Categories/CategoryPage';
-import ProductPage from './Components/ProductPage/ProductPage'; // Import ProductPage component
+import ProductPage from './Components/ProductPage/ProductPage';
+import StorePage from './Components/Store/StorePage'; // Import ProductPage component
 
 function App() {
   return (

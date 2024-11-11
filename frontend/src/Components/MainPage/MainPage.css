@@ -1,101 +1,36 @@
+/* MainPage.css */
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .main-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100vh; /* Full viewport height */
+  width: 100vw;      /* Full viewport width */
   font-family: Arial, sans-serif;
   color: #333;
 }
 
 .header {
-  background-color: #01236A;
+  background-color: rgb(171, 163, 161);
   color: #fff;
   padding: 0 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Space out content */
   position: fixed;
   top: 0;
   width: 100%;
-  width: 100vw;
   height: 60px;
   z-index: 1000;
 }
 
 
-<<<<<<< HEAD
-=======
-.nav-left ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
-.nav-left ul li {
-  margin: 0 15px;
-  position: relative;
-}
-
-.nav-left ul li a {
-  color: #fff;
-  text-decoration: none;
-  padding: 5px 10px;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.nav-right a {
-  color: #fff;
-  text-decoration: none;
-  padding: 5px 10px;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #01236A;
-  color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  min-width: 150px;
-  z-index: 1000;
-}
-
-.dropdown-menu li a {
-  color: #fff;
-  text-decoration: none;
-  display: block;
-  margin: 5px;
-  padding: 5px 10px;
-}
-
-.dropdown-menu li a:hover {
-  background-color: #f4f4f4;
-  color: #333;
-}
-
-.nav-left ul li:hover .dropdown-menu {
-  display: block;
-}
->>>>>>> a25850565b1c5cc3dd76e08d61c8af0e7be8f4c5
 
 .content {
   flex: 1;
@@ -137,7 +72,7 @@ html, body {
 
 .hero button {
   margin: 20px 0 40px;
-  background-color: #01236A;
+  background-color: rgb(171, 163, 161);
   color: #fff;
   padding: 20px 40px;
   border: none;
@@ -160,7 +95,7 @@ html, body {
 }
 
 .footer {
-  background-color: #01236A;
+  background-color: rgb(171, 163, 161);
   color: #fff;
   text-align: center;
   padding: 10px;
