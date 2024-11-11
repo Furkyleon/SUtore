@@ -9,6 +9,7 @@ import Categories from './Components/Categories/CategoriesPage';
 import CategoryPage from './Components/Categories/CategoryPage';
 import ProductPage from './Components/ProductPage/ProductPage';
 import StorePage from './Components/Store/StorePage'; // Import ProductPage component
+import Cart from './Components/Cart/Cart';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="categories" element={<Categories />} />
           <Route path="categories/:categoryName" element={<CategoryPage />} /> {/* Dynamic category route */}
           <Route path="product/:productId" element={<ProductPage />} /> {/* Dynamic product route */}
+          <Route path="cart" element={<Cart />} />
         </Route>
       </Routes>
     </Router>

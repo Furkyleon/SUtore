@@ -17,7 +17,7 @@ html, body {
 }
 
 .header {
-  background-color: rgb(171, 163, 161);
+  background-color: #01236a;
   color: #fff;
   padding: 0 20px;
   display: flex;
@@ -72,7 +72,7 @@ html, body {
 
 .hero button {
   margin: 20px 0 40px;
-  background-color: rgb(171, 163, 161);
+  background-color: #01236a;
   color: #fff;
   padding: 20px 40px;
   border: none;
