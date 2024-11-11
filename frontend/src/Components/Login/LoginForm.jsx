@@ -20,10 +20,6 @@ const LoginForm = () => {
             <input type='password' placeholder='Password' required />
             <FaLock className='icon' />
           </div>
-          <div className='remember-forgot'>
-            <label><input type="checkbox" /> Remember Me</label>
-            <Link to="/forgot-password">Forgot Password</Link>
-          </div>
           <button type='submit'>Login</button>
           <div className='register-link'>
             <p>Do not have an account? <Link to="/register">Register</Link></p>

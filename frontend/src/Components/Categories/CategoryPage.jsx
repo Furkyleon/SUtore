@@ -1,4 +1,3 @@
-// src/Components/CategoryPage/CategoryPage.jsx
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import './CategoryPage.css';

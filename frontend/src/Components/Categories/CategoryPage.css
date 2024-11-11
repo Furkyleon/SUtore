@@ -1,66 +1,63 @@
-/* CategoryPage.css */
-
 .category-page {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .category-page h1 {
-    color: #01236A;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-  }
-  
-  .product-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .product-card {
-    background-color: #f4f4f4;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 200px;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .product-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-  }
-  
-  .product-card h2 {
-    font-size: 1.2rem;
-    color: #333;
-    margin: 10px 0;
-  }
-  
-  .product-card p {
-    font-size: 1rem;
-    color: #666;
-  }
-  
-  .product-card .price {
-    font-weight: bold;
-    color: #01236A;
-    margin: 10px 0;
-  }
-  
-  .product-card button {
-    background-color: #333;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .product-card button:hover {
-    background-color: #555;
-  }
-  
+  padding: 20px;
+  text-align: center;
+}
+
+.category-page h1 {
+  color: #01236a;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.product-card {
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+  padding: 10px;
+  text-align: center;
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.product-card h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 10px 0;
+}
+
+.product-card p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.product-card .price {
+  font-weight: bold;
+  color: #01236a;
+  margin: 10px 0;
+}
+
+.product-card button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.product-card button:hover {
+  background-color: #555;
+}
