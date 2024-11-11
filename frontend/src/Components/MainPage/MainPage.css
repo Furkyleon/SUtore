@@ -30,75 +30,7 @@ html, body {
   z-index: 1000;
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-}
 
-.nav-left ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
-.nav-left ul li {
-  margin: 0 15px;
-  position: relative; /* Required for dropdown positioning */
-}
-
-.nav-left ul li a {
-  color: #fff;
-  text-decoration: none;
-  padding: 5px 10px;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Space between Login and Register */
-}
-
-.nav-right a {
-  color: #fff;
-  text-decoration: none;
-  padding: 5px 10px;
-}
-
-/* Dropdown menu styles */
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%; /* Position below the Categories link */
-  left: 0;
-  background-color: #333;
-  color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  min-width: 150px;
-  z-index: 1000;
-}
-
-.dropdown-menu li a {
-  color: #fff;
-  text-decoration: none;
-  display: block;
-  padding: 5px 10px;
-}
-
-.dropdown-menu li a:hover {
-  background-color: #f4f4f4;
-  color: #333;
-}
-
-/* Show dropdown based on click in React */
-.nav-left ul li:hover .dropdown-menu {
-  display: block;
-}
 
 .content {
   flex: 1;

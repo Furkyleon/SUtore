@@ -1,6 +1,6 @@
 // src/Components/CategoryPage/CategoryPage.jsx
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import './CategoryPage.css';
 import products from '../../data/products';
 
@@ -15,8 +15,10 @@ const CategoryPage = () => {
         {filteredProducts.length > 0 ? (
           filteredProducts.map(product => (
             <div key={product.id} className="product-card">
-              <img src={product.image} alt={product.name} />
-              <h2>{product.name}</h2>
+              <Link to={`/product/${product.id}`}>
+                <img src={product.image} alt={product.name} />
+                <h2>{product.name}</h2>
+              </Link>
               <p>{product.description}</p>
               <p className="price">{product.price}</p>
               <button>Add to Cart</button>
