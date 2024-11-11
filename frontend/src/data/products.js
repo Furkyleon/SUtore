@@ -14,7 +14,7 @@ const products = [
     name: "Smartphone A",
     description: "High-quality smartphone.",
     price: "28000 TL",
-    image: "/images/9.png",
+    image: "/images/1.png",
     category: "Telephone"
   },
   {
@@ -22,7 +22,7 @@ const products = [
     name: "Smartphone B",
     description: "Affordable smartphone.",
     price: "15000 TL",
-    image: "/images/10.png",
+    image: "/images/1.png",
     category: "Telephone"
   },
   {
@@ -30,7 +30,7 @@ const products = [
     name: "Smartphone C",
     description: "Gaming smartphone.",
     price: "30000 TL",
-    image: "/images/11.png",
+    image: "/images/1.png",
     category: "Telephone"
   },
   {
@@ -38,7 +38,7 @@ const products = [
     name: "Basic Phone",
     description: "Simple and durable.",
     price: "5000 TL",
-    image: "/images/12.png",
+    image: "/images/1.png",
     category: "Telephone"
   },
 
@@ -56,7 +56,7 @@ const products = [
     name: "Smart TV",
     description: "4K Smart TV.",
     price: "40000 TL",
-    image: "/images/13.png",
+    image: "/images/2.png",
     category: "TV"
   },
   {
@@ -64,7 +64,7 @@ const products = [
     name: "LED TV",
     description: "High-resolution LED TV.",
     price: "30000 TL",
-    image: "/images/14.png",
+    image: "/images/2.png",
     category: "TV"
   },
   {
@@ -72,7 +72,7 @@ const products = [
     name: "OLED TV",
     description: "Excellent color quality.",
     price: "45000 TL",
-    image: "/images/15.png",
+    image: "/images/2.png",
     category: "TV"
   },
   {
@@ -80,7 +80,7 @@ const products = [
     name: "Curved TV",
     description: "Immersive viewing experience.",
     price: "37000 TL",
-    image: "/images/16.png",
+    image: "/images/2.png",
     category: "TV"
   },
 
@@ -98,7 +98,7 @@ const products = [
     name: "Gaming Laptop",
     description: "High-end gaming laptop.",
     price: "60000 TL",
-    image: "/images/17.png",
+    image: "/images/3.png",
     category: "Laptop"
   },
   {
@@ -106,7 +106,7 @@ const products = [
     name: "Ultrabook",
     description: "Lightweight and powerful.",
     price: "45000 TL",
-    image: "/images/18.png",
+    image: "/images/3.png",
     category: "Laptop"
   },
   {
@@ -114,7 +114,7 @@ const products = [
     name: "Business Laptop",
     description: "Perfect for work.",
     price: "55000 TL",
-    image: "/images/19.png",
+    image: "/images/3.png",
     category: "Laptop"
   },
   {
@@ -122,7 +122,7 @@ const products = [
     name: "2-in-1 Laptop",
     description: "Tablet and laptop in one.",
     price: "48000 TL",
-    image: "/images/20.png",
+    image: "/images/3.png",
     category: "Laptop"
   },
 
@@ -148,7 +148,7 @@ const products = [
     name: "Nintendo Switch",
     description: "Portable gaming console.",
     price: "30000 TL",
-    image: "/images/21.png",
+    image: "/images/9.png",
     category: "Consoles"
   },
   {
@@ -156,7 +156,7 @@ const products = [
     name: "Xbox Series S",
     description: "Compact console.",
     price: "22000 TL",
-    image: "/images/22.png",
+    image: "/images/4.png",
     category: "Consoles"
   },
   {
@@ -164,7 +164,7 @@ const products = [
     name: "Retro Console",
     description: "Classic game collection.",
     price: "10000 TL",
-    image: "/images/23.png",
+    image: "/images/10.png",
     category: "Consoles"
   },
 
@@ -175,14 +175,14 @@ const products = [
     description: "Hungry solver.",
     price: "1500 TL",
     image: "/images/5.png",
-    category: "Accessory"
+    category: "White"
   },
   {
     id: 24,
     name: "Wireless Earbuds",
     description: "Noise-canceling earbuds.",
     price: "2500 TL",
-    image: "/images/24.png",
+    image: "/images/11.png",
     category: "Accessory"
   },
   {
@@ -190,7 +190,7 @@ const products = [
     name: "Smartwatch",
     description: "Fitness tracking smartwatch.",
     price: "3500 TL",
-    image: "/images/25.png",
+    image: "/images/12.png",
     category: "Accessory"
   },
   {
@@ -198,7 +198,7 @@ const products = [
     name: "Phone Charger",
     description: "Fast charging adapter.",
     price: "500 TL",
-    image: "/images/26.png",
+    image: "/images/13.png",
     category: "Accessory"
   },
   {
@@ -206,7 +206,7 @@ const products = [
     name: "Bluetooth Speaker",
     description: "Portable speaker.",
     price: "1500 TL",
-    image: "/images/27.png",
+    image: "/images/14.png",
     category: "Accessory"
   },
 
@@ -232,7 +232,7 @@ const products = [
     name: "Refrigerator",
     description: "Keeps food fresh.",
     price: "20000 TL",
-    image: "/images/28.png",
+    image: "/images/15.png",
     category: "White"
   },
   {
@@ -240,7 +240,7 @@ const products = [
     name: "Microwave",
     description: "Heats food quickly.",
     price: "8000 TL",
-    image: "/images/29.png",
+    image: "/images/16.png",
     category: "White"
   },
   {
@@ -248,7 +248,7 @@ const products = [
     name: "Oven",
     description: "Perfect for baking.",
     price: "12000 TL",
-    image: "/images/30.png",
+    image: "/images/17.png",
     category: "White"
   }
 ];

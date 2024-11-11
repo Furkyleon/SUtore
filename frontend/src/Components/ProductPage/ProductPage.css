@@ -10,6 +10,7 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  
 }
 
 .product-full-width {
@@ -17,7 +18,7 @@ body {
   align-items: flex-start;
   gap: 80px;
   width: 100vw;
-  padding: 60px;
+  padding: 200px;
   background-color: #f9f9f9;
   box-sizing: border-box;
   min-height: 100vh;
@@ -26,12 +27,14 @@ body {
 .product-image-section {
   flex: 1;
   text-align: center;
+  
 }
 
 .product-image-section img {
   width: 80%;
   max-width: 600px;
   border-radius: 8px;
+  
 }
 
 .top-seller {
