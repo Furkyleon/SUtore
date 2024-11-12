@@ -1,5 +1,4 @@
-// src/Components/ProductPage/ProductPage.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import products from '../../data/products';
 import './ProductPage.css';
@@ -11,7 +10,12 @@ const ProductPage = () => {
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(0);
   const [commentsList, setCommentsList] = useState([]);
-  const commentsRef = useRef(null); // Reference for comments section
+  const commentsRef = useRef(null);
+
+  // Scroll to top when ProductPage mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (!product) {
     return <p>Product not found.</p>;
@@ -40,7 +44,6 @@ const ProductPage = () => {
   return (
     <div className="product-page">
       <div className="product-full-width">
-        {/* Product Image and Details */}
         <div className="product-image-section">
           <img src={product.image} alt={product.name} />
           <button className="top-seller">Top Seller</button>
@@ -71,7 +74,6 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Comments Section with reference for scrolling */}
       <div ref={commentsRef} className="comments-section">
         <h2>Customer Reviews</h2>
         {commentsList.length > 0 ? (

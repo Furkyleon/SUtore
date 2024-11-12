@@ -13,11 +13,14 @@ const Layout = () => {
   const shouldShowNavbar = !noNavbarRoutes.includes(location.pathname);
 
   return (
-    <div>
+    <div className="layout">
       {shouldShowNavbar && <Navbar />} {/* Render Navbar conditionally */}
-      <main>
+      <main className="content">
         <Outlet />
       </main>
+      <footer className="footer">
+        <p>&copy; 2024 SUtore. All rights reserved.</p>
+      </footer>
     </div>
   );
 };
