@@ -10,6 +10,7 @@ urlpatterns = [
     path('products/add_product/', views.add_product, name='add_product'),
     path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'),  # Delete product
     path('products/get_all/', views.get_all_products, name='get_all_products'),
+    
     path('categories/add/', views.add_category, name='add_category'),  # URL for adding a new category
     path('categories/get_all/', views.get_categories, name='get_categories'),  # New endpoint for retrieving categories
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),  # New endpoint for retrieving products by category
