@@ -13,12 +13,6 @@ body {
   
 }
 
-.product-card a {
-  text-decoration: none;
-  color: inherit; /* This keeps the color of the text as is */
-}
-
-
 .product-full-width {
   display: flex;
   align-items: flex-start;

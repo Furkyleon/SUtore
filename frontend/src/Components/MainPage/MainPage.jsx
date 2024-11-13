@@ -23,6 +23,10 @@ const MainPage = () => {
           <StorePage />
         </section>
       </main>
+
+      <footer className="footer">
+        <p>&copy; 2024 SUtore. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

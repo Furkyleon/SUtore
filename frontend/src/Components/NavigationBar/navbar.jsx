@@ -1,19 +1,23 @@
 // Navbar.js
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+<<<<<<< HEAD
 import "./Navbar.css";
+=======
+import "./navbar.css"; // Create or link to a CSS file for Navbar styling
+>>>>>>> parent of d9cdb476 (categories sidebar and footer etc)
 
 const Navbar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const sidebarRef = useRef(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prevState) => !prevState);
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prevState) => !prevState);
   };
 
   const handleClickOutside = (event) => {
-    if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-      setIsSidebarOpen(false);
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
     }
   };
 
@@ -33,10 +37,39 @@ const Navbar = () => {
           </li>
         </ul>
         <ul>
+<<<<<<< HEAD
           <li>
             <p onClick={toggleSidebar}>
               Categories
             </p>
+=======
+          <li ref={dropdownRef}>
+            <a href="#!" onClick={toggleDropdown}>
+              Categories
+            </a>
+            {isDropdownOpen && (
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/categories/Telephone">Telephone</Link>
+                </li>
+                <li>
+                  <Link to="/categories/TV">TV</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Laptop">Laptop</Link>
+                </li>
+                <li>
+                  <Link to="/categories/White">White</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Accessory">Accessory</Link>
+                </li>
+                <li>
+                  <Link to="/categories/Consoles">Consoles</Link>
+                </li>
+              </ul>
+            )}
+>>>>>>> parent of d9cdb476 (categories sidebar and footer etc)
           </li>
         </ul>
       </nav>
@@ -46,6 +79,7 @@ const Navbar = () => {
         <Link to="/register">Register</Link>
         <Link to="/cart">Cart</Link>
       </div>
+<<<<<<< HEAD
 
       {/* Sidebar for categories */}
       <div
@@ -94,6 +128,8 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
+=======
+>>>>>>> parent of d9cdb476 (categories sidebar and footer etc)
     </header>
   );
 };

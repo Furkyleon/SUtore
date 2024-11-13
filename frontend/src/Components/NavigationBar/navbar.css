@@ -1,4 +1,5 @@
 .header {
+<<<<<<< HEAD
   background-color: #01236a;
   color: #fff;
   padding: 0 20px;
@@ -126,4 +127,86 @@
 
 .sidebar-menu li a:hover .arrow {
   color: #01236a; /* Arrow color changes on hover */
+=======
+    display: flex;
+    justify-content: space-between; /* Space between left and right sections */
+    align-items: center;
+    width: 100%; /* Full width of the viewport */
+    padding: 0 20px; /* Optional padding for inner spacing */
+    background-color: #333; /* Background color of the navbar */
+    box-sizing: border-box; /* Include padding in width calculation */
+    position: fixed; /* Make navbar fixed at the top */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-left ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-left ul li {
+    margin: 0 15px;
+    position: relative;
+}
+
+.nav-left ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-right a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #01236a;
+    color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 150px;
+    z-index: 1000;
+}
+
+.dropdown-menu li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 5px 10px;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.nav-left ul li:hover .dropdown-menu {
+    display: block;
+>>>>>>> parent of d9cdb476 (categories sidebar and footer etc)
 }
