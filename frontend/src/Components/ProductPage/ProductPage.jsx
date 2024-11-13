@@ -51,7 +51,7 @@ const ProductPage = () => {
         </div>
         <div className="product-details-section">
           <h1 className="product-name">{product.name}</h1>
-          <p className="product-code">Product Code: {product.serialNumber || "123456789"}</p>
+          <p className="product-code">Product Code: {product.serialNumber || "123456"}</p>
           <div className="rating" onClick={scrollToComments} style={{ cursor: 'pointer' }}>
             <span className="stars">★★★★☆</span>
             <span className="review-count">
@@ -60,16 +60,16 @@ const ProductPage = () => {
             <div className="rating-tooltip">Click to view comments</div>
           </div>
           <div className="price-section">
-            <span className="original-price">{product.originalPrice || "42000 TL"}</span>
+            <span className="original-price">{product.originalPrice || "? TL"}</span>
             <span className="discounted-price">{product.price}</span>
-            <span className="discount-rate">16.67% OFF</span>
+            <span className="discount-rate">?% OFF</span>
           </div>
           <button className="add-to-cart-button" onClick={handleAddToCart}>
             Add to Cart
           </button>
           <div className="additional-info">
-            <p><strong>Distributor:</strong> {product.distributor || "FITFIYATHOME"}</p>
-            <p><strong>Shipping:</strong> 1-2 business days</p>
+            <p><strong>Distributor:</strong> {product.distributor || "SUtore"}</p>
+            <p><strong>Shipping:</strong> 2-3 business days</p>
           </div>
         </div>
       </div>
