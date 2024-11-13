@@ -1,17 +1,17 @@
 // MainPage.jsx
-import React from "react";
-import "./MainPage.css";
-import Navbar from "../NavigationBar/Navbar";
-import StorePage from "../Store/StorePage";
+import React from 'react';
+import './MainPage.css';
+import Navbar from '../NavigationBar/navbar'; // Import Navbar correctly
+import StorePage from '../Store/StorePage';
 
 const MainPage = () => {
   const handleScroll = () => {
-    document.getElementById("store").scrollIntoView({ behavior: "smooth" });
+    document.getElementById('store').scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div className="main-page">
-      <Navbar />
+      <Navbar /> {/* Navbar component is now reusable */}
 
       <main className="content">
         <section id="hero" className="hero">
@@ -23,10 +23,6 @@ const MainPage = () => {
           <StorePage />
         </section>
       </main>
-
-      <footer className="footer">
-        <p>&copy; 2024 SUtore. All rights reserved.</p>
-      </footer>
     </div>
   );
 };

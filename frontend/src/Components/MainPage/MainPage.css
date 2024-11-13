@@ -4,15 +4,30 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .main-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100vh; /* Full viewport height */
+  width: 100vw;      /* Full viewport width */
   font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.header {
+  background-color: #01236a;
+  color: #fff;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Space out content */
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 1000;
 }
 
 .content {
@@ -33,7 +48,7 @@ html, body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  min-height: 70vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,5 +99,4 @@ html, body {
   padding: 10px;
   width: 100%;
   max-width: 100%;
-  font-family: Arial, sans-serif;
 }
