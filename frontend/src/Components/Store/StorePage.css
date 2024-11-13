@@ -1,11 +1,13 @@
 .store-page {
-  padding: 40px;
+  padding: 30px;
   text-align: center;
 }
 
 h1 {
   font-size: 3rem;
   margin-bottom: 40px;
+  font-family: Arial, sans-serif;
+  color: #01236A;
 }
 
 .product-list {
@@ -21,7 +23,7 @@ h1 {
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 50px;
-  width: 250px;
+  width: 20px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
@@ -47,11 +49,11 @@ h1 {
 
 .price {
   font-weight: bold;
-  color: #333;
+  color: #01236A;
 }
 
 button {
-  background-color: #333;
+  background-color: #01236A;
   color: #fff;
   border: none;
   padding: 10px 15px;
