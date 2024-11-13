@@ -1,36 +1,17 @@
-/* MainPage.css */
-
-html, body {
-  margin: 0;
-  padding: 0;
+html,
+body {
   width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
 }
 
 .main-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Full viewport height */
-  width: 100vw;      /* Full viewport width */
+  min-height: 100vh;
   font-family: Arial, sans-serif;
-  color: #333;
 }
 
-.header {
-  background-color: #01236a;
-  color: #fff;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Space out content */
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 60px;
-  z-index: 1000;
-}
-
-.content {
+.main-page .content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -40,7 +21,7 @@ html, body {
   max-width: 100%;
 }
 
-.hero {
+.main-page .hero {
   background-color: #f4f4f4;
   padding: 40px 20px;
   padding-top: 50px;
@@ -56,19 +37,19 @@ html, body {
   text-align: center;
 }
 
-.hero h2 {
+.main-page .hero h2 {
   margin: 40px 0 30px;
-  color: #01236A;
+  color: #01236a;
   font-size: 7rem;
 }
 
-.hero h3 {
+.main-page .hero h3 {
   margin: 0 0 30px;
   color: #000000;
   font-size: 2rem;
 }
 
-.hero button {
+.main-page .hero button {
   margin: 20px 0 40px;
   background-color: #01236a;
   color: #fff;
@@ -80,23 +61,13 @@ html, body {
   transition: transform 0.2s ease;
 }
 
-.hero button a {
-  color: #FFFFFF;
+.main-page .hero button a {
+  color: #ffffff;
   text-decoration: none;
 }
 
-#store {
+.main-page #store {
   width: 100%;
   max-width: 100%;
-  padding-top: 20px;
-  background-color: #ffffff;
-}
-
-.footer {
-  background-color: #01236A;
-  color: #fff;
-  text-align: center;
-  padding: 10px;
-  width: 100%;
-  max-width: 100%;
+  background-color: #f4f4f4;
 }

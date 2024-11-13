@@ -1,7 +1,6 @@
-// Navbar.js
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import "./navbar.css";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,7 +24,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="header">
+    <div className="navbar">
       <nav className="nav-left">
         <ul>
           <li>
@@ -34,9 +33,7 @@ const Navbar = () => {
         </ul>
         <ul>
           <li>
-            <a href="#!" onClick={toggleSidebar}>
-              Categories
-            </a>
+            <p onClick={toggleSidebar}>Categories</p>
           </li>
         </ul>
       </nav>
@@ -55,8 +52,13 @@ const Navbar = () => {
         <button className="close-button" onClick={toggleSidebar}>
           ×
         </button>
-        <h2>Tüm kategoriler</h2>
+        <h2>All categories:</h2>
         <ul className="sidebar-menu">
+          <li>
+            <Link to="/store" onClick={toggleSidebar}>
+              All products <span className="arrow">›</span>
+            </Link>
+          </li>
           <li>
             <Link to="/categories/Telephone" onClick={toggleSidebar}>
               Telephone <span className="arrow">›</span>
@@ -87,9 +89,24 @@ const Navbar = () => {
               Consoles <span className="arrow">›</span>
             </Link>
           </li>
+          <li>
+            <Link to="/categories/Photo" onClick={toggleSidebar}>
+              Photo <span className="arrow">›</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/categories/Selfcare" onClick={toggleSidebar}>
+              Self Care <span className="arrow">›</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/categories/Outdoor" onClick={toggleSidebar}>
+              Outdoor <span className="arrow">›</span>
+            </Link>
+          </li>
         </ul>
       </div>
-    </header>
+    </div>
   );
 };
 

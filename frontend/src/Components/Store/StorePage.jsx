@@ -1,14 +1,14 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './StorePage.css';
-import products from '../../data/products';
+import React from "react";
+import { Link } from "react-router-dom";
+import "./StorePage.css";
+import products from "../../data/products";
 
 const StorePage = () => {
   return (
-    <div className="store-page">
+    <div className="store-page-wrapper">
       <h1>Products</h1>
       <div className="product-list">
-        {products.map(product => (
+        {products.map((product) => (
           <div key={product.id} className="product-card">
             <Link to={`/product/${product.id}`}>
               <img src={product.image} alt={product.name} />

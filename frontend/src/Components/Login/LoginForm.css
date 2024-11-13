@@ -1,44 +1,51 @@
-.wrapper {
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.login-form-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.login-form-container .page-title {
+  margin-bottom: -10px;
+}
+
+.login-form-container .page-title a {
+  font-size: 56px;
+  font-weight: bold;
+  color: #01236A;
+  text-decoration: none;
+}
+
+.login-form-container .wrapper {
   width: 420px;
   color: #fff;
   border-radius: 10px;
   padding: 30px 40px;
-  border: 2px solid black;
+  border: 3px solid black;
   backdrop-filter: blur(30px);
-  background-color: rgb(171, 163, 161);
-  margin-bottom: 200px;
+  background-color: #005da9;
+  margin-top: 20px;
+  margin-bottom: 90px;
 }
 
-.wrapper h1 {
-  font-size: 36px;
+.login-form-container .wrapper h1 {
+  font-size: 40px;
   text-align: center;
 }
 
-.wrapper .input-box {
+.login-form-container .wrapper .input-box {
   position: relative;
   width: 100%;
-  height: 50px;
-  margin: 30px 0;
+  height: 55px;
+  margin: 20px 0;
 }
 
-.page-container {
-  text-align: center;
-  margin-top: 50px;
-  margin-bottom: 50px;
-}
-
-.page-title {
-  font-size: 48px;
-  font-weight: bold;
-  margin-top: 20px;
-  color: #01236a;
-}
-
-.page-title a {
-  text-decoration: none;
-}
-
-.input-box input {
+.login-form-container .input-box input {
   width: 100%;
   height: 100%;
   background: transparent;
@@ -50,11 +57,11 @@
   padding: 20px 45px 20px 20px;
 }
 
-.input-box input::placeholder {
+.login-form-container .input-box input::placeholder {
   color: #fff;
 }
 
-.input-box .icon {
+.login-form-container .input-box .icon {
   position: absolute;
   right: 20px;
   top: 50%;
@@ -62,7 +69,7 @@
   font-size: 16px;
 }
 
-.wrapper button {
+.login-form-container .wrapper button {
   width: 100%;
   height: 45px;
   background-color: #fff;
@@ -72,23 +79,23 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   font-size: 16px;
-  color: #333;
+  color: #01236A;
   font-weight: 700;
   margin-bottom: 20px;
 }
 
-.wrapper .register-link {
+.login-form-container .register-link {
   font-size: 15px;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
-.register-link p a {
+.login-form-container .register-link p a {
   color: #fff;
   text-decoration: none;
   font-weight: 600;
 }
 
-.register-link p a:hover {
+.login-form-container .register-link p a:hover {
   text-decoration: underline;
 }

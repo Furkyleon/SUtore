@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const RegisterForm = () => {
   return (
-    <div className="page-container">
+    <div className="register-form-container">
       <h1 className="page-title">
         <a href="/">SUtore</a>
       </h1>
@@ -30,7 +30,7 @@ const RegisterForm = () => {
             <FaLock className="icon" />
           </div>
           <button type="submit">Register</button>
-          <div className="register-link">
+          <div className="login-link">
             <p>
               Already have an account? <Link to="/login">Login</Link>
             </p>

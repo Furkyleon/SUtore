@@ -1,6 +1,6 @@
-// Layout.jsx
 import React from 'react';
-import Navbar from './NavigationBar/navbar';
+import Navbar from './NavigationBar/Navbar';
+import "./Layout.css";
 import { Outlet, useLocation } from 'react-router-dom';
 
 const Layout = () => {
@@ -14,13 +14,10 @@ const Layout = () => {
 
   return (
     <div className="layout">
-      {shouldShowNavbar && <Navbar />} {/* Render Navbar conditionally */}
+      {shouldShowNavbar && <Navbar />}
       <main className="content">
         <Outlet />
       </main>
-      <footer className="footer">
-        <p>&copy; 2024 SUtore. All rights reserved.</p>
-      </footer>
     </div>
   );
 };

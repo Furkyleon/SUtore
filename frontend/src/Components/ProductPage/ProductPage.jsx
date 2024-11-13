@@ -42,7 +42,7 @@ const ProductPage = () => {
   };
 
   return (
-    <div className="product-page">
+    <div className="product-page-container">
       <div className="product-full-width">
         <div className="product-image-section">
           <img src={product.image} alt={product.name} />

@@ -1,7 +1,5 @@
-// MainPage.jsx
 import React from 'react';
 import './MainPage.css';
-import Navbar from '../NavigationBar/navbar'; // Import Navbar correctly
 import StorePage from '../Store/StorePage';
 
 const MainPage = () => {
@@ -11,8 +9,6 @@ const MainPage = () => {
 
   return (
     <div className="main-page">
-      <Navbar /> {/* Navbar component is now reusable */}
-
       <main className="content">
         <section id="hero" className="hero">
           <h2>SUtore</h2>
