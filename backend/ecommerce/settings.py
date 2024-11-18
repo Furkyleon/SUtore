@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-6nlj0y!n%wxx=(7yu4bq!*pxj#mc7h7&0n=-52mgd@tul!_nu%
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Your React frontend's URL
+]
 
 
 # settings.py
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'ecommerce', 
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'

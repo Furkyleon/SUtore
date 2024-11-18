@@ -85,6 +85,7 @@ def register(request):
         }
     }, status=status.HTTP_201_CREATED)
 
+@csrf_exempt
 @api_view(['POST'])
 def login(request):
     serializer = LoginSerializer(data=request.data)
