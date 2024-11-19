@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import "./navbar.css";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,26 +25,30 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <nav className="nav-left">
-        <ul>
-          <li>
-            <a href="/">Main Page</a>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <p onClick={toggleSidebar}>Categories</p>
-          </li>
-        </ul>
-      </nav>
-
-      <div className="nav-right">
-        <Link to="/login">Login</Link>
-        <Link to="/register">Register</Link>
-        <Link to="/cart">Cart</Link>
+      <div className="nav-left">
+        <a href="/">
+          <img src="/navbarlogo.png" alt="" className="logo" />
+        </a>
+        <a href="/" className="SUtore">
+          SUtore
+        </a>
+        <a href="javascript:void(0)" onClick={toggleSidebar}>
+          Categories
+        </a>
       </div>
 
-      {/* Sidebar for categories */}
+      <div className="nav-right">
+        <a href="/login" className="SUtore">
+          Login
+        </a>
+        <a href="/register" className="SUtore">
+          Register
+        </a>
+        <a href="/cart" className="SUtore">
+          <img src="/navbarlogo.png" alt="" className="logo"/>
+        </a>
+      </div>
+
       <div
         className={`sidebar ${isSidebarOpen ? "sidebar-open" : ""}`}
         ref={sidebarRef}

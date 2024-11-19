@@ -1,8 +1,12 @@
 .layout footer {
+  font-family: Arial, sans-serif;
   background-color: #01236a;
   color: #fff;
   text-align: center;
   padding: 10px;
+  height: 40px;
   width: 100%;
   max-width: 100%;
+  bottom: 0;
+  left: 0;
 }

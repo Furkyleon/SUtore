@@ -2,12 +2,13 @@
   font-family: Arial, sans-serif;
   background-color: #01236a;
   color: #fff;
-  padding: 0 20px;
+  padding: 0px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: fixed;
   top: 0;
+  left: 0; /* Sağa kayıklığı düzeltmek için */
   width: 100%;
   height: 60px;
   z-index: 1000;
@@ -16,24 +17,24 @@
 .navbar .nav-left {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
-.navbar .nav-left ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
-.navbar .nav-left ul li {
-  margin: 0 15px;
-}
-
-.navbar .nav-left ul li a {
+.navbar .nav-left a {
   color: #fff;
   text-decoration: none;
   padding: 5px 10px;
+}
+
+.navbar .nav-left .logo {
+  width: 45px;
+  margin-right: -25px;
+}
+
+.navbar .nav-left a.SUtore {
+  color: #fff;
+  font-weight: bold;
+  font-size: 30px;
 }
 
 .navbar .nav-right {
@@ -46,6 +47,10 @@
   color: #fff;
   text-decoration: none;
   padding: 5px 10px;
+}
+
+.navbar .nav-right .logo {
+  width: 30px;
 }
 
 .navbar .sidebar {
