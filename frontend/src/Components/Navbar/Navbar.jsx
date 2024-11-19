@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
+import { IoMdSearch } from "react-icons/io";
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
   const sidebarRef = useRef(null);
 
   const toggleSidebar = () => {
@@ -14,6 +16,16 @@ const Navbar = () => {
     if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
       setIsSidebarOpen(false);
     }
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    console.log("Search Term:", searchTerm); // Handle search logic here
+    // Example: Navigate to a search results page or filter products
   };
 
   useEffect(() => {
@@ -32,9 +44,24 @@ const Navbar = () => {
         <a href="/" className="SUtore">
           SUtore
         </a>
-        <a href="javascript:void(0)" onClick={toggleSidebar}>
+        <a className = "animation" href="javascript:void(0)" onClick={toggleSidebar}>
           Categories
         </a>
+      </div>
+
+      <div className="nav-center">
+        <form className="search-bar" onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <button type="submit" className="search-button">
+          <IoMdSearch />
+          </button>
+        </form>
       </div>
 
       <div className="nav-right">
@@ -45,7 +72,7 @@ const Navbar = () => {
           Register
         </a>
         <a href="/cart" className="SUtore">
-          <img src="/navbarlogo.png" alt="" className="logo"/>
+          <img src="/navbarlogo.png" alt="" className="logo" />
         </a>
       </div>
 
