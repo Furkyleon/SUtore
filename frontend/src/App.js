@@ -8,6 +8,7 @@ import CategoryPage from "./Components/Categories/CategoryPage";
 import ProductPage from "./Components/ProductPage/ProductPage";
 import StorePage from "./Components/Store/StorePage";
 import Cart from "./Components/Cart/Cart";
+import PaymentPage from "./Components/PaymentPage/PaymentPage";
 
 function App() {
   // State to store cart items
@@ -41,6 +42,7 @@ function App() {
           <Route path="store" element={<StorePage />} />
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
+          <Route path="payment" element={<PaymentPage />} />
           <Route
             path="categories/:categoryName"
             element={<CategoryPage addToCart={addToCart} />}
@@ -50,6 +52,7 @@ function App() {
             path="cart"
             element={<Cart cartItems={cartItems} handlePurchase={handlePurchase} />}
           />
+
         </Route>
       </Routes>
     </Router>
