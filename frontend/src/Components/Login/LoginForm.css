@@ -8,17 +8,22 @@ body {
 .login-form-container {
   text-align: center;
   margin-top: 50px;
+  font-family: Arial, sans-serif;
 }
 
 .login-form-container .page-title {
-  margin-bottom: -10px;
+  margin-bottom: 20px;
 }
 
 .login-form-container .page-title a {
   font-size: 56px;
   font-weight: bold;
-  color: #01236A;
+  color: #01236a;
   text-decoration: none;
+}
+
+.login-form-container .page-title a:hover {
+  color: #005da9;
 }
 
 .login-form-container .wrapper {
@@ -57,6 +62,12 @@ body {
   padding: 20px 45px 20px 20px;
 }
 
+.login-form-container .error-message {
+  margin-bottom: 20px;
+  color: #880000;
+  font-weight: bold;
+}
+
 .login-form-container .input-box input::placeholder {
   color: #fff;
 }
@@ -79,7 +90,7 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   font-size: 16px;
-  color: #01236A;
+  color: #01236a;
   font-weight: 700;
   margin-bottom: 20px;
 }

@@ -66,7 +66,9 @@ const LoginForm = () => {
             />
             <FaLock className="icon" />
           </div>
+
           {errorMessage && <p className="error-message">{errorMessage}</p>}
+          
           <button type="submit">Login</button>
           <div className="register-link">
             <p>
