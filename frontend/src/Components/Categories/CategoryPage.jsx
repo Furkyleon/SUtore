@@ -28,7 +28,6 @@ const CategoryPage = ({ addToCart }) => {
     <div className="category-page-wrapper">
       <h1>{categoryName}</h1>
 
-      {/* Sort Dropdown */}
       <div className="sort-dropdown">
         <label htmlFor="sortOrder">Sort by Price: </label>
         <select
