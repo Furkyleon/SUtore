@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./RegisterForm.css";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +27,7 @@ const RegisterForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         alert(`Welcome, ${responseData.user.username || "user"}!`);
-        // Optionally, redirect the user to another page
+        navigate("/"); // Redirect to the main page
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Register failed");
@@ -52,7 +53,6 @@ const RegisterForm = () => {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              required
             />
             <FaUser className="icon" />
           </div>
@@ -62,7 +62,6 @@ const RegisterForm = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
             <FaEnvelope className="icon" />
           </div>
@@ -72,7 +71,6 @@ const RegisterForm = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
             <FaLock className="icon" />
           </div>

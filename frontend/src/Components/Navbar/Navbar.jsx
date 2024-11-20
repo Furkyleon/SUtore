@@ -44,7 +44,11 @@ const Navbar = () => {
         <a href="/" className="SUtore">
           SUtore
         </a>
-        <a className = "animation" href="javascript:void(0)" onClick={toggleSidebar}>
+        <a
+          className="animation"
+          href="javascript:void(0)"
+          onClick={toggleSidebar}
+        >
           Categories
         </a>
       </div>
@@ -59,7 +63,7 @@ const Navbar = () => {
             onChange={handleSearchChange}
           />
           <button type="submit" className="search-button">
-          <IoMdSearch />
+            <IoMdSearch />
           </button>
         </form>
       </div>
@@ -96,8 +100,8 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/categories/TV" onClick={toggleSidebar}>
-              TV <span className="arrow">›</span>
+            <Link to="/categories/Television" onClick={toggleSidebar}>
+              Television <span className="arrow">›</span>
             </Link>
           </li>
           <li>
@@ -106,7 +110,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/categories/White" onClick={toggleSidebar}>
+            <Link to="/categories/White Goods" onClick={toggleSidebar}>
               White Goods <span className="arrow">›</span>
             </Link>
           </li>
@@ -121,18 +125,13 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/categories/Photo" onClick={toggleSidebar}>
-              Photo <span className="arrow">›</span>
+            <Link to="/categories/Photography" onClick={toggleSidebar}>
+              Photography <span className="arrow">›</span>
             </Link>
           </li>
           <li>
-            <Link to="/categories/Selfcare" onClick={toggleSidebar}>
+            <Link to="/categories/Self Care" onClick={toggleSidebar}>
               Self Care <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Outdoor" onClick={toggleSidebar}>
-              Outdoor <span className="arrow">›</span>
             </Link>
           </li>
         </ul>

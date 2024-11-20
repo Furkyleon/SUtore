@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
 import { FaUser, FaLock } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -14,7 +15,6 @@ const LoginForm = () => {
     const data = { email, password };
 
     try {
-
       const response = await fetch("http://127.0.0.1:8000/login/", {
         method: "POST",
         headers: {
@@ -26,7 +26,7 @@ const LoginForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         alert(`Welcome, ${responseData.user.username || "user"}!`);
-        // Optionally, redirect the user to another page
+        navigate("/"); // Redirect to the main page
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Login failed");
@@ -52,7 +52,6 @@ const LoginForm = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
             <FaUser className="icon" />
           </div>
@@ -62,13 +61,12 @@ const LoginForm = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
             <FaLock className="icon" />
           </div>
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-          
+
           <button type="submit">Login</button>
           <div className="register-link">
             <p>

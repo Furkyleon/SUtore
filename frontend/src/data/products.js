@@ -7,7 +7,7 @@ const products = [
     price: "25000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 9,
@@ -16,7 +16,7 @@ const products = [
     price: "28000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 10,
@@ -25,7 +25,7 @@ const products = [
     price: "15000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 11,
@@ -34,7 +34,7 @@ const products = [
     price: "30000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 12,
@@ -43,7 +43,7 @@ const products = [
     price: "5000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 101,
@@ -52,7 +52,7 @@ const products = [
     price: "3000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 102,
@@ -61,7 +61,7 @@ const products = [
     price: "50000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
   {
     id: 103,
@@ -70,7 +70,7 @@ const products = [
     price: "25000 TL",
     image: "/images/1.png",
     category: "Telephone",
-    inCart: false
+    inCart: false,
   },
 
   // TV category
@@ -80,8 +80,8 @@ const products = [
     description: "Great television.",
     price: "35000 TL",
     image: "/images/2.png",
-    category: "TV",
-    inCart: false
+    category: "Television",
+    inCart: false,
   },
   {
     id: 13,
@@ -89,8 +89,8 @@ const products = [
     description: "4K Smart TV.",
     price: "40000 TL",
     image: "/images/2.png",
-    category: "TV",
-    inCart: false
+    category: "Television",
+    inCart: false,
   },
   {
     id: 14,
@@ -98,8 +98,8 @@ const products = [
     description: "High-resolution LED TV.",
     price: "30000 TL",
     image: "/images/2.png",
-    category: "TV",
-    inCart: false
+    category: "Television",
+    inCart: false,
   },
   {
     id: 15,
@@ -107,8 +107,8 @@ const products = [
     description: "Excellent color quality.",
     price: "45000 TL",
     image: "/images/2.png",
-    category: "TV",
-    inCart: false
+    category: "Television",
+    inCart: false,
   },
   {
     id: 16,
@@ -116,8 +116,8 @@ const products = [
     description: "Immersive viewing experience.",
     price: "37000 TL",
     image: "/images/2.png",
-    category: "TV",
-    inCart: false
+    category: "Television",
+    inCart: false,
   },
 
   // Laptop category
@@ -128,7 +128,7 @@ const products = [
     price: "50000 TL",
     image: "/images/3.png",
     category: "Laptop",
-    inCart: false
+    inCart: false,
   },
   {
     id: 17,
@@ -137,7 +137,7 @@ const products = [
     price: "60000 TL",
     image: "/images/3.png",
     category: "Laptop",
-    inCart: false
+    inCart: false,
   },
   {
     id: 18,
@@ -146,7 +146,7 @@ const products = [
     price: "45000 TL",
     image: "/images/3.png",
     category: "Laptop",
-    inCart: false
+    inCart: false,
   },
   {
     id: 19,
@@ -155,7 +155,7 @@ const products = [
     price: "55000 TL",
     image: "/images/3.png",
     category: "Laptop",
-    inCart: false
+    inCart: false,
   },
   {
     id: 20,
@@ -164,7 +164,7 @@ const products = [
     price: "48000 TL",
     image: "/images/3.png",
     category: "Laptop",
-    inCart: false
+    inCart: false,
   },
 
   // Consoles category
@@ -175,7 +175,7 @@ const products = [
     price: "20000 TL",
     image: "/images/4.png",
     category: "Consoles",
-    inCart: false
+    inCart: false,
   },
   {
     id: 8,
@@ -184,7 +184,7 @@ const products = [
     price: "40000 TL",
     image: "/images/8.png",
     category: "Consoles",
-    inCart: false
+    inCart: false,
   },
   {
     id: 21,
@@ -193,7 +193,7 @@ const products = [
     price: "30000 TL",
     image: "/images/9.png",
     category: "Consoles",
-    inCart: false
+    inCart: false,
   },
   {
     id: 22,
@@ -202,7 +202,7 @@ const products = [
     price: "22000 TL",
     image: "/images/4.png",
     category: "Consoles",
-    inCart: false
+    inCart: false,
   },
   {
     id: 23,
@@ -211,7 +211,7 @@ const products = [
     price: "10000 TL",
     image: "/images/10.png",
     category: "Consoles",
-    inCart: false
+    inCart: false,
   },
 
   // Accessory category
@@ -221,8 +221,8 @@ const products = [
     description: "Hungry solver.",
     price: "1500 TL",
     image: "/images/5.png",
-    category: "White",
-    inCart: false
+    category: "White Goods",
+    inCart: false,
   },
   {
     id: 24,
@@ -231,7 +231,7 @@ const products = [
     price: "2500 TL",
     image: "/images/11.png",
     category: "Accessory",
-    inCart: false
+    inCart: false,
   },
   {
     id: 25,
@@ -240,7 +240,7 @@ const products = [
     price: "3500 TL",
     image: "/images/12.png",
     category: "Accessory",
-    inCart: false
+    inCart: false,
   },
   {
     id: 26,
@@ -249,7 +249,7 @@ const products = [
     price: "500 TL",
     image: "/images/13.png",
     category: "Accessory",
-    inCart: false
+    inCart: false,
   },
   {
     id: 27,
@@ -258,7 +258,7 @@ const products = [
     price: "1500 TL",
     image: "/images/14.png",
     category: "Accessory",
-    inCart: false
+    inCart: false,
   },
 
   // White goods category
@@ -268,8 +268,8 @@ const products = [
     description: "Clean clothes.",
     price: "15000 TL",
     image: "/images/6.png",
-    category: "White",
-    inCart: false
+    category: "White Goods",
+    inCart: false,
   },
   {
     id: 7,
@@ -277,8 +277,8 @@ const products = [
     description: "Clean dishes.",
     price: "17000 TL",
     image: "/images/7.png",
-    category: "White",
-    inCart: false
+    category: "White Goods",
+    inCart: false,
   },
   {
     id: 28,
@@ -286,8 +286,8 @@ const products = [
     description: "Keeps food fresh.",
     price: "20000 TL",
     image: "/images/15.png",
-    category: "White",
-    inCart: false
+    category: "White Goods",
+    inCart: false,
   },
   {
     id: 29,
@@ -295,8 +295,8 @@ const products = [
     description: "Heats food quickly.",
     price: "8000 TL",
     image: "/images/16.png",
-    category: "White",
-    inCart: false
+    category: "White Goods",
+    inCart: false,
   },
   {
     id: 30,
@@ -304,9 +304,9 @@ const products = [
     description: "Perfect for baking.",
     price: "12000 TL",
     image: "/images/17.png",
-    category: "White",
-    inCart: false
-  }
+    category: "White Goods",
+    inCart: false,
+  },
 ];
 
 export default products;
