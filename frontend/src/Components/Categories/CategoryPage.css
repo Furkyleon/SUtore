@@ -84,3 +84,35 @@ body {
   text-decoration: none;
   color: inherit;
 }
+
+/* Add styling for the sorting dropdown */
+.sort-dropdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.sort-dropdown label {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #01236a;
+}
+
+.sort-dropdown select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background-color: #f4f4f4;
+  cursor: pointer;
+  color: #01236a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sort-dropdown select:hover {
+  border-color: #01236a;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+

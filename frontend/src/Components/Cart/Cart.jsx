@@ -27,9 +27,10 @@ const Cart = ({ cartItems, handlePurchase, addToCart }) => {
           <div className="cart-total">
             <span>Total: {calculateTotal()}TL</span>
           </div>
-          <button className="purchase-button" onClick={handlePurchase}>
-            Purchase
-          </button>
+          <a href="/payment">
+              <button className="purchase-button" onClick={handlePurchase}>Purchase</button>
+          </a>
+          <a href="/">SUtore</a>
         </>
       ) : (
         <p className="empty-cart-message">Your cart is empty.</p>
