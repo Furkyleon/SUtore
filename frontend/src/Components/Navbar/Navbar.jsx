@@ -5,16 +5,28 @@ import { IoMdSearch } from "react-icons/io";
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // State for search input
   const sidebarRef = useRef(null);
+  const sidebarRef2 = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
+  const toggleSidebar2 = () => {
+    setIsSidebarOpen2((prevState) => !prevState);
+  };
+
   const handleClickOutside = (event) => {
     if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
       setIsSidebarOpen(false);
+    }
+  };
+
+  const handleClickOutside2 = (event) => {
+    if (sidebarRef2.current && !sidebarRef2.current.contains(event.target)) {
+      setIsSidebarOpen2(false);
     }
   };
 
@@ -69,14 +81,16 @@ const Navbar = () => {
       </div>
 
       <div className="nav-right">
-        <a href="/login" className="SUtore">
-          Login
+        <a
+          className="animation2"
+          href="javascript:void(0)"
+          onClick={toggleSidebar2}
+        >
+          <img src="/loginregister.png" alt="" className="logo" />
         </a>
-        <a href="/register" className="SUtore">
-          Register
-        </a>
+
         <a href="/cart" className="SUtore">
-          <img src="/navbarlogo.png" alt="" className="logo" />
+          <img src="/navbarlogo.png" alt="" className="logo2" />
         </a>
       </div>
 
@@ -132,6 +146,28 @@ const Navbar = () => {
           <li>
             <Link to="/categories/Self Care" onClick={toggleSidebar}>
               Self Care <span className="arrow">›</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        className={`sidebar2 ${isSidebarOpen2 ? "sidebar2-open" : ""}`}
+        ref={sidebarRef2}
+      >
+        <button className="close-button2" onClick={toggleSidebar2}>
+          ×
+        </button>
+        <h2>Login / Register:</h2>
+        <ul className="sidebar-menu2">
+          <li>
+            <Link to="/login" onClick={toggleSidebar2}>
+              Login
+            </Link>
+          </li>
+          <li>
+            <Link to="/register" onClick={toggleSidebar2}>
+              Register
             </Link>
           </li>
         </ul>

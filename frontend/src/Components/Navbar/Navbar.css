@@ -71,6 +71,11 @@
 }
 
 .navbar .nav-right .logo {
+  width: 30px;
+  transition: transform 0.3s ease;
+}
+
+.navbar .nav-right .logo2 {
   width: 35px;
   transition: transform 0.3s ease;
 }
@@ -165,6 +170,83 @@
 .navbar .sidebar-menu li a:hover .arrow {
   color: #fff;
   transform: rotate(90deg);
+}
+
+.navbar .sidebar2 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 75%;
+  max-width: 320px;
+  background-color: #f9f9f9;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+  overflow-y: auto;
+}
+
+.navbar .sidebar2-open {
+  transform: translateX(0);
+}
+
+.navbar .close-button2 {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #ff5f5f;
+  align-self: flex-end;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar .close-button2:hover {
+  color: #ff9800;
+  transform: rotate(90deg);
+}
+
+.navbar .sidebar2 h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #01236a;
+  text-shadow: 1px 1px 2px #f9f9f9;
+}
+
+.navbar .sidebar-menu2 {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar .sidebar-menu2 li {
+  margin: 15px 0;
+}
+
+.navbar .sidebar-menu2 li a {
+  color: #01236a;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.navbar .sidebar-menu2 li a:hover {
+  background-color: #01236a;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .search-bar {
