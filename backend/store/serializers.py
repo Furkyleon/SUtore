@@ -84,3 +84,34 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+        
+        
+class OrderItemSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'subtotal', 'date_added']
+        
+    def validate(self, data):
+        if data['quantity'] > data['product'].stock:
+            raise serializers.ValidationError("Ordered quantity exceeds available stock.")
+        return data
+    
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True, source='order_items')  # Ensure `source` matches related_name in OrderItem model
+
+    class Meta:
+        model = Order
+        fields = ['id', 'customer', 'date_ordered', 'complete', 'transaction_id', 'status', 'items']  # Ensure `items` is included here
+
+class OrderHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderHistory
+        fields = ['id', 'customer', 'status', 'update_date', 'notes', 'total_amount']
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'product', 'rating', 'comment', 'comment_status', 'date_added']

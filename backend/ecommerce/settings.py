@@ -27,9 +27,7 @@ SECRET_KEY = 'django-insecure-6nlj0y!n%wxx=(7yu4bq!*pxj#mc7h7&0n=-52mgd@tul!_nu%
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Your React frontend's URL
-]
+
 
 
 # settings.py
@@ -48,8 +46,8 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'rest_framework',
     'rest_framework.authtoken',
+    'phonenumber_field',
     'ecommerce', 
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
@@ -69,9 +66,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / "templates"
+            BASE_DIR / "templates",  # Global templates directory
         ],
-        'APP_DIRS': True,
+        'APP_DIRS': True,  # Look for templates in app-specific directories
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -82,6 +79,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
@@ -134,8 +132,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'frontend'),
+    os.path.join(BASE_DIR, 'static')
 ]
 
 # Default primary key field type
@@ -152,3 +149,19 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    # Add any custom backends if you have them
+]
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'suleyman200350@gmail.com'
+EMAIL_HOST_PASSWORD = 'rsvl wpta pgqq wbir'
+DEFAULT_FROM_EMAIL = 'suleyman200350@gmail.com'

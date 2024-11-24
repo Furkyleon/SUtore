@@ -1,0 +1,18 @@
+<!-- order_confirmation_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Confirmation</title>
+</head>
+<body>
+    <h2>Thank you for your order, {{ order.customer.name }}!</h2>
+    <p>Your order #{{ order.id }} has been processed successfully. Please find the attached invoice.</p>
+    <p>Order Details:</p>
+    <ul>
+        {% for item in order.order_items.all %}
+            <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Price: {{ item.subtotal }}</li>
+        {% endfor %}
+    </ul>
+    <p>Total: ${{ order.get_total_cost|floatformat:2  }}</p>
+</body>
+</html>
