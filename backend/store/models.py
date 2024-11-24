@@ -36,8 +36,6 @@ class CustomUserManager(BaseUserManager):
         except self.model.DoesNotExist:
             return None
         
-        
-        
 
 class CustomUser(AbstractUser):
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -157,3 +155,25 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s review of {self.product.name} - Rating: {self.rating}"
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wishlist")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="wishlisted_by")
+    added_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')  # Prevent duplicate wishlist entries
+
+    def __str__(self):
+        return f"Wishlist item for {self.user.username}: {self.product.name}"
+
+"""class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:20]}"
+"""
+

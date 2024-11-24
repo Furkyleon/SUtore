@@ -97,8 +97,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Ordered quantity exceeds available stock.")
         return data
     
-    
-
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True, source='order_items')  # Ensure `source` matches related_name in OrderItem model
 
@@ -115,3 +113,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'user', 'product', 'rating', 'comment', 'comment_status', 'date_added']
+
+class WishlistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'user', 'product', 'added_date']
+        read_only_fields = ['user', 'added_date']

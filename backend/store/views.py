@@ -483,9 +483,6 @@ def checkout(request):
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_review(request, product_id):
@@ -518,3 +515,80 @@ def get_reviews_by_product(request, product_id):
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_wishlist(request):
+    """Retrieve the current user's wishlist."""
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    if not wishlist_items.exists():
+        return Response({'message': 'Your wishlist is empty.'}, status=status.HTTP_200_OK)
+
+    serializer = WishlistSerializer(wishlist_items, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_to_wishlist(request):
+    """Add a product to the user's wishlist."""
+    product_id = request.data.get('product_id')  # Extract product_id from JSON body
+
+    if not product_id:
+        return Response({'error': 'Product ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        product = Product.objects.get(id=product_id)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
+
+        if created:
+            return Response({'message': 'Product added to wishlist.'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Product is already in wishlist.'}, status=status.HTTP_200_OK)
+
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_from_wishlist(request):
+    """Remove a product from the user's wishlist."""
+    product_id = request.data.get('product_id')  # Extract product_id from the request body
+
+    if not product_id:
+        return Response({'error': 'Product ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        wishlist_item = Wishlist.objects.get(user=request.user, product_id=product_id)
+        wishlist_item.delete()
+        return Response({'message': 'Product removed from wishlist.'}, status=status.HTTP_204_NO_CONTENT)
+    except Wishlist.DoesNotExist:
+        return Response({'error': 'Product not found in your wishlist.'}, status=status.HTTP_404_NOT_FOUND)
+
+"""
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_notifications(request):
+    Get notifications for the logged-in user.
+    notifications = Notification.objects.filter(user=request.user, is_read=False)
+    response_data = [
+        {
+            'id': notification.id,
+            'message': notification.message,
+            'created_at': notification.created_at,
+            'is_read': notification.is_read,
+        }
+        for notification in notifications
+    ]
+    return Response(response_data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notifications_as_read(request):
+    Mark notifications as read.
+    notification_ids = request.data.get('notification_ids', [])
+    if not notification_ids:
+        return Response({'error': 'No notification IDs provided'}, status=400)
+
+    Notification.objects.filter(id__in=notification_ids, user=request.user).update(is_read=True)
+    return Response({'message': 'Notifications marked as read.'})
+"""

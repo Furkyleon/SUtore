@@ -24,6 +24,11 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
+    path('wishlist/', views.get_wishlist, name='get_wishlist'),
+    path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('notifications/', get_notifications, name='get_notifications'),
+    path('notifications/mark-read/', mark_notifications_as_read, name='mark_notifications_as_read'),
 ]   
 
     #path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
