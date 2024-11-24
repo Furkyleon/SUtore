@@ -72,6 +72,9 @@ class Product(models.Model):
     serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)  # Unique serial number
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
+
+    # description needed
+    # image needed
         
     def _str_(self):
         return self.name

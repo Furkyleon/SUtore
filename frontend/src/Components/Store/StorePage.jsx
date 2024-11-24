@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./StorePage.css";
-import products from "../../data/products";
 
 const StorePage = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/products/get_all/")
+      .then((response) => {
+        if (!response.ok) {
+          console.error("HTTP Error:", response.status, response.statusText);
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => setProducts(data))
+      .catch((error) => console.error("Fetch Error:", error));
+  }, []);
+
   return (
     <div className="store-page-wrapper">
       <h1>Products</h1>
@@ -14,7 +28,8 @@ const StorePage = () => {
               <img src={product.image} alt={product.name} />
               <h2>{product.name}</h2>
             </Link>
-            <p>{product.description}</p>
+            {/*<p>{product.description}</p>*/}
+            <p>{product.category}</p>
             <p className="price">{product.price}</p>
             <button>Add to Cart</button>
           </div>
