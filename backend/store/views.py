@@ -25,7 +25,12 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import pdfkit
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import CustomUser
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 # bu alttakilere bakılacak
@@ -36,12 +41,7 @@ def store(request):
      return render(request, 'store/store.html', context)
 
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from .models import CustomUser
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+
 
 @csrf_exempt  # Exempt from CSRF verification
 @api_view(['POST'])
@@ -358,6 +358,50 @@ def get_order_items(request):
 
 
 @api_view(['GET'])
+def get_subtotal(request):
+    """
+    API to calculate and return the subtotal of all products in an active order's order items,
+    using Product's get_subtotal method.
+    """
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "Authentication credentials were not provided."},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    try:
+        # Retrieve the active order for the logged-in customer
+        order = Order.objects.get(customer=request.user, complete=False)
+        
+        # Calculate subtotals for all order items using Product's get_subtotal method
+        order_items = order.order_items.all()
+        subtotals = []
+        total_subtotal = 0.0
+
+        for item in order_items:
+            if item.product is not None:
+                subtotal = (item.product.price * (1 - (item.product.discount/100)) * item.quantity)
+                subtotals.append({
+                    "product_name": item.product.name,
+                    "quantity": item.quantity,
+                    "price_per_item": item.product.price,
+                    "subtotal": subtotal
+                })
+                total_subtotal += subtotal
+
+        return Response(
+            {"order_subtotal": total_subtotal, "details": subtotals},
+            status=status.HTTP_200_OK
+        )
+    except Order.DoesNotExist:
+        return Response(
+            {"error": "No active order found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+
+@api_view(['GET'])
 def get_order(request):
     if not request.user.is_authenticated:
         return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -516,6 +560,7 @@ def get_reviews_by_product(request, product_id):
     serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+<<<<<<< HEAD
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
@@ -592,3 +637,70 @@ def mark_notifications_as_read(request):
     Notification.objects.filter(id__in=notification_ids, user=request.user).update(is_read=True)
     return Response({'message': 'Notifications marked as read.'})
 """
+=======
+
+@api_view(['POST'])
+def apply_discount(request):
+    """
+    API endpoint to allow a Sales Manager to apply a discount to a product using the product's serial number.
+    """
+    user = request.user
+
+    """
+    # Ensure the user is a Sales Manager
+    if not isinstance(user, CustomUser) or user.role != 'sales_manager':
+        return Response(
+            {"error": "You do not have permission to perform this action."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    """
+    # Validate the request payload
+    serial_number = request.data.get('serial_number')
+    discount_percentage = request.data.get('discount_percentage')
+
+    if not serial_number or discount_percentage is None:
+        return Response(
+            {"error": "Both 'serial_number' and 'discount_percentage' are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        discount_percentage = float(discount_percentage)
+        if discount_percentage < 0 or discount_percentage > 100:
+            return Response(
+                {"error": "Discount percentage must be between 0 and 100."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    except ValueError:
+        return Response(
+            {"error": "Discount percentage must be a valid number."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Fetch the product using the serial number
+    try:
+        product = Product.objects.get(serial_number=serial_number)
+        product.discount = discount_percentage
+    except Product.DoesNotExist:
+        return Response(
+            {"error": "Product with the given serial number not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    original_price = product.price
+    discount_price = original_price * (1 - discount_percentage / 100)
+    product.discount_price = discount_price
+    product.save()
+
+    return Response(
+        {
+            "message": f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price}).",
+            "serial_number": product.serial_number,
+            "product_name": product.name,
+            "original_price": original_price,
+            "discounted_price": product.discount_price,
+            "price": product.price
+        },
+        status=status.HTTP_200_OK
+    )
+>>>>>>> 07550b4c86f10eaf8ff50a26eeced016196f57e8

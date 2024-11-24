@@ -46,6 +46,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'name',
             'price',
             'digital',
+            'discount',
             'stock',
             'popularity',
             'model',
@@ -53,6 +54,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'warranty_status',
             'distributor_info',
             'category',
+            'discount_price',
         ]
         
     def validate_price(self, value):

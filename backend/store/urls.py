@@ -18,17 +18,23 @@ urlpatterns = [
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
+    path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
     path('order/items/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
     path('order/', views.get_order, name='get_order'),  # Endpoint for order details
     path('order/history/', views.order_history, name='order_history'),  # URL for viewing order history
     path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
+<<<<<<< HEAD
     path('wishlist/', views.get_wishlist, name='get_wishlist'),
     path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('notifications/', get_notifications, name='get_notifications'),
     path('notifications/mark-read/', mark_notifications_as_read, name='mark_notifications_as_read'),
+=======
+    path('apply-discount/', views.apply_discount, name='apply_discount'),
+    
+>>>>>>> 07550b4c86f10eaf8ff50a26eeced016196f57e8
 ]   
 
     #path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
