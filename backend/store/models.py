@@ -105,7 +105,13 @@ class Product(models.Model):
     serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)  # Unique serial number
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
+<<<<<<< HEAD
     discount_price = models.FloatField(default=0, null=True)
+=======
+
+    # description needed
+    # image needed
+>>>>>>> 9fba1f75e08f4eaa054d5b35cf6ae84cbfcbf717
         
     def _str_(self):
         return self.name
