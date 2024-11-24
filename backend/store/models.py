@@ -4,8 +4,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
 from django.conf import settings
-
 from django.contrib.auth.models import BaseUserManager
+from django.db.models import Sum
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import F, Q
 
 
 class CustomUserManager(BaseUserManager):
@@ -52,6 +55,35 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()  # Assign the custom manager
 
 
+
+class SalesManager:
+    def __init__(self, user):
+        """Initialize with a user object."""
+        if not isinstance(user, CustomUser):
+            raise ValueError("User must be an instance of CustomUser.")
+        if user.role != 'sales_manager':
+            raise PermissionError("The user is not authorized as a Sales Manager.")
+        self.user = user
+
+    def apply_discount(self, product, discount_percentage):
+        """
+        Apply a discount to a product.
+        :param product: Product instance.
+        :param discount_percentage: Discount percentage (0-100).
+        """
+        if discount_percentage < 0 or discount_percentage > 100:
+            raise ValueError("Discount percentage must be between 0 and 100.")
+        if not isinstance(product, Product):
+            raise ValueError("Invalid product instance.")
+        # Calculate discounted price
+        original_price = product.price
+        discounted_price = original_price * (1 - discount_percentage / 100)
+        product.price = round(discounted_price, 2)
+        product.save()
+        return f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price})."
+    
+    
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -65,6 +97,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     price = models.FloatField()
     digital = models.BooleanField(default=False,null=True, blank=True)
+    discount = models.FloatField(default=0.0)  # Discount percentage (0-100)
     category = models.CharField(max_length=200, null=True)  # Make sure to have this
     stock = models.IntegerField(default=0) 
     popularity = models.IntegerField(default=0)  # Tracks popularity, based on views or purchases
@@ -72,9 +105,15 @@ class Product(models.Model):
     serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)  # Unique serial number
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
+    discount_price = models.FloatField(default=0, null=True)
         
     def _str_(self):
         return self.name
+    
+    @property
+    def discounted_price(self):
+        """Calculate and return the discounted price."""
+        return self.price * (1 - self.discount / 100)
      
     
 class OrderHistory(models.Model):
@@ -92,7 +131,7 @@ class OrderHistory(models.Model):
     )
 
     orders = models.ManyToManyField('Order', related_name="order_histories")  # Allows multiple orders per history
-    
+
     status = models.CharField(max_length=50, choices=ORDER_STATUS_CHOICES)
     update_date = models.DateTimeField(default=timezone.now)
     notes = models.TextField(blank=True, null=True)
@@ -122,6 +161,24 @@ class Order(models.Model):
     @property
     def get_total_cost(self):
         return sum(item.subtotal for item in self.order_items.all())
+    
+    @classmethod
+    def calculate_revenue(cls, start_date, end_date):
+        """Calculate revenue from orders within the date range."""
+        orders = cls.objects.filter(date_ordered__range=(start_date, end_date), complete=True)
+        return sum(order.get_total_cost for order in orders)
+
+    @classmethod
+    def calculate_profit_or_loss(cls, start_date, end_date):
+        """Calculate profit/loss in the given date range."""
+        orders = cls.objects.filter(date_ordered__range=(start_date, end_date), complete=True)
+        revenue = sum(order.get_total_cost for order in orders)
+        cost = sum(
+            item.product.price * item.quantity  # Assuming `price` is the cost price
+            for order in orders
+            for item in order.order_items.all()
+        )
+        return revenue - cost  # Positive for profit, negative for loss
 
 
 class OrderItem(models.Model):
@@ -137,6 +194,8 @@ class OrderItem(models.Model):
 
     def can_review(self):
         return self.order.complete  # Only allows reviews if the order is complete
+    
+
 
     
 class Review(models.Model):
