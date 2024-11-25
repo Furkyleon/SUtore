@@ -29,8 +29,7 @@ const StorePage = () => {
               <h2>{product.name}</h2>
             </Link>
             <p>{product.description}</p>
-            <p>{product.category}</p>
-            <p className="price">{product.price}</p>
+            <p className="price">{product.price + " TL"}</p>
             <button>Add to Cart</button>
           </div>
         ))}
