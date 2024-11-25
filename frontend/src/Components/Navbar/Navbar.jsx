@@ -169,6 +169,12 @@ const Navbar = () => {
             <Link to="/register" onClick={toggleSidebar2}>
               Register
             </Link>
+          </li> 
+          <li> 
+          <h2>Order History:</h2>
+            <Link to="/orderhistory" onClick={toggleSidebar2}>
+              Order History
+            </Link>
           </li>
         </ul>
       </div>
