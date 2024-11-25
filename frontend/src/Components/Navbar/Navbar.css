@@ -155,7 +155,7 @@
   align-items: center;
   padding: 12px 15px;
   border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(207, 207, 207, 0.616);
   transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
 }
@@ -225,13 +225,9 @@
 }
 
 .navbar .sidebar-menu2 {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.navbar .sidebar-menu2 li {
-  margin: 15px 0;
+  display: flex;
+  flex-direction: column; /* Ensure items are stacked vertically */
+  gap: 15px; /* Space between items */
 }
 
 .navbar .sidebar-menu2 li a {
@@ -244,9 +240,14 @@
   align-items: center;
   padding: 12px 15px;
   border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(207, 207, 207, 0.616);
   transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+
+.navbar .sidebar-menu2 li:last-child {
+  margin-bottom: 0; /* Ensure no extra margin for the last item */
 }
 
 .navbar .sidebar-menu2 li a:hover {
