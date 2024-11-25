@@ -63,14 +63,15 @@ const CategoryPage = ({ addToCart }) => {
               sortedProducts.map((product) => (
                 <div key={product.id} className="product-card">
                   <Link to={`/product/${product.id}`}>
-                    <img src={product.image} alt={product.name} />
+                    <img
+                      src={"/images/" + product.category + ".png"}
+                      alt={product.name}
+                    />
                     <h2>{product.name}</h2>
                   </Link>
                   <p>{product.description}</p>
-                  <p className="price">{product.price}</p>
-                  <button onClick={() => addToCart(product)}>
-                    Add to Cart
-                  </button>
+                  <p className="price">{product.price + " TL"}</p>
+                  <button>Add to Cart</button>
                 </div>
               ))
             ) : (

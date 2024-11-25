@@ -5,7 +5,6 @@ import "./ProductPage.css";
 const ProductPage = () => {
   const { productId } = useParams(); // Get productId from URL params
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [commentsList, setCommentsList] = useState([]);
@@ -33,10 +32,6 @@ const ProductPage = () => {
     return <p>Product not found.</p>;
   }
 
-  const handleAddToCart = () => {
-    alert(`Added ${quantity} of ${product.name} to the cart.`);
-  };
-
   const handleCommentSubmit = () => {
     if (comment && rating > 0) {
       const newComment = { rating, text: comment, approved: false };
@@ -57,7 +52,10 @@ const ProductPage = () => {
     <div className="product-page-container">
       <div className="product-full-width">
         <div className="product-image-section">
-          <img src={product.image} alt={product.name} />
+          <img
+            src={"/images/" + product.category + ".png"}
+            alt={product.name}
+          />
           <button className="top-seller">Top Seller</button>
           <p className="saved-count">8 times saved</p>
         </div>
@@ -82,9 +80,7 @@ const ProductPage = () => {
             </span>
             <span className="discount-rate">{product.discount + " % OFF"}</span>
           </div>
-          <button className="add-to-cart-button" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
+          <button className="add-to-cart-button">Add to Cart</button>
           <div className="additional-info">
             <p>
               <strong>Stock:</strong> {product.stock}
