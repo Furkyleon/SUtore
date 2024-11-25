@@ -31,17 +31,13 @@ from rest_framework import status
 from .models import CustomUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
 
 # bu alttakilere bakılacak
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
 def store(request):
      context = {}
-     return render(request, 'store/store.html', context)
-
-
-
+     return render(request, 'store.html', context)
 
 @csrf_exempt  # Exempt from CSRF verification
 @api_view(['POST'])

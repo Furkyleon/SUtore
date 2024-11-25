@@ -42,7 +42,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id',              # Assuming you want to include the ID
+            'id',            
             'name',
             'price',
             'digital',

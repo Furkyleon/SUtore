@@ -28,7 +28,7 @@ const StorePage = () => {
               <img src={product.image} alt={product.name} />
               <h2>{product.name}</h2>
             </Link>
-            {/*<p>{product.description}</p>*/}
+            <p>{product.description}</p>
             <p>{product.category}</p>
             <p className="price">{product.price}</p>
             <button>Add to Cart</button>

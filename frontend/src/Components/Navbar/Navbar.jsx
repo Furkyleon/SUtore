@@ -134,8 +134,8 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/categories/Consoles" onClick={toggleSidebar}>
-              Consoles <span className="arrow">›</span>
+            <Link to="/categories/Console" onClick={toggleSidebar}>
+              Console <span className="arrow">›</span>
             </Link>
           </li>
           <li>
