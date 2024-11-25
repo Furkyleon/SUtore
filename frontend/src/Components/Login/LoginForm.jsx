@@ -12,19 +12,27 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
 
-    const data = { email, password };
+    const credentials = { email, password };
 
     try {
+      // Make the login request
       const response = await fetch("http://127.0.0.1:8000/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(credentials),
       });
 
       if (response.ok) {
         const responseData = await response.json();
+
+        // Save credentials in localStorage for Basic Authentication
+        localStorage.setItem("username", "furkyleon");
+        localStorage.setItem("password", password);
+
+        console.log(localStorage.getItem("username"), password);
+
         alert(`Welcome, ${responseData.user.username || "user"}!`);
         navigate("/"); // Redirect to the main page
       } else {

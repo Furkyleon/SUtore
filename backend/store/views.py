@@ -291,7 +291,7 @@ def add_to_cart(request):
     """
     if request.CustomUser.role != 'customer':
         return Response({"error": "Only customers can add items to the cart."}, status=status.HTTP_403_FORBIDDEN)
-    """
+  """  
     if not request.user.is_authenticated:
         return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
