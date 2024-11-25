@@ -18,6 +18,7 @@ urlpatterns = [
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
     path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
+    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
