@@ -10,6 +10,7 @@ import StorePage from "./Components/Store/StorePage";
 import Cart from "./Components/Cart/Cart";
 import PaymentPage from "./Components/PaymentPage/PaymentPage";
 import OrderHistory from "./Components/OrderHistory/OrderHistory";
+import SearchPage from "./Components/Search/SearchPage";
 
 function App() {
   // State to store cart items
@@ -54,7 +55,7 @@ function App() {
             path="cart"
             element={<Cart cartItems={cartItems} handlePurchase={handlePurchase} />}
           />
-
+          <Route path="search" element={<SearchPage />} />
         </Route>
       </Routes>
     </Router>

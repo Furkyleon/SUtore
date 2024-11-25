@@ -1,12 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef  } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { IoMdSearch } from "react-icons/io";
 
 const Navbar = () => {
+const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault(); // Prevents the default form submission behavior
+    if (searchTerm.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
+    }
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
   const sidebarRef = useRef(null);
   const sidebarRef2 = useRef(null);
 
@@ -34,11 +43,6 @@ const Navbar = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    console.log("Search Term:", searchTerm); // Handle search logic here
-    // Example: Navigate to a search results page or filter products
-  };
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
