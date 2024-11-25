@@ -560,7 +560,6 @@ def get_reviews_by_product(request, product_id):
     serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-<<<<<<< HEAD
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
@@ -637,7 +636,6 @@ def mark_notifications_as_read(request):
     Notification.objects.filter(id__in=notification_ids, user=request.user).update(is_read=True)
     return Response({'message': 'Notifications marked as read.'})
 """
-=======
 
 @api_view(['POST'])
 def apply_discount(request):
@@ -703,4 +701,3 @@ def apply_discount(request):
         },
         status=status.HTTP_200_OK
     )
->>>>>>> 07550b4c86f10eaf8ff50a26eeced016196f57e8

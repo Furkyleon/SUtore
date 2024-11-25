@@ -95,7 +95,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     price = models.FloatField()
     digital = models.BooleanField(default=False,null=True, blank=True)
-    discount = models.FloatField(default=0.0)  # Discount percentage (0-100)
+    discount = models.FloatField(default=0.0, null=True)  # Discount percentage (0-100)
     category = models.CharField(max_length=200, null=True)  # Make sure to have this
     stock = models.IntegerField(default=0) 
     popularity = models.IntegerField(default=0)  # Tracks popularity, based on views or purchases
@@ -103,13 +103,11 @@ class Product(models.Model):
     serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)  # Unique serial number
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
-<<<<<<< HEAD
     discount_price = models.FloatField(default=0, null=True)
-=======
-
+    description = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='product_images/', null=True, blank=True)  # New field
     # description needed
     # image needed
->>>>>>> 9fba1f75e08f4eaa054d5b35cf6ae84cbfcbf717
         
     def _str_(self):
         return self.name
