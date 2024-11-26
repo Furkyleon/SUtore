@@ -20,7 +20,7 @@ const StorePage = () => {
 
   return (
     <div className="store-page-wrapper">
-      <h1>Products</h1>
+      <h1>All Products</h1>
       <div className="product-list">
         {products.map((product) => (
           <div key={product.id} className="product-card">

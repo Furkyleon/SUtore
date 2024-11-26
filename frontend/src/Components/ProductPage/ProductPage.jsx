@@ -3,14 +3,14 @@ import { useParams } from "react-router-dom";
 import "./ProductPage.css";
 
 const ProductPage = () => {
-  const { productId } = useParams(); // Get productId from URL params
+  const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [commentsList, setCommentsList] = useState([]);
   const commentsRef = useRef(null);
 
-  // Fetch product details when the component mounts
+  // Fetch product details
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/get_all/`)
       .then((response) => response.json())
@@ -23,30 +23,68 @@ const ProductPage = () => {
       .catch((error) => console.error("Error fetching product:", error));
   }, [productId]);
 
-  // Scroll to top when ProductPage mounts
+  // Fetch reviews
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
+      .then((response) => response.json())
+      .then((data) => {
+        setCommentsList(data);
+      })
+      .catch((error) => console.error("Error fetching reviews:", error));
+  }, [productId]);
+
+  // Scroll to top when the component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  if (!product) {
-    return <p>Product not found.</p>;
-  }
-
+  // Handle comment submission
   const handleCommentSubmit = () => {
     if (comment && rating > 0) {
-      const newComment = { rating, text: comment, approved: false };
-      setCommentsList([...commentsList, newComment]);
-      setComment("");
-      setRating(0);
-      alert("Your comment has been submitted and is awaiting approval.");
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+      const encodedCredentials = btoa(`${username}:${password}`);
+
+      fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+        body: JSON.stringify({ rating, comment }),
+      })
+        .then((response) => {
+          if (response.status === 201) {
+            return response.json();
+          } else if (response.status === 403) {
+            throw new Error("You can only review products you've purchased.");
+          } else {
+            throw new Error("Failed to submit review.");
+          }
+        })
+        .then((newReview) => {
+          setCommentsList([...commentsList, newReview]);
+          setComment("");
+          setRating(0);
+          alert("Your review has been submitted successfully.");
+        })
+        .catch((error) => {
+          console.error("Error submitting review:", error);
+          alert(error.message);
+        });
     } else {
       alert("Please add both a comment and a rating.");
     }
   };
 
+  // Scroll to comments section
   const scrollToComments = () => {
     commentsRef.current.scrollIntoView({ behavior: "smooth" });
   };
+
+  if (!product) {
+    return <p>Product not found.</p>;
+  }
 
   return (
     <div className="product-page-container">
@@ -56,8 +94,6 @@ const ProductPage = () => {
             src={"/images/" + product.category + ".png"}
             alt={product.name}
           />
-          <button className="top-seller">Top Seller</button>
-          <p className="saved-count">8 times saved</p>
         </div>
         <div className="product-details-section">
           <h1 className="product-name">{product.name}</h1>
@@ -67,9 +103,12 @@ const ProductPage = () => {
             onClick={scrollToComments}
             style={{ cursor: "pointer" }}
           >
-            <span className="stars">★★★★☆</span>
+            <span className="stars">
+              {"★".repeat(Math.round(product.rating_average || 0))}
+              {"☆".repeat(5 - Math.round(product.rating_average || 0))}
+            </span>
             <span className="review-count">
-              (1 Review) <span className="review-arrow">▼</span>
+              {commentsList.length} Reviews ▼
             </span>
             <div className="rating-tooltip">Click to view comments</div>
           </div>
@@ -80,6 +119,10 @@ const ProductPage = () => {
             </span>
             <span className="discount-rate">{product.discount + " % OFF"}</span>
           </div>
+          <div className="description-section">
+            <p>{product.description}</p>
+          </div>
+
           <button className="add-to-cart-button">Add to Cart</button>
           <div className="additional-info">
             <p>
@@ -91,9 +134,6 @@ const ProductPage = () => {
             <p>
               <strong>Warranty Status:</strong> {product.warranty_status}
             </p>
-            <p>
-              <strong>Shipping:</strong> 2-3 business days
-            </p>
           </div>
         </div>
       </div>
@@ -103,15 +143,12 @@ const ProductPage = () => {
         {commentsList.length > 0 ? (
           commentsList.map((c, index) => (
             <div key={index} className="comment">
-              <p className="comment-text">{c.text}</p>
+              <p className="comment-text">{c.comment}</p>
               <p className="comment-rating">Rating: {c.rating} ★</p>
-              {!c.approved && (
-                <p className="comment-awaiting-approval">(Awaiting approval)</p>
-              )}
             </div>
           ))
         ) : (
-          <p>No comments yet. Be the first to review this product!</p>
+          <p>No reviews yet. Be the first to review this product!</p>
         )}
 
         <div className="add-comment">

@@ -38,6 +38,11 @@ body {
   transition: transform 0.2s;
 }
 
+.store-page-wrapper .product-card a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .store-page-wrapper .product-card:hover {
   transform: scale(1.05);
 }
@@ -78,9 +83,4 @@ body {
 
 .store-page-wrapper .product-card button:hover {
   background-color: #01236a;
-}
-
-.category-page-wrapper .product-card a {
-  text-decoration: none;
-  color: inherit;
 }
