@@ -1,22 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./Cart.css";
 
-const Cart = ({ handlePurchase }) => {
-  const [cartItems, setCartItems] = useState([]);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/cart/get/")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch cart items");
-        }
-        return response.json();
-      })
-      .then((data) => setCartItems(data))
-      .catch((error) => console.error("Error fetching cart items:", error));
-  }, []);
-  
-
+const Cart = ({ cartItems, handlePurchase, addToCart }) => {
   const calculateTotal = () => {
     return cartItems
       .reduce((total, item) => total + item.price * item.quantity, 0)
@@ -31,7 +16,7 @@ const Cart = ({ handlePurchase }) => {
           <ul className="cart-items">
             {cartItems.map((item) => (
               <li key={item.id} className="cart-item">
-                <span className="item-name">{item.product_name}</span>
+                <span className="item-name">{item.name}</span>
                 <span className="item-quantity">Quantity: {item.quantity}</span>
                 <span className="item-price">
                   {(item.price * item.quantity).toFixed(2)}TL
@@ -43,9 +28,7 @@ const Cart = ({ handlePurchase }) => {
             <span>Total: {calculateTotal()}TL</span>
           </div>
           <a href="/payment">
-            <button className="purchase-button" onClick={handlePurchase}>
-              Purchase
-            </button>
+              <button className="purchase-button" onClick={handlePurchase}>Purchase</button>
           </a>
           <a href="/">SUtore</a>
         </>
