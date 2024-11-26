@@ -129,7 +129,7 @@ const PaymentPage = () => {
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="John Doe"
+            placeholder="Name Surname"
           />
           {errors.name && <span className="error-text">{errors.name}</span>}
         </div>
@@ -150,7 +150,7 @@ const PaymentPage = () => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="expiryDate">Expiry Date (MM/YY)</label>
+            <label htmlFor="expiryDate">Expiry Date</label>
             <input
               type="text"
               id="expiryDate"
@@ -185,15 +185,17 @@ const PaymentPage = () => {
             name="billingAddress"
             value={form.billingAddress}
             onChange={handleChange}
-            placeholder="123 Main St, City, Country"
+            placeholder=""
           ></textarea>
           {errors.billingAddress && (
             <span className="error-text">{errors.billingAddress}</span>
           )}
         </div>
-        <button type="submit" className="payment-button">
-          Pay Now
-        </button>
+        <a href="/orderhistory" className="href">
+          <button type="submit" className="payment-button">
+            Purchase
+          </button>
+        </a>
       </form>
     </div>
   );

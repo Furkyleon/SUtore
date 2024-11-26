@@ -5,6 +5,8 @@
   background: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  margin-top: 100px;
 }
 
 .payment-page-container h2 {
@@ -77,9 +79,9 @@
 }
 
 .payment-button:hover {
-  background: #005da9;
+  background: #01236a;
 }
 
 .payment-button:active {
-  background: #003f7f;
+  background: #01236a;
 }

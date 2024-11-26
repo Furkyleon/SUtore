@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Cart.css";
 
-const Cart = ({ handlePurchase }) => {
+const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ const Cart = ({ handlePurchase }) => {
         return response.json();
       })
       .then((data) => {
-        console.log("Fetched cart items:", data); // Debugging output
+        console.log("Fetched cart items:", data);
         setCartItems(data);
         setLoading(false);
       })
@@ -45,6 +45,11 @@ const Cart = ({ handlePurchase }) => {
         return total + subtotal;
       }, 0)
       .toFixed(2); // Format as a fixed-point number
+  };
+
+  const handlePurchaseClick = () => {
+    // Update the alert or behavior here
+    alert("Your purchase is being processed. Redirecting to payment...");
   };
 
   return (
@@ -73,8 +78,8 @@ const Cart = ({ handlePurchase }) => {
             <span>Total: {calculateTotal()} TL</span>
           </div>
           <a href="/payment">
-            <button className="purchase-button" onClick={handlePurchase}>
-              Purchase
+            <button className="purchase-button" onClick={handlePurchaseClick}>
+              Go to Payment
             </button>
           </a>
           <a href="/">SUtore</a>

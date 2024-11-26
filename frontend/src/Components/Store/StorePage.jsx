@@ -5,7 +5,6 @@ import "./StorePage.css";
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/products/get_all/")
@@ -44,11 +43,12 @@ const StorePage = () => {
       })
       .then((data) => {
         console.log("Item added to cart:", data);
-        const email = localStorage.getItem("email");
-        const password = localStorage.getItem("password");
-        setCartItems((prev) => [...prev, data]); // Update state if necessary
+        alert("Product added to cart successfully!");
       })
-      .catch((error) => console.error("Error adding item to cart:", error));
+      .catch((error) => {
+        console.error("This product is out of stock:", error);
+        alert("This product is out of stock.");
+      });
   };
   
 

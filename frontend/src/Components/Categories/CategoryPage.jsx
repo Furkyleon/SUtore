@@ -65,8 +65,8 @@ const CategoryPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("Error adding item to cart:", error);
-        alert("Failed to add product to cart. Please try again.");
+        console.error("This product is out of stock:", error);
+        alert("This product is out of stock.");
       });
   };
 

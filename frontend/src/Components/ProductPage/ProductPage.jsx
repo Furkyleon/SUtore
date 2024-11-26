@@ -23,6 +23,37 @@ const ProductPage = () => {
       .catch((error) => console.error("Error fetching product:", error));
   }, [productId]);
 
+  const addToCart = (serialNumber) => {
+    const username = localStorage.getItem("username"); // Retrieve username from localStorage
+    const password = localStorage.getItem("password"); // Retrieve password from localStorage
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode username:password
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader, // Add the Authorization header
+      },
+      body: JSON.stringify({
+        serial_number: serialNumber,
+        quantity: 1, // Default quantity to add
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Item added to cart:", data);
+        alert("Product added to cart successfully!");
+      })
+      .catch((error) => {
+        console.error("This product is out of stock:", error);
+        alert("This product is out of stock.");
+      });
+  };
+
   // Fetch reviews
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
@@ -97,7 +128,8 @@ const ProductPage = () => {
         </div>
         <div className="product-details-section">
           <h1 className="product-name">{product.name}</h1>
-          <p className="product-code">Product Code: {product.serial_number}</p>
+          <h2 className="product-model">Product Model: {product.model}</h2>
+          <p className="product-code">Serial Number: {product.serial_number}</p>
           <div
             className="rating"
             onClick={scrollToComments}
@@ -123,7 +155,12 @@ const ProductPage = () => {
             <p>{product.description}</p>
           </div>
 
-          <button className="add-to-cart-button">Add to Cart</button>
+          <button
+            className="add-to-cart-button"
+            onClick={() => addToCart(product.serial_number)}
+          >
+            Add to Cart
+          </button>
           <div className="additional-info">
             <p>
               <strong>Stock:</strong> {product.stock}

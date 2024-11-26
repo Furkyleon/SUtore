@@ -311,7 +311,8 @@ def add_to_cart(request):
     """
     if request.CustomUser.role != 'customer':
         return Response({"error": "Only customers can add items to the cart."}, status=status.HTTP_403_FORBIDDEN)
-  """  
+    """
+    
     if not request.user.is_authenticated:
         return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -495,7 +496,7 @@ def checkout(request):
     # Calculate the total amount for the order
     total_amount = 0
     for item in order.order_items.all():
-        total_amount += item.subtotal
+        total_amount += Decimal(str(item.subtotal))
         
         # Decrease product stock based on quantity in the order
         product = item.product
@@ -505,7 +506,7 @@ def checkout(request):
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
-    order_history.total_amount += Decimal(total_amount)  # Ensure total_amount is set
+    order_history.total_amount += total_amount  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
