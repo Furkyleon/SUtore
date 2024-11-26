@@ -4,7 +4,7 @@ body {
   height: auto;
 }
 
-.product-page {
+.product-page-container {
   width: 100vw;
   font-family: Arial, sans-serif;
   margin: 0;
@@ -12,12 +12,7 @@ body {
   box-sizing: border-box;
 }
 
-.product-card a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.product-full-width {
+.product-page-container .product-full-width {
   display: flex;
   align-items: flex-start;
   gap: 80px;
@@ -28,76 +23,56 @@ body {
   min-height: 100vh;
 }
 
-.product-image-section {
+.product-page-container .product-image-section {
   flex: 1;
   text-align: center;
 }
 
-.product-image-section img {
+.product-page-container .product-image-section img {
   width: 80%;
   max-width: 600px;
   border-radius: 8px;
 }
 
-.top-seller {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: #00c98d;
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.9em;
-  border: none;
-}
-
-.saved-count {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #2e2e90;
-  font-size: 0.9em;
-}
-
-.product-details-section {
+.product-page-container .product-details-section {
   flex: 1;
   padding: 20px 30px;
   box-sizing: border-box;
 }
 
-.product-name {
+.product-page-container .product-name {
   font-size: 2.2em;
   font-weight: bold;
-  color: #01236A;
+  color: #01236a;
   margin-bottom: 10px;
 }
 
-.product-code {
+.product-page-container .product-code {
   color: #888;
   font-size: 1em;
   margin-bottom: 15px;
 }
 
-.rating {
+.product-page-container .rating {
   display: flex;
   align-items: center;
   font-size: 1.2em;
   margin-bottom: 15px;
   cursor: pointer;
-  color: #0073e6;
+  color: #005da9;
   position: relative;
 }
 
-.review-count {
+.product-page-container .review-count {
   text-decoration: underline;
   margin-left: 8px;
 }
 
-.rating:hover {
+.product-page-container .rating:hover {
   color: #005bb5;
 }
 
-.rating-tooltip {
+.product-page-container .rating-tooltip {
   visibility: hidden;
   background-color: #333;
   color: #fff;
@@ -115,55 +90,45 @@ body {
   transition: opacity 0.2s;
 }
 
-.rating:hover .rating-tooltip {
+.product-page-container .rating:hover .rating-tooltip {
   visibility: visible;
   opacity: 1;
 }
 
-.review-arrow {
-  margin-left: 5px;
-  font-size: 0.9em;
-}
-
-.stars {
-  color: #ffb400;
+.product-page-container .stars {
+  color: #ff9800;
   font-size: 1.4em;
   margin-right: 10px;
 }
 
-.review-count {
-  color: #005da9;
-  font-size: 1em;
-}
-
-.price-section {
+.product-page-container .price-section {
   display: flex;
   align-items: baseline;
   gap: 10px;
   margin: 20px 0;
 }
 
-.original-price {
+.product-page-container .original-price {
   text-decoration: line-through;
   color: #888;
   font-size: 1em;
 }
 
-.discounted-price {
+.product-page-container .discounted-price {
   font-size: 2em;
-  color: #01236A;
+  color: #01236a;
   font-weight: bold;
 }
 
-.discount-rate {
-  background-color: #d00000;
+.product-page-container .discount-rate {
+  background-color: #ff9800;
   color: #fff;
   padding: 5px 10px;
   font-size: 0.9em;
   border-radius: 5px;
 }
 
-.add-to-cart-button {
+.product-page-container .add-to-cart-button {
   background-color: #005da9;
   color: white;
   border: none;
@@ -175,38 +140,21 @@ body {
   transition: background-color 0.3s;
 }
 
-.add-to-cart-button:hover {
-  background-color: #01236A;
+.product-page-container .add-to-cart-button:hover {
+  background-color: #01236a;
 }
 
-.additional-info {
+.product-page-container .additional-info {
   margin-top: 20px;
   font-size: 1em;
   color: #333;
 }
 
-.additional-info p {
+.product-page-container .additional-info p {
   margin: 10px 0;
 }
 
-/* Toggle Comments Button */
-.toggle-comments-button {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  font-size: 1em;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  color: #333;
-}
-
-.toggle-comments-button:hover {
-  background-color: #eaeaea;
-}
-
-.comments-section {
+.product-page-container .comments-section {
   width: 100%;
   max-width: 800px;
   margin: 40px auto;
@@ -214,56 +162,49 @@ body {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
 }
 
-.comments-section h2 {
+.product-page-container .comments-section h2 {
   font-size: 1.8em;
   font-weight: bold;
   color: #333;
   margin-bottom: 20px;
 }
 
-.comment {
+.product-page-container .comment {
   margin-bottom: 20px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
 }
 
-.comment-text {
+.product-page-container .comment-text {
   font-size: 1em;
   color: #333;
 }
 
-.comment-rating {
+.product-page-container .comment-rating {
   color: #ffb400;
   font-size: 1em;
 }
 
-.comment-awaiting-approval {
-  color: #888;
-  font-style: italic;
-  font-size: 0.9em;
-}
-
-.add-comment {
+.product-page-container .add-comment {
   margin-top: 30px;
 }
 
-.add-comment h3 {
+.product-page-container .add-comment h3 {
   font-size: 1.5em;
   color: #333;
   margin-bottom: 15px;
 }
 
-.add-comment label {
+.product-page-container .add-comment label {
   font-weight: bold;
   font-size: 1em;
   color: #333;
   margin-right: 10px;
 }
 
-.add-comment input[type="number"] {
+.product-page-container .add-comment input[type="number"] {
   width: 60px;
   padding: 5px;
   border-radius: 4px;
@@ -273,7 +214,7 @@ body {
   color: #333;
 }
 
-.add-comment textarea {
+.product-page-container .add-comment textarea {
   width: 100%;
   height: 100px;
   padding: 10px;
@@ -285,7 +226,7 @@ body {
   color: #333;
 }
 
-.add-comment button {
+.product-page-container .add-comment button {
   margin-top: 15px;
   padding: 10px 20px;
   font-size: 1em;
@@ -297,6 +238,6 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.add-comment button:hover {
-  background-color: #01236A;
+.product-page-container .add-comment button:hover {
+  background-color: #01236a;
 }
