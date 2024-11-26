@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./PaymentPage.css";
-import { Link } from "react-router-dom";
 
 const PaymentPage = () => {
   const [form, setForm] = useState({
@@ -10,8 +9,41 @@ const PaymentPage = () => {
     cvv: "",
     billingAddress: "",
   });
-
   const [errors, setErrors] = useState({});
+  const [orderId, setOrderId] = useState(null); // State to store the dynamic order ID
+  const [loading, setLoading] = useState(true); // State for loading status
+  const [errorMessage, setErrorMessage] = useState(null); // State for error messages
+
+  // Fetch the current order ID when the component mounts
+  useEffect(() => {
+    const fetchOrderId = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/order/", {
+          headers: {
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch the order ID.");
+        }
+
+        const orderData = await response.json();
+        setOrderId(orderData.id); // Assuming the order ID is in the response
+      } catch (error) {
+        console.error("Error fetching order ID:", error);
+        setErrorMessage("Failed to fetch the order. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderId();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,19 +64,58 @@ const PaymentPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!orderId) {
+      alert("Order ID not found. Please refresh and try again.");
+      return;
+    }
+
     if (validateForm()) {
-      alert("Payment Successful!");
-      setForm({
-        name: "",
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-        billingAddress: "",
-      });
+      try {
+        const response = await fetch("http://127.0.0.1:8000/checkout/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+          body: JSON.stringify({ order_id: orderId }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("API Error:", errorData);
+          alert(errorData.error || "Payment failed. Please try again.");
+          return;
+        }
+
+        alert("Payment successful!");
+        setForm({
+          name: "",
+          cardNumber: "",
+          expiryDate: "",
+          cvv: "",
+          billingAddress: "",
+        });
+      } catch (error) {
+        console.error("Error during checkout:", error);
+        alert("An unexpected error occurred. Please try again.");
+      }
     }
   };
+
+  if (loading) {
+    return <div className="loading-message">Loading order details...</div>;
+  }
+
+  if (errorMessage) {
+    return <div className="error-message">{errorMessage}</div>;
+  }
 
   return (
     <div className="payment-page-container">

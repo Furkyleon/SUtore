@@ -5,14 +5,15 @@ import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
 
-    const credentials = { email, password };
+    const credentials = { username, password };
+    console.log(username, password);
 
     try {
       // Make the login request
@@ -28,10 +29,10 @@ const LoginForm = () => {
         const responseData = await response.json();
 
         // Save credentials in localStorage for Basic Authentication
-        localStorage.setItem("username", "furkyleon");
+        localStorage.setItem("username", username);
         localStorage.setItem("password", password);
 
-        console.log(localStorage.getItem("username"), password);
+        console.log(username, password);
 
         alert(`Welcome, ${responseData.user.username || "user"}!`);
         navigate("/"); // Redirect to the main page
@@ -56,10 +57,10 @@ const LoginForm = () => {
           <h1>Login</h1>
           <div className="input-box">
             <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="username"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <FaUser className="icon" />
           </div>

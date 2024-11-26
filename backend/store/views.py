@@ -99,14 +99,14 @@ def login(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    email = serializer.validated_data['email']
+    username = serializer.validated_data['username']
     password = serializer.validated_data['password']
 
     # Use the custom manager to retrieve the user by email
-    user = CustomUser.objects.get_user_by_email(email)
+    user = CustomUser.objects.get_user_by_username(username)
 
     if user is None:
-        return Response({'error': 'Invalid email.'}, 
+        return Response({'error': 'Invalid username.'}, 
                         status=status.HTTP_401_UNAUTHORIZED)
         
     if not user.check_password(password):
