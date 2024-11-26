@@ -65,7 +65,6 @@ const StorePage = () => {
               />
               <h2>{product.name}</h2>
             </Link>
-            <p>{product.description}</p>
             <p className="price">{product.price + " TL"}</p>
             <button onClick={() => addToCart(product.serial_number)}>
               Add to Cart

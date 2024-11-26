@@ -45,6 +45,7 @@ const OrderHistory = () => {
             <li key={order.order_id} className="order-item">
               <div className="order-header">
                 <span className="order-id">Order ID: {order.order_id}</span>
+                <span className="order-status">Order Status: {order.status}</span>
                 <span className="order-date">
                   Date: {new Date(order.date_ordered).toLocaleDateString()}
                 </span>
@@ -63,10 +64,10 @@ const OrderHistory = () => {
                 {order.items.map((item) => (
                   <li key={item.id} className="order-item-detail">
                     <span className="item-name">{item.product}</span>
-                    <span className="item-quantity">Qty: {item.quantity}</span>
-                    <span className="item-price">
-                      {item.subtotal} TL
+                    <span className="item-quantity">
+                      Quantity: {item.quantity}
                     </span>
+                    <span className="item-price">{item.subtotal} TL</span>
                   </li>
                 ))}
               </ul>

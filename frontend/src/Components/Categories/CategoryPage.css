@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   width: 100%;
   overflow-x: hidden;
 }
@@ -35,6 +36,9 @@ html, body {
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .category-page-wrapper .product-card:hover {
@@ -63,6 +67,7 @@ html, body {
   font-weight: bold;
   color: #01236a;
   margin: 10px 0;
+  align-self: center;
 }
 
 .category-page-wrapper .product-card button {
@@ -72,7 +77,7 @@ html, body {
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  align-self: center;
 }
 
 .category-page-wrapper .product-card button:hover {
@@ -114,4 +119,3 @@ html, body {
   border-color: #01236a;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
-

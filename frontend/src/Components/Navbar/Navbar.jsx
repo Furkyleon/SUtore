@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef  } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { IoMdSearch } from "react-icons/io";
 
 const Navbar = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchSubmit = (event) => {
@@ -43,11 +43,17 @@ const navigate = useNavigate();
     setSearchTerm(event.target.value);
   };
 
-
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside2);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside2);
     };
   }, []);
 
@@ -162,7 +168,7 @@ const navigate = useNavigate();
         <button className="close-button2" onClick={toggleSidebar2}>
           ×
         </button>
-        <h2>Login / Register:</h2>
+        <h2>{"Account: " + localStorage.getItem("username")}</h2>
         <ul className="sidebar-menu2">
           <li>
             <Link to="/login" onClick={toggleSidebar2}>
@@ -173,9 +179,8 @@ const navigate = useNavigate();
             <Link to="/register" onClick={toggleSidebar2}>
               Register
             </Link>
-          </li> 
-          <li> 
-          <h2>Order History:</h2>
+          </li>
+          <li>
             <Link to="/orderhistory" onClick={toggleSidebar2}>
               Order History
             </Link>

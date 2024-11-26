@@ -102,7 +102,6 @@ const CategoryPage = () => {
                     />
                     <h2>{product.name}</h2>
                   </Link>
-                  <p>{product.description}</p>
                   <p className="price">{product.price + " TL"}</p>
                   <button
                     onClick={() => {
