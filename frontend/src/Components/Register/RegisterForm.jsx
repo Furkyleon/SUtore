@@ -27,7 +27,7 @@ const RegisterForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         alert(`Welcome, ${responseData.user.username || "user"}!`);
-        navigate("/"); // Redirect to the main page
+        navigate("/login"); // Redirect to the login page
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Register failed");

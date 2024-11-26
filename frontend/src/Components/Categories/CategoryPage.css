@@ -102,6 +102,7 @@ body {
   margin-right: 10px;
   font-weight: bold;
   color: #01236a;
+  margin-right: 10px;
 }
 
 .sort-dropdown select {
@@ -113,6 +114,7 @@ body {
   cursor: pointer;
   color: #01236a;
   transition: border-color 0.2s, box-shadow 0.2s;
+  margin-right: 20px;
 }
 
 .sort-dropdown select:hover {

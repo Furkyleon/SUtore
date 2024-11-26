@@ -6,6 +6,7 @@ const CategoryPage = () => {
   const { categoryName } = useParams();
   const [products, setProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc"); // State for sorting order
+  const [sortCriterion, setSortCriterion] = useState("price"); // State for sorting criterion
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -27,14 +28,28 @@ const CategoryPage = () => {
       });
   }, [categoryName]);
 
-  // Sort products based on price and sortOrder
+  // Sort products based on selected criterion and order
   const sortedProducts = products.sort((a, b) => {
-    return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+    if (sortCriterion === "price") {
+      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+    } else if (sortCriterion === "name") {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
+      if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    }
+    return 0;
   });
 
   // Handle sorting order change
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
+  };
+
+  // Handle sorting criterion change
+  const handleCriterionChange = (event) => {
+    setSortCriterion(event.target.value);
   };
 
   // Function to handle adding a product to the cart
@@ -80,14 +95,24 @@ const CategoryPage = () => {
       {!loading && !error && (
         <>
           <div className="sort-dropdown">
-            <label htmlFor="sortOrder">Sort by Price: </label>
+            <label htmlFor="sortCriterion">Sort by: </label>
+            <select
+              id="sortCriterion"
+              value={sortCriterion}
+              onChange={handleCriterionChange}
+            >
+              <option value="price">Price</option>
+              <option value="name">Name</option>
+            </select>
+
+            <label htmlFor="sortOrder">Order: </label>
             <select
               id="sortOrder"
               value={sortOrder}
               onChange={handleSortChange}
             >
-              <option value="asc">Low to High</option>
-              <option value="desc">High to Low</option>
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
             </select>
           </div>
 
