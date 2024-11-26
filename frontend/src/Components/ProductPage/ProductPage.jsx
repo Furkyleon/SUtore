@@ -32,6 +32,39 @@ const ProductPage = () => {
     return <p>Product not found.</p>;
   }
 
+  // Function to handle adding product to cart
+  const addToCart = (serialNumber) => {
+    const username = localStorage.getItem("username"); // Retrieve username from localStorage
+    const password = localStorage.getItem("password"); // Retrieve password from localStorage
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode username:password
+
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader, // Add the Authorization header
+      },
+      body: JSON.stringify({
+        serial_number: serialNumber,
+        quantity: 1, // Default quantity to add
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Item added to cart:", data);
+        alert("Product added to cart successfully!");
+      })
+      .catch((error) => {
+        console.error("Error adding item to cart:", error);
+        alert("Failed to add product to cart. Please try again.");
+      });
+  };
+
   const handleCommentSubmit = () => {
     if (comment && rating > 0) {
       const newComment = { rating, text: comment, approved: false };
@@ -80,7 +113,12 @@ const ProductPage = () => {
             </span>
             <span className="discount-rate">{product.discount + " % OFF"}</span>
           </div>
-          <button className="add-to-cart-button">Add to Cart</button>
+          <button
+            className="add-to-cart-button"
+            onClick={() => addToCart(product.serial_number)}
+          >
+            Add to Cart
+          </button>
           <div className="additional-info">
             <p>
               <strong>Stock:</strong> {product.stock}
