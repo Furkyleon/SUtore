@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import "./CategoryPage.css";
 
-const CategoryPage = ({ addToCart }) => {
+const CategoryPage = () => {
   const { categoryName } = useParams();
   const [products, setProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc"); // State for sorting order
@@ -35,6 +35,39 @@ const CategoryPage = ({ addToCart }) => {
   // Handle sorting order change
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
+  };
+
+  // Function to handle adding a product to the cart
+  const addToCart = (serialNumber) => {
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        serial_number: serialNumber,
+        quantity: 1,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Item added to cart:", data);
+        alert("Product added to cart successfully!");
+      })
+      .catch((error) => {
+        console.error("Error adding item to cart:", error);
+        alert("Failed to add product to cart. Please try again.");
+      });
   };
 
   return (
@@ -71,7 +104,13 @@ const CategoryPage = ({ addToCart }) => {
                   </Link>
                   <p>{product.description}</p>
                   <p className="price">{product.price + " TL"}</p>
-                  <button>Add to Cart</button>
+                  <button
+                    onClick={() => {
+                      addToCart(product.serial_number);
+                    }}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               ))
             ) : (

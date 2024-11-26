@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./StorePage.css";
 
+
 const StorePage = () => {
   const [products, setProducts] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/products/get_all/")
@@ -18,9 +20,41 @@ const StorePage = () => {
       .catch((error) => console.error("Fetch Error:", error));
   }, []);
 
+  const addToCart = (serialNumber) => {
+
+    const username = localStorage.getItem("username"); // Retrieve email from localStorage
+    const password = localStorage.getItem("password"); // Retrieve password from localStorage
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode email:password
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader, // Add the Authorization header
+      },
+      body: JSON.stringify({
+        serial_number: serialNumber,
+        quantity: 1, // Default quantity to add
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Item added to cart:", data);
+        const email = localStorage.getItem("email");
+        const password = localStorage.getItem("password");
+        setCartItems((prev) => [...prev, data]); // Update state if necessary
+      })
+      .catch((error) => console.error("Error adding item to cart:", error));
+  };
+  
+
   return (
     <div className="store-page-wrapper">
-      <h1>Products</h1>
+      <h1>All Products</h1>
       <div className="product-list">
         {products.map((product) => (
           <div key={product.id} className="product-card">
@@ -33,7 +67,9 @@ const StorePage = () => {
             </Link>
             <p>{product.description}</p>
             <p className="price">{product.price + " TL"}</p>
-            <button>Add to Cart</button>
+            <button onClick={() => addToCart(product.serial_number)}>
+              Add to Cart
+            </button>
           </div>
         ))}
       </div>

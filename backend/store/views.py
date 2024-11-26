@@ -99,14 +99,14 @@ def login(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    email = serializer.validated_data['email']
+    username = serializer.validated_data['username']
     password = serializer.validated_data['password']
 
     # Use the custom manager to retrieve the user by email
-    user = CustomUser.objects.get_user_by_email(email)
+    user = CustomUser.objects.get_user_by_username(username)
 
     if user is None:
-        return Response({'error': 'Invalid email.'}, 
+        return Response({'error': 'Invalid username.'}, 
                         status=status.HTTP_401_UNAUTHORIZED)
         
     if not user.check_password(password):
@@ -311,7 +311,7 @@ def add_to_cart(request):
     """
     if request.CustomUser.role != 'customer':
         return Response({"error": "Only customers can add items to the cart."}, status=status.HTTP_403_FORBIDDEN)
-    """
+  """  
     if not request.user.is_authenticated:
         return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 

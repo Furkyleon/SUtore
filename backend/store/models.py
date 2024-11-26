@@ -39,6 +39,13 @@ class CustomUserManager(BaseUserManager):
         except self.model.DoesNotExist:
             return None
         
+    def get_user_by_username(self, username):
+        """Retrieve a user by their username."""
+        try:
+            return self.get(username=username)
+        except self.model.DoesNotExist:
+            return None
+        
 
 class CustomUser(AbstractUser):
     address = models.CharField(max_length=255, blank=True, null=True)
