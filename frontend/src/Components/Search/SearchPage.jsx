@@ -4,13 +4,14 @@ import './SearchPage.css';
 
 const SearchPage = () => {
   const [products, setProducts] = useState([]);
-  const [sortOrder, setSortOrder] = useState("asc"); // State for sorting order
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortCriterion, setSortCriterion] = useState("price");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const searchTerm = queryParams.get("query");
+  const searchTerm = queryParams.get("query")?.toLowerCase() || ""; // Normalize case
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -43,14 +44,31 @@ const SearchPage = () => {
     }
   }, [searchTerm]);
 
-  // Sort products based on price and sortOrder
-  const sortedProducts = products.sort((a, b) => {
-    return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+  // Client-side filtering to match the searchTerm
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm)
+  );
+
+  // Sort products based on selected criterion and order
+  const sortedProducts = filteredProducts.sort((a, b) => {
+    if (sortCriterion === "price") {
+      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+    } else if (sortCriterion === "name") {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
+      if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    }
+    return 0;
   });
 
-  // Handle sorting order change
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
+  };
+
+  const handleCriterionChange = (event) => {
+    setSortCriterion(event.target.value);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -58,24 +76,32 @@ const SearchPage = () => {
 
   return (
     <div className="search-page-wrapper">
-      <h1>Search Results for "{searchTerm}"</h1>
+      <h1>Search Results for "{queryParams.get("query")}"</h1>
 
-      {products.length > 0 ? (
+      {sortedProducts.length > 0 ? (
         <>
-          {/* Sorting Dropdown */}
           <div className="sort-dropdown">
-            <label htmlFor="sortOrder">Sort by Price: </label>
+            <label htmlFor="sortCriterion">Sort by: </label>
+            <select
+              id="sortCriterion"
+              value={sortCriterion}
+              onChange={handleCriterionChange}
+            >
+              <option value="price">Price</option>
+              <option value="name">Name</option>
+            </select>
+
+            <label htmlFor="sortOrder">Order: </label>
             <select
               id="sortOrder"
               value={sortOrder}
               onChange={handleSortChange}
             >
-              <option value="asc">Low to High</option>
-              <option value="desc">High to Low</option>
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
             </select>
           </div>
 
-          {/* Product List */}
           <ul className="product-list">
             {sortedProducts.map((product) => (
               <div key={product.id} className="product-card">
@@ -94,7 +120,7 @@ const SearchPage = () => {
           </ul>
         </>
       ) : (
-        <p className="no-results">No products found.</p>
+        <p className="no-results">No products found for "{queryParams.get("query")}".</p>
       )}
     </div>
   );
