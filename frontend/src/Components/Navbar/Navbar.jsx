@@ -8,7 +8,7 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchSubmit = (event) => {
-    event.preventDefault(); // Prevents the default form submission behavior
+    event.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
@@ -41,6 +41,13 @@ const Navbar = () => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleLogout = () => {
+    localStorage.setItem("username", null);
+    localStorage.setItem("password", null);
+    alert("You have been logged out.");
+    navigate("/"); // Redirect to the main page after logout
   };
 
   useEffect(() => {
@@ -171,14 +178,19 @@ const Navbar = () => {
         <h2>{"Account: " + localStorage.getItem("username")}</h2>
         <ul className="sidebar-menu2">
           <li>
+            <Link to="/register" onClick={toggleSidebar2}>
+              Register
+            </Link>
+          </li>
+          <li>
             <Link to="/login" onClick={toggleSidebar2}>
               Login
             </Link>
           </li>
           <li>
-            <Link to="/register" onClick={toggleSidebar2}>
-              Register
-            </Link>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
           </li>
           <li>
             <Link to="/orderhistory" onClick={toggleSidebar2}>

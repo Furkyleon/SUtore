@@ -300,3 +300,28 @@
   background-color: #011b4d;
   transform: translateY(0);
 }
+
+.navbar .sidebar-menu2 li button.logout-button {
+  color: #01236a;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 6px;
+  background-color: rgba(207, 207, 207, 0.616);
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.navbar .sidebar-menu2 li button.logout-button:hover {
+  background-color: #01236a;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
