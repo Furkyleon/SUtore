@@ -11,6 +11,7 @@ import Cart from "./Components/Cart/Cart";
 import PaymentPage from "./Components/PaymentPage/PaymentPage";
 import OrderHistory from "./Components/OrderHistory/OrderHistory";
 import SearchPage from "./Components/Search/SearchPage";
+import Invoice from "./Components/Invoice/Invoice";
 
 function App() {
   // State to store cart items
@@ -56,6 +57,7 @@ function App() {
             element={<Cart cartItems={cartItems} handlePurchase={handlePurchase} />}
           />
           <Route path="search" element={<SearchPage />} />
+          <Route path="/invoice/:orderId" element={<Invoice />} />
         </Route>
       </Routes>
     </Router>
