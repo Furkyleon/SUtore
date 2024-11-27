@@ -27,6 +27,7 @@ const ProductPage = () => {
     const username = localStorage.getItem("username"); // Retrieve username from localStorage
     const password = localStorage.getItem("password"); // Retrieve password from localStorage
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode username:password
+
     fetch("http://127.0.0.1:8000/cart/add/", {
       method: "POST",
       headers: {
@@ -57,9 +58,14 @@ const ProductPage = () => {
   // Fetch reviews
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        return response.json();
+      })
       .then((data) => {
-        setCommentsList(data);
+        setCommentsList(data); // Update state with fetched reviews
       })
       .catch((error) => console.error("Error fetching reviews:", error));
   }, [productId]);
@@ -144,23 +150,39 @@ const ProductPage = () => {
             </span>
             <div className="rating-tooltip">Click to view comments</div>
           </div>
+
           <div className="price-section">
-            <span className="original-price">{product.price + " TL"}</span>
-            <span className="discounted-price">
-              {product.discounted_price + " TL"}
-            </span>
-            <span className="discount-rate">{product.discount + " % OFF"}</span>
-          </div>
-          <div className="description-section">
-            <p>{product.description}</p>
+            {product.discount > 0 ? (
+              <>
+                <span className="original-price">{product.price + " TL"}</span>
+                <span className="discounted-price">
+                  {(
+                    product.price -
+                    product.price * (product.discount / 100)
+                  ).toFixed(2) + " TL"}
+                </span>
+                <span className="discount-rate">
+                  {product.discount + " % OFF"}
+                </span>
+              </>
+            ) : (
+              <span className="discounted-price">{product.price + " TL"}</span>
+            )}
           </div>
 
-          <button
-            className="add-to-cart-button"
-            onClick={() => addToCart(product.serial_number)}
-          >
-            Add to Cart
-          </button>
+          <div className="button-stock-section">
+            {product.stock > 0 ? (
+              <button
+                className="add-to-cart-button"
+                onClick={() => addToCart(product.serial_number)}
+              >
+                Add to Cart
+              </button>
+            ) : (
+              <span className="out-of-stock-label">Out of Stock!</span>
+            )}
+          </div>
+
           <div className="additional-info">
             <p>
               <strong>Stock:</strong> {product.stock}
@@ -180,8 +202,9 @@ const ProductPage = () => {
         {commentsList.length > 0 ? (
           commentsList.map((c, index) => (
             <div key={index} className="comment">
-              <p className="comment-text">{c.comment}</p>
+              <p>User ID: {c.user}</p>
               <p className="comment-rating">Rating: {c.rating} ★</p>
+              <p className="comment-text">Comment: {c.comment}</p>
             </div>
           ))
         ) : (

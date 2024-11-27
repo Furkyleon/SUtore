@@ -83,7 +83,11 @@ const StorePage = () => {
 
       <div className="sort-dropdown">
         <label htmlFor="sortCriterion">Sort by: </label>
-        <select id="sortCriterion" value={sortCriterion} onChange={handleSortChange}>
+        <select
+          id="sortCriterion"
+          value={sortCriterion}
+          onChange={handleSortChange}
+        >
           <option value="price">Price</option>
           <option value="name">Name</option>
         </select>
@@ -106,9 +110,13 @@ const StorePage = () => {
               <h2>{product.name}</h2>
             </Link>
             <p className="price">{product.price + " TL"}</p>
-            <button onClick={() => addToCart(product.serial_number)}>
-              Add to Cart
-            </button>
+            {product.stock > 0 ? (
+              <button onClick={() => addToCart(product.serial_number)}>
+                Add to Cart
+              </button>
+            ) : (
+              <span className="out-of-stock-label">Out of Stock!</span>
+            )}
           </div>
         ))}
       </div>

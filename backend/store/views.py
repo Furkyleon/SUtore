@@ -571,7 +571,7 @@ def get_reviews_by_product(request, product_id):
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
     
     # Filter reviews by product
-    reviews = Review.objects.filter(product=product)
+    reviews = Review.objects.filter(product=product, comment_status='Approved')
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
