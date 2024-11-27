@@ -41,7 +41,7 @@ const ProductPage = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to add item to cart");
+          throw new Error("Failed to add item to cart!");
         }
         return response.json();
       })
@@ -50,8 +50,8 @@ const ProductPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+        console.error("You are not registered:", error);
+        alert("You are not registered!");
       });
   };
 

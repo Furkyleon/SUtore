@@ -80,8 +80,8 @@ const CategoryPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+        console.error("You are not registered:", error);
+        alert("You are not registered.");
       });
   };
 
