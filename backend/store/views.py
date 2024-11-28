@@ -316,8 +316,6 @@ def add_to_cart(request):
 
     try:
         quantity = int(quantity)
-        if quantity <= 0:
-            return Response({"error": "Quantity must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
     except ValueError:
         return Response({"error": "Quantity must be a valid integer."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -326,7 +324,7 @@ def add_to_cart(request):
     price = product.price
 
     # Stock check
-    if product.stock < quantity:
+    if product.stock < quantity :
         return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Determine if the user is authenticated
@@ -358,6 +356,11 @@ def add_to_cart(request):
     if not created:  # Update quantity and subtotal if item already exists
         if order_item.quantity + quantity > product.stock:
             return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if order_item.quantity + quantity ==0:
+            order_item.delete()
+            return Response({"error": f"Order_item deleted."}, status=status.HTTP_400_BAD_REQUEST)
+        
         
         order_item.quantity += quantity
         order_item.subtotal = price * order_item.quantity
@@ -533,10 +536,17 @@ def checkout(request):
     order.status = 'In Progress'
     order.save()
 
+        # Increase the popularity of products in the order
+    order_items = order.order_items.all()  # Get all OrderItems related to the Order
+    for order_item in order_items:
+        product = order_item.product
+        product.popularity = F('popularity') + order_item.quantity # Use F expressions to avoid race conditions
+        product.save()
+
     # Calculate the total amount for the order
-    total_amount = 0
+    total_amount = 0.0
     for item in order.order_items.all():
-        total_amount += Decimal(str(item.subtotal))
+        total_amount += float(str(item.subtotal))
         
         # Decrease product stock based on quantity in the order
         product = item.product
@@ -546,7 +556,7 @@ def checkout(request):
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
-    order_history.total_amount += total_amount  # Ensure total_amount is set
+    order_history.total_amount += Decimal(total_amount)  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
@@ -596,6 +606,12 @@ def add_review(request, product_id):
     purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if the user has already reviewed this product
+    existing_review = Review.objects.filter(user=request.user, product=product).first()
+    if existing_review:
+        return Response({"error": "You can only leave one review per product."}, status=status.HTTP_400_BAD_REQUEST)
+
 
     # Save the review
     review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
@@ -611,7 +627,7 @@ def get_reviews_by_product(request, product_id):
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
     
     # Filter reviews by product
-    reviews = Review.objects.filter(product=product)
+    reviews = Review.objects.filter(product=product, comment_status= "Approved")
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
