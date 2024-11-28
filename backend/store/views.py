@@ -31,7 +31,7 @@ from rest_framework import status
 from .models import CustomUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+from django.db.models import Q
 # bu alttakilere bakılacak
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
@@ -302,6 +302,81 @@ def get_products_by_name(request):
 
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_sorted_by_popularity_asc(request):
+    """Retrieve products sorted by price in ascending order."""
+    products = Product.objects.all().order_by('popularity')  # Order by price ascending
+
+    if not products.exists():
+        return Response({'error': 'No products found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_by_category_sorted_by_popularity_asc(request, category_name):
+    """Retrieve products by category name sorted by price in descending order."""
+    products = Product.objects.filter(category=category_name).order_by('popularity')  # Filter and order
+
+    if not products.exists():
+        return Response({'error': 'No products found for this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_sorted_by_popularity_desc(request):
+    """Retrieve products sorted by price in ascending order."""
+    products = Product.objects.all().order_by('-popularity')  # Order by price ascending
+
+    if not products.exists():
+        return Response({'error': 'No products found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_by_category_sorted_by_popularity_desc(request, category_name):
+    """Retrieve products by category name sorted by price in descending order."""
+    products = Product.objects.filter(category=category_name).order_by('-popularity')  # Filter and order
+
+    if not products.exists():
+        return Response({'error': 'No products found for this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+
+
+
+@api_view(['GET'])
+def search_products(request):
+    search_term = request.data.get('search', '')  # Search term (name or description)
+    category_id = request.data.get('category', None)  # Category ID to filter by
+
+    if not search_term:
+        return Response({"error": "Search term is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Start with the base query: filtering by name or description containing the search term
+    products = Product.objects.filter(
+        Q(name__icontains=search_term) | Q(description__icontains=search_term)
+    )
+
+    # If category is provided, filter by the category as well
+    if category_id:
+        # Validate if the category exists
+        try:
+            category = Category.objects.get(id=category_id)
+            products = products.filter(category=category)
+        except Category.DoesNotExist:
+            return Response({"error": "Category not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Serialize the filtered products
+    serializer = ProductSerializer(products, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])

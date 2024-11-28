@@ -14,10 +14,17 @@ urlpatterns = [
     path('categories/add/', views.add_category, name='add_category'),  # URL for adding a new category
     path('categories/get_all/', views.get_categories, name='get_categories'),  # New endpoint for retrieving categories
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),  # New endpoint for retrieving products by category
+
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
     path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
+    path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
+    path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
+    path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
+    path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+    path('products/search_products/', views.search_products, name='search_products'),
+
     path('products/search/', views.get_products_by_name, name='get_products_by_name'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
