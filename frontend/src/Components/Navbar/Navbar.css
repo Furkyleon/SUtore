@@ -217,7 +217,7 @@
 }
 
 .navbar .sidebar2 h2 {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   margin-bottom: 25px;
   color: #01236a;
@@ -226,11 +226,27 @@
 
 .navbar .sidebar-menu2 {
   display: flex;
-  flex-direction: column; /* Ensure items are stacked vertically */
-  gap: 15px; /* Space between items */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.navbar .sidebar-menu2 li a {
+.navbar .sidebar-menu2 .register-login {
+  margin-bottom: 50px;
+}
+
+.navbar .sidebar-menu2 p {
+  color: #01236a;
+  font-size: 17.5px;
+  font-weight: bold;
+}
+
+.navbar .sidebar-menu2 li {
+  list-style: none;
+  margin: 10px 0;
+}
+
+.navbar .sidebar-menu2 li a,
+.navbar .sidebar-menu2 li button {
   color: #01236a;
   text-decoration: none;
   font-size: 18px;
@@ -243,18 +259,22 @@
   background-color: rgba(207, 207, 207, 0.616);
   transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
+  border: none;
+  width: 100%;
+  cursor: pointer;
 }
 
-
-.navbar .sidebar-menu2 li:last-child {
-  margin-bottom: 0; /* Ensure no extra margin for the last item */
+.navbar .sidebar-menu2 li button.logout-button {
+  margin-top: 230px;
+  background-color: #005da9;
+  color: white;
 }
 
-.navbar .sidebar-menu2 li a:hover {
+.navbar .sidebar-menu2 li a:hover,
+.navbar .sidebar-menu2 li button:hover {
   background-color: #01236a;
   color: #fff;
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .search-bar {
@@ -299,29 +319,4 @@
 .search-button:active {
   background-color: #011b4d;
   transform: translateY(0);
-}
-
-.navbar .sidebar-menu2 li button.logout-button {
-  color: #01236a;
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 15px;
-  border-radius: 6px;
-  background-color: rgba(207, 207, 207, 0.616);
-  transition: background-color 0.3s ease, transform 0.2s ease,
-    box-shadow 0.2s ease;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.navbar .sidebar-menu2 li button.logout-button:hover {
-  background-color: #01236a;
-  color: #fff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }

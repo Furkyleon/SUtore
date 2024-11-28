@@ -177,25 +177,32 @@ const Navbar = () => {
         </button>
         <h2>{"Account: " + localStorage.getItem("username")}</h2>
         <ul className="sidebar-menu2">
+          <div className="register-login">
+            <p>Register/Login:</p>
+
+            <li>
+              <Link to="/register" onClick={toggleSidebar2}>
+                Register
+              </Link>
+            </li>
+            <li>
+              <Link to="/login" onClick={toggleSidebar2}>
+                Login
+              </Link>
+            </li>
+          </div>
+
+          <p>Order History:</p>
+
           <li>
-            <Link to="/register" onClick={toggleSidebar2}>
-              Register
-            </Link>
-          </li>
-          <li>
-            <Link to="/login" onClick={toggleSidebar2}>
-              Login
+            <Link to="/orderhistory" onClick={toggleSidebar2}>
+              Order History
             </Link>
           </li>
           <li>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
-          </li>
-          <li>
-            <Link to="/orderhistory" onClick={toggleSidebar2}>
-              Order History
-            </Link>
           </li>
         </ul>
       </div>
