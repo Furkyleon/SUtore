@@ -6,13 +6,21 @@
   background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  margin-top: 80px;
+}
+
+.order-history-container p {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 .order-history-container h2 {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 20px;
-  padding-top: 5%;
+  padding-top: 50px;
   color: #333;
 }
 
@@ -84,12 +92,12 @@
   color: #555;
 }
 
-/* Empty history message styling */
-.empty-history-message {
+.order-history-container p.empty-history-message {
   text-align: center;
   font-size: 1.2rem;
   color: #999;
-  margin-top: 50px;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
 /* Responsive Design */
