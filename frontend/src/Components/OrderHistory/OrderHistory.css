@@ -109,3 +109,19 @@
     margin-bottom: 5px; /* Add spacing between stacked elements */
   }
 }
+
+.view-invoice-button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #005da9;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-invoice-button:hover {
+  background-color: #01236a; /* Darker shade for hover effect */
+}
