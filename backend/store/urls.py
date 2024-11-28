@@ -21,6 +21,7 @@ urlpatterns = [
     path('products/search/', views.get_products_by_name, name='get_products_by_name'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
+    path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'),  # Endpoint for assigning an order to a user
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
     path('order/items/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
     path('order/', views.get_order, name='get_order'),  # Endpoint for order details
