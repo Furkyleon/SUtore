@@ -217,7 +217,7 @@
 }
 
 .navbar .sidebar2 h2 {
-  font-size: 25px;
+  font-size: 22.5px;
   font-weight: bold;
   margin-bottom: 25px;
   color: #01236a;
@@ -262,12 +262,6 @@
   border: none;
   width: 100%;
   cursor: pointer;
-}
-
-.navbar .sidebar-menu2 li button.logout-button {
-  margin-top: 230px;
-  background-color: #005da9;
-  color: white;
 }
 
 .navbar .sidebar-menu2 li a:hover,

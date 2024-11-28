@@ -48,6 +48,7 @@ const Navbar = () => {
     localStorage.setItem("password", null);
     alert("You have been logged out.");
     navigate("/"); // Redirect to the main page after logout
+    setIsSidebarOpen2(false);
   };
 
   useEffect(() => {
@@ -175,35 +176,44 @@ const Navbar = () => {
         <button className="close-button2" onClick={toggleSidebar2}>
           ×
         </button>
-        <h2>{"Account: " + localStorage.getItem("username")}</h2>
+        <h2>
+          {localStorage.getItem("username") === "null" ||
+          !localStorage.getItem("username")
+            ? "Welcome!"
+            : `Welcome "${localStorage.getItem("username")}"`}
+        </h2>
         <ul className="sidebar-menu2">
-          <div className="register-login">
-            <p>Register/Login:</p>
+          {localStorage.getItem("username") === "null" && (
+            <div className="register-login">
+              <li>
+                <Link to="/register" onClick={toggleSidebar2}>
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" onClick={toggleSidebar2}>
+                  Login
+                </Link>
+              </li>
+            </div>
+          )}
 
-            <li>
-              <Link to="/register" onClick={toggleSidebar2}>
-                Register
-              </Link>
-            </li>
-            <li>
-              <Link to="/login" onClick={toggleSidebar2}>
-                Login
-              </Link>
-            </li>
-          </div>
+          {localStorage.getItem("username") !== "null" &&
+            localStorage.getItem("username") && (
+              <div>
+                <li>
+                  <Link to="/orderhistory" onClick={toggleSidebar2}>
+                    Order History
+                  </Link>
+                </li>
 
-          <p>Order History:</p>
-
-          <li>
-            <Link to="/orderhistory" onClick={toggleSidebar2}>
-              Order History
-            </Link>
-          </li>
-          <li>
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
-          </li>
+                <li>
+                  <button onClick={handleLogout} className="logout-button">
+                    Logout
+                  </button>
+                </li>
+              </div>
+            )}
         </ul>
       </div>
     </div>
