@@ -5,7 +5,7 @@ import "./SearchPage.css";
 const SearchPage = () => {
   const [products, setProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [sortCriterion, setSortCriterion] = useState("price");
+  const [sortCriterion, setSortCriterion] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -52,9 +52,13 @@ const SearchPage = () => {
     } else if (sortCriterion === "name") {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
-      if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
-      if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
+      return sortOrder === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    } else if (sortCriterion === "popularity") {
+      return sortOrder === "asc"
+        ? a.popularity - b.popularity
+        : b.popularity - a.popularity;
     }
     return 0;
   });
@@ -81,10 +85,10 @@ const SearchPage = () => {
         }
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         alert("Product added to cart successfully!");
       })
-      .catch((error) => {
+      .catch(() => {
         alert("You are not registered.");
       });
   };
@@ -112,8 +116,9 @@ const SearchPage = () => {
               value={sortCriterion}
               onChange={handleCriterionChange}
             >
-              <option value="price">Price</option>
               <option value="name">Name</option>
+              <option value="price">Price</option>
+              <option value="popularity">Popularity</option>
             </select>
 
             <label htmlFor="sortOrder">Order: </label>

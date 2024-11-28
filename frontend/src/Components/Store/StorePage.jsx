@@ -4,7 +4,7 @@ import "./StorePage.css";
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
-  const [sortCriterion, setSortCriterion] = useState("price");
+  const [sortCriterion, setSortCriterion] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
@@ -62,6 +62,10 @@ const StorePage = () => {
         if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
         if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
         return 0;
+      } else if (sortCriterion === "popularity") {
+        return sortOrder === "asc"
+          ? a.popularity - b.popularity
+          : b.popularity - a.popularity;
       }
       return 0;
     });
@@ -88,8 +92,9 @@ const StorePage = () => {
           value={sortCriterion}
           onChange={handleSortChange}
         >
-          <option value="price">Price</option>
           <option value="name">Name</option>
+          <option value="price">Price</option>
+          <option value="popularity">Popularity</option>
         </select>
 
         <label htmlFor="sortOrder">Order: </label>
