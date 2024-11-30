@@ -37,6 +37,15 @@
   font-weight: bold;
 }
 
+.navbar .nav-left p {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: bold;
+}
+
 .navbar .nav-left .animation:hover {
   background-color: #ff9800;
   transform: scale(1.1);
@@ -77,8 +86,22 @@
   transform: scale(1.1);
 }
 
+.navbar .nav-right p {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar .nav-right p:hover {
+  background-color: #ff9800;
+  transform: scale(1.1);
+}
+
 .navbar .nav-right .logo {
-  width: 30px;
+  width: 35px;
   transition: transform 0.3s ease;
 }
 

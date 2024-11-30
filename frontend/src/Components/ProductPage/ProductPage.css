@@ -60,6 +60,12 @@ body {
   margin-bottom: 15px;
 }
 
+.product-page-container .product-description {
+  color: #303030;
+  font-size: 1em;
+  margin-bottom: 15px;
+}
+
 .product-page-container .rating {
   display: flex;
   align-items: center;

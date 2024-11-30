@@ -78,7 +78,7 @@ const CategoryPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch(() => {
-        alert("You are not registered.");
+        alert("There is an error.");
       });
   };
 

@@ -285,23 +285,7 @@ def get_products_by_price_interval(request):
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 
-@api_view(['GET'])
-def get_products_by_name(request):
-    """Retrieve products by their name."""
-    search_query = request.query_params.get('name')
-    
-    # Validate input
-    if not search_query:
-        return Response({'error': 'The "name" parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Filter products by name (case-insensitive search)
-    products = Product.objects.filter(name__icontains=search_query)
-    
-    if not products.exists():
-        return Response({'error': 'No products found with this name.'}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
-    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 @api_view(['GET'])
 def get_products_sorted_by_popularity_asc(request):
@@ -347,9 +331,7 @@ def get_products_by_category_sorted_by_popularity_desc(request, category_name):
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
-
-
-
+# searching by name or description
 @api_view(['GET'])
 def search_products(request):
     search_term = request.data.get('search', '')  # Search term (name or description)
@@ -377,7 +359,24 @@ def search_products(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+# searching by only name
+@api_view(['GET'])
+def get_products_by_name(request):
+    """Retrieve products by their name."""
+    search_query = request.query_params.get('name')
+    
+    # Validate input
+    if not search_query:
+        return Response({'error': 'The "name" parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Filter products by name (case-insensitive search)
+    products = Product.objects.filter(name__icontains=search_query)
+    
+    if not products.exists():
+        return Response({'error': 'No products found with this name.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 @api_view(['POST'])
 def add_to_cart(request):

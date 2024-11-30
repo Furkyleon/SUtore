@@ -74,13 +74,9 @@ const Navbar = () => {
         <a href="/" className="SUtore">
           SUtore
         </a>
-        <a
-          className="animation"
-          href="javascript:void(0)"
-          onClick={toggleSidebar}
-        >
+        <p className="animation" onClick={toggleSidebar}>
           Categories
-        </a>
+        </p>
       </div>
 
       <div className="nav-center">
@@ -99,13 +95,9 @@ const Navbar = () => {
       </div>
 
       <div className="nav-right">
-        <a
-          className="animation2"
-          href="javascript:void(0)"
-          onClick={toggleSidebar2}
-        >
+        <p className="animation2" onClick={toggleSidebar2}>
           <img src="/loginregister.png" alt="" className="logo" />
-        </a>
+        </p>
 
         <a href="/cart" className="SUtore">
           <img src="/navbarlogo.png" alt="" className="logo2" />

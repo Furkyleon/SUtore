@@ -47,8 +47,8 @@ const StorePage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("You are not registered:", error);
-        alert("You are not registered.");
+        console.error("There is an error:", error);
+        alert("There is an error.");
       });
   };
 

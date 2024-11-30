@@ -42,8 +42,10 @@ const SearchPage = () => {
     }
   }, [searchTerm]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm)
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm)
   );
 
   const sortedProducts = filteredProducts.sort((a, b) => {
@@ -89,7 +91,7 @@ const SearchPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch(() => {
-        alert("You are not registered.");
+        alert("There is an error.");
       });
   };
 
@@ -106,7 +108,7 @@ const SearchPage = () => {
 
   return (
     <div className="search-page-wrapper">
-      <h1>Search Results for "{queryParams.get("query")}"</h1>
+      <h1>Search results for "{queryParams.get("query")}"</h1>
       {sortedProducts.length > 0 ? (
         <>
           <div className="sort-dropdown">

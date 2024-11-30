@@ -50,8 +50,8 @@ const ProductPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("You are not registered:", error);
-        alert("You are not registered!");
+        console.error("There is an error:", error);
+        alert("There is an error!");
       });
   };
 
@@ -96,7 +96,7 @@ const ProductPage = () => {
             } else if (response.status === 403) {
               throw new Error("You can only review products you've purchased.");
             } else {
-              throw new Error("Failed to submit review.");
+              throw new Error("You have already reviewed this product.");
             }
           })
           .then((newReview) => {
@@ -173,6 +173,8 @@ const ProductPage = () => {
             )}
           </div>
 
+          <p className="product-description">{product.description}</p>
+
           <div className="button-stock-section">
             {product.stock > 0 ? (
               <button
@@ -207,7 +209,9 @@ const ProductPage = () => {
             <div key={index} className="comment">
               <p>User ID: {c.user}</p>
               <p className="comment-rating">Rating: {c.rating} ★</p>
-              <p className="comment-text">Comment: {c.comment}</p>
+              {c.comment.length > 0 && (
+                <p className="comment-text">Comment: {c.comment}</p>
+              )}
             </div>
           ))
         ) : (
