@@ -304,59 +304,99 @@ def get_products_by_name(request):
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 
-
 @api_view(['POST'])
 def add_to_cart(request):
-
-    """
-    if request.CustomUser.role != 'customer':
-        return Response({"error": "Only customers can add items to the cart."}, status=status.HTTP_403_FORBIDDEN)
-    """
-    
-    if not request.user.is_authenticated:
-        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
-
-    
+    # Extract data from the request
     serial_number = request.data.get('serial_number')
-    
+    quantity = request.data.get('quantity')
+    order_id = request.data.get('order_id')  # Optional for unauthenticated users
+
+    if not serial_number or not quantity:
+        return Response({"error": "Serial number and quantity are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        quantity = int(quantity)
+        if quantity <= 0:
+            return Response({"error": "Quantity must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"error": "Quantity must be a valid integer."}, status=status.HTTP_400_BAD_REQUEST)
+
     # Validate that the product exists
     product = get_object_or_404(Product, serial_number=serial_number)
-    quantity = request.data.get('quantity')
     price = product.price
 
     # Stock check
     if product.stock < quantity:
         return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-    # Get or create the order for the customer
-    order, created = Order.objects.get_or_create(
-        customer=request.user,
-        complete=False  # Ensure it's an active cart
-    )
-    
+
+    # Determine if the user is authenticated
+    if not request.user.is_authenticated:
+        # Handle unauthenticated users
+        if order_id:
+            try:
+                # Try to fetch the existing order
+                order = Order.objects.get(id=order_id, complete=False)
+            except Order.DoesNotExist:
+                return Response({"error": "Invalid order ID or order is already complete."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Create a new order for unauthenticated users
+            order = Order.objects.create(complete=False)
+    else:
+        # Handle authenticated users
+        order, created = Order.objects.get_or_create(
+            customer=request.user,
+            complete=False  # Ensure it's an active cart
+        )
+
     # Create or update the OrderItem
     order_item, created = OrderItem.objects.get_or_create(
         order=order,
         product=product,
-        price=price,
-        defaults={'quantity': quantity}
+        defaults={'quantity': quantity, 'price': price}
     )
-    
-    if not created:  # If the OrderItem already exists, update the quantity
+
+    if not created:  # Update quantity and subtotal if item already exists
         if order_item.quantity + quantity > product.stock:
             return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
         
         order_item.quantity += quantity
-        order_item.subtotal= (price*(order_item.quantity))
+        order_item.subtotal = price * order_item.quantity
         order_item.save()
     else:
-        order_item.subtotal= (price*(order_item.quantity))
+        # Set subtotal for a new item
+        order_item.subtotal = price * order_item.quantity
         order_item.save()
 
-    # Optionally, return the order item or order details
+    # Optionally return the order ID and order item details
     serializer = OrderItemSerializer(order_item)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response({"order_id": order.id, "order_item": serializer.data}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def assign_user_to_order(request):
+    order_id = request.data.get('order_id')  # Order ID to be updated
+     # User ID to associate with the order
+
+    if not order_id:
+        return Response({"error": "order_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validate order existence
+    try:
+        order = Order.objects.get(id=order_id, complete=False)  # Ensure it's an active order
+    except Order.DoesNotExist:
+        return Response({"error": "Order does not exist or is already complete."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+    # Associate the user with the order
+    order.customer = request.user
+    order.save()
+
+    return Response({
+        "message": "User successfully assigned to the order.",
+        "order_id": order.id,
+        "user_username": request.user.username
+    }, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
