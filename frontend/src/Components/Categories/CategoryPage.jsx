@@ -135,7 +135,7 @@ const CategoryPage = () => {
                       Add to Cart
                     </button>
                   ) : (
-                    <span className="out-of-stock-label">Out of Stock</span>
+                    <span className="out-of-stock-label">Out of Stock!</span>
                   )}
                 </div>
               ))
