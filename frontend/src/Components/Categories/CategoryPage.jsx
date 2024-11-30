@@ -5,12 +5,11 @@ import "./CategoryPage.css";
 const CategoryPage = () => {
   const { categoryName } = useParams();
   const [products, setProducts] = useState([]);
-  const [sortOrder, setSortOrder] = useState("asc"); // State for sorting order
-  const [sortCriterion, setSortCriterion] = useState("price"); // State for sorting criterion
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortCriterion, setSortCriterion] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch products based on category
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/category/${categoryName}/`)
       .then((response) => response.json())
@@ -28,31 +27,31 @@ const CategoryPage = () => {
       });
   }, [categoryName]);
 
-  // Sort products based on selected criterion and order
   const sortedProducts = products.sort((a, b) => {
     if (sortCriterion === "price") {
       return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
     } else if (sortCriterion === "name") {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
-      if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
-      if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
+      return sortOrder === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    } else if (sortCriterion === "popularity") {
+      return sortOrder === "asc"
+        ? a.popularity - b.popularity
+        : b.popularity - a.popularity;
     }
     return 0;
   });
 
-  // Handle sorting order change
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
 
-  // Handle sorting criterion change
   const handleCriterionChange = (event) => {
     setSortCriterion(event.target.value);
   };
 
-  // Function to handle adding a product to the cart
   const addToCart = (serialNumber) => {
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
@@ -75,13 +74,11 @@ const CategoryPage = () => {
         }
         return response.json();
       })
-      .then((data) => {
-        console.log("Item added to cart:", data);
+      .then(() => {
         alert("Product added to cart successfully!");
       })
-      .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+      .catch(() => {
+        alert("You are not registered.");
       });
   };
 
@@ -101,8 +98,9 @@ const CategoryPage = () => {
               value={sortCriterion}
               onChange={handleCriterionChange}
             >
-              <option value="price">Price</option>
               <option value="name">Name</option>
+              <option value="price">Price</option>
+              <option value="popularity">Popularity</option>
             </select>
 
             <label htmlFor="sortOrder">Order: </label>
@@ -137,7 +135,7 @@ const CategoryPage = () => {
                       Add to Cart
                     </button>
                   ) : (
-                    <span className="out-of-stock-label">Out of Stock</span>
+                    <span className="out-of-stock-label">Out of Stock!</span>
                   )}
                 </div>
               ))

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./OrderHistory.css";
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Fetch order history when the component mounts
   useEffect(() => {
@@ -34,6 +36,10 @@ const OrderHistory = () => {
       });
   }, []);
 
+  const viewInvoice = (orderId) => {
+    navigate(`/invoice/${orderId}`);
+  };
+
   return (
     <div className="order-history-container">
       <h2>Order History</h2>
@@ -59,6 +65,12 @@ const OrderHistory = () => {
                     .toFixed(2)}{" "}
                   TL
                 </span>
+                <button
+                  className="view-invoice-button"
+                  onClick={() => viewInvoice(order.order_id)}
+                >
+                  View Invoice
+                </button>
               </div>
               <ul className="order-items">
                 {order.items.map((item) => (

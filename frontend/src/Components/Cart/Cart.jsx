@@ -5,33 +5,47 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState({});
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/order/items/", {
-      headers: {
-        Authorization: `Basic ${btoa(
-          `${localStorage.getItem("username")}:${localStorage.getItem(
-            "password"
-          )}`
-        )}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch cart items");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Fetched cart items:", data);
-        setCartItems(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching cart items:", error);
+    const fetchCartItems = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/order/items/", {
+          headers: {
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch cart items");
+        const cartData = await response.json();
+        setCartItems(cartData);
+      } catch (err) {
         setError("Failed to load cart items. Please try again.");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    const fetchProductDetails = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/products/get_all/"); // Endpoint for products
+        if (!response.ok) throw new Error("Failed to fetch product details");
+        const productData = await response.json();
+        const productMap = {};
+        productData.forEach((product) => {
+          productMap[product.id] = product.name;
+        });
+        setProducts(productMap); // Store products as { id: name }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+
+    fetchCartItems();
+    fetchProductDetails();
   }, []);
 
   const calculateTotal = () => {
@@ -62,7 +76,7 @@ const Cart = () => {
           <ul className="cart-items">
             {cartItems.map((item) => (
               <li key={item.id} className="cart-item">
-                <span className="item-id">Product ID: {item.product}</span>
+                <span className="item-name">{products[item.product]}</span>
                 <span className="item-quantity">Quantity: {item.quantity}</span>
                 <span className="item-price">
                   Price per Unit: {parseFloat(item.price).toFixed(2)} TL

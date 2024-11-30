@@ -8,7 +8,7 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchSubmit = (event) => {
-    event.preventDefault(); // Prevents the default form submission behavior
+    event.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
@@ -41,6 +41,14 @@ const Navbar = () => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleLogout = () => {
+    localStorage.setItem("username", null);
+    localStorage.setItem("password", null);
+    alert("You have been logged out.");
+    navigate("/"); // Redirect to the main page after logout
+    setIsSidebarOpen2(false);
   };
 
   useEffect(() => {
@@ -168,23 +176,44 @@ const Navbar = () => {
         <button className="close-button2" onClick={toggleSidebar2}>
           ×
         </button>
-        <h2>{"Account: " + localStorage.getItem("username")}</h2>
+        <h2>
+          {localStorage.getItem("username") === "null" ||
+          !localStorage.getItem("username")
+            ? "Welcome!"
+            : `Welcome "${localStorage.getItem("username")}"`}
+        </h2>
         <ul className="sidebar-menu2">
-          <li>
-            <Link to="/login" onClick={toggleSidebar2}>
-              Login
-            </Link>
-          </li>
-          <li>
-            <Link to="/register" onClick={toggleSidebar2}>
-              Register
-            </Link>
-          </li>
-          <li>
-            <Link to="/orderhistory" onClick={toggleSidebar2}>
-              Order History
-            </Link>
-          </li>
+          {localStorage.getItem("username") === "null" && (
+            <div className="register-login">
+              <li>
+                <Link to="/register" onClick={toggleSidebar2}>
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" onClick={toggleSidebar2}>
+                  Login
+                </Link>
+              </li>
+            </div>
+          )}
+
+          {localStorage.getItem("username") !== "null" &&
+            localStorage.getItem("username") && (
+              <div>
+                <li>
+                  <Link to="/orderhistory" onClick={toggleSidebar2}>
+                    Order History
+                  </Link>
+                </li>
+
+                <li>
+                  <button onClick={handleLogout} className="logout-button">
+                    Logout
+                  </button>
+                </li>
+              </div>
+            )}
         </ul>
       </div>
     </div>

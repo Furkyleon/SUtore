@@ -41,7 +41,7 @@ const ProductPage = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to add item to cart");
+          throw new Error("Failed to add item to cart!");
         }
         return response.json();
       })
@@ -50,8 +50,8 @@ const ProductPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+        console.error("You are not registered:", error);
+        alert("You are not registered!");
       });
   };
 
@@ -75,42 +75,45 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Handle comment submission
   const handleCommentSubmit = () => {
-    if (comment && rating > 0) {
-      const username = localStorage.getItem("username");
-      const password = localStorage.getItem("password");
-      const encodedCredentials = btoa(`${username}:${password}`);
+    if (rating > 0) {
+      if (comment || rating > 0) {
+        const username = localStorage.getItem("username");
+        const password = localStorage.getItem("password");
+        const encodedCredentials = btoa(`${username}:${password}`);
 
-      fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${encodedCredentials}`,
-        },
-        body: JSON.stringify({ rating, comment }),
-      })
-        .then((response) => {
-          if (response.status === 201) {
-            return response.json();
-          } else if (response.status === 403) {
-            throw new Error("You can only review products you've purchased.");
-          } else {
-            throw new Error("Failed to submit review.");
-          }
+        fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encodedCredentials}`,
+          },
+          body: JSON.stringify({ rating, comment }),
         })
-        .then((newReview) => {
-          setCommentsList([...commentsList, newReview]);
-          setComment("");
-          setRating(0);
-          alert("Your review has been submitted successfully.");
-        })
-        .catch((error) => {
-          console.error("Error submitting review:", error);
-          alert(error.message);
-        });
+          .then((response) => {
+            if (response.status === 201) {
+              return response.json();
+            } else if (response.status === 403) {
+              throw new Error("You can only review products you've purchased.");
+            } else {
+              throw new Error("Failed to submit review.");
+            }
+          })
+          .then((newReview) => {
+            setCommentsList([...commentsList, newReview]);
+            setComment("");
+            setRating(0);
+            alert("Your review has been submitted successfully.");
+          })
+          .catch((error) => {
+            console.error("Error submitting review:", error);
+            alert(error.message);
+          });
+      } else {
+        alert("Please add a comment.");
+      }
     } else {
-      alert("Please add both a comment and a rating.");
+      alert("Please provide a rating.");
     }
   };
 
