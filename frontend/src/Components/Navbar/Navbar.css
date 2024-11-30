@@ -37,6 +37,15 @@
   font-weight: bold;
 }
 
+.navbar .nav-left p {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: bold;
+}
+
 .navbar .nav-left .animation:hover {
   background-color: #ff9800;
   transform: scale(1.1);
@@ -77,8 +86,22 @@
   transform: scale(1.1);
 }
 
+.navbar .nav-right p {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar .nav-right p:hover {
+  background-color: #ff9800;
+  transform: scale(1.1);
+}
+
 .navbar .nav-right .logo {
-  width: 30px;
+  width: 35px;
   transition: transform 0.3s ease;
 }
 
@@ -217,7 +240,7 @@
 }
 
 .navbar .sidebar2 h2 {
-  font-size: 20px;
+  font-size: 22.5px;
   font-weight: bold;
   margin-bottom: 25px;
   color: #01236a;
@@ -226,11 +249,27 @@
 
 .navbar .sidebar-menu2 {
   display: flex;
-  flex-direction: column; /* Ensure items are stacked vertically */
-  gap: 15px; /* Space between items */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.navbar .sidebar-menu2 li a {
+.navbar .sidebar-menu2 .register-login {
+  margin-bottom: 50px;
+}
+
+.navbar .sidebar-menu2 p {
+  color: #01236a;
+  font-size: 17.5px;
+  font-weight: bold;
+}
+
+.navbar .sidebar-menu2 li {
+  list-style: none;
+  margin: 10px 0;
+}
+
+.navbar .sidebar-menu2 li a,
+.navbar .sidebar-menu2 li button {
   color: #01236a;
   text-decoration: none;
   font-size: 18px;
@@ -243,18 +282,16 @@
   background-color: rgba(207, 207, 207, 0.616);
   transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
+  border: none;
+  width: 100%;
+  cursor: pointer;
 }
 
-
-.navbar .sidebar-menu2 li:last-child {
-  margin-bottom: 0; /* Ensure no extra margin for the last item */
-}
-
-.navbar .sidebar-menu2 li a:hover {
+.navbar .sidebar-menu2 li a:hover,
+.navbar .sidebar-menu2 li button:hover {
   background-color: #01236a;
   color: #fff;
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .search-bar {

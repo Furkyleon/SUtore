@@ -4,7 +4,7 @@ import "./StorePage.css";
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
-  const [sortCriterion, setSortCriterion] = useState("price");
+  const [sortCriterion, setSortCriterion] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
@@ -47,8 +47,8 @@ const StorePage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+        console.error("There is an error:", error);
+        alert("There is an error.");
       });
   };
 
@@ -62,6 +62,10 @@ const StorePage = () => {
         if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
         if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
         return 0;
+      } else if (sortCriterion === "popularity") {
+        return sortOrder === "asc"
+          ? a.popularity - b.popularity
+          : b.popularity - a.popularity;
       }
       return 0;
     });
@@ -83,9 +87,14 @@ const StorePage = () => {
 
       <div className="sort-dropdown">
         <label htmlFor="sortCriterion">Sort by: </label>
-        <select id="sortCriterion" value={sortCriterion} onChange={handleSortChange}>
-          <option value="price">Price</option>
+        <select
+          id="sortCriterion"
+          value={sortCriterion}
+          onChange={handleSortChange}
+        >
           <option value="name">Name</option>
+          <option value="price">Price</option>
+          <option value="popularity">Popularity</option>
         </select>
 
         <label htmlFor="sortOrder">Order: </label>
@@ -106,9 +115,13 @@ const StorePage = () => {
               <h2>{product.name}</h2>
             </Link>
             <p className="price">{product.price + " TL"}</p>
-            <button onClick={() => addToCart(product.serial_number)}>
-              Add to Cart
-            </button>
+            {product.stock > 0 ? (
+              <button onClick={() => addToCart(product.serial_number)}>
+                Add to Cart
+              </button>
+            ) : (
+              <span className="out-of-stock-label">Out of Stock!</span>
+            )}
           </div>
         ))}
       </div>

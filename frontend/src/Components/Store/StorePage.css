@@ -85,6 +85,14 @@ body {
   align-self: center;
 }
 
+.store-page-wrapper .product-card .out-of-stock-label {
+  color: red;
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
 .store-page-wrapper .product-card button:hover {
   background-color: #01236a;
 }

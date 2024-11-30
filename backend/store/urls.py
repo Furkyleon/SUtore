@@ -14,13 +14,22 @@ urlpatterns = [
     path('categories/add/', views.add_category, name='add_category'),  # URL for adding a new category
     path('categories/get_all/', views.get_categories, name='get_categories'),  # New endpoint for retrieving categories
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),  # New endpoint for retrieving products by category
+
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
     path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
+    path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
+    path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
+    path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
+    path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+    
+    path('products/search_products/', views.search_products, name='search_products'), # search products by name or description
     path('products/search/', views.get_products_by_name, name='get_products_by_name'),
+    
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
+    path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'),  # Endpoint for assigning an order to a user
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
     path('order/items/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
     path('order/', views.get_order, name='get_order'),  # Endpoint for order details
@@ -28,6 +37,7 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
+
     #path('wishlist/', views.get_wishlist, name='get_wishlist'),
     #path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
     #path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),

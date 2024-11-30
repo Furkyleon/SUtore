@@ -31,7 +31,7 @@ from rest_framework import status
 from .models import CustomUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+from django.db.models import Q
 # bu alttakilere bakılacak
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
@@ -285,6 +285,81 @@ def get_products_by_price_interval(request):
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 
+
+
+@api_view(['GET'])
+def get_products_sorted_by_popularity_asc(request):
+    """Retrieve products sorted by price in ascending order."""
+    products = Product.objects.all().order_by('popularity')  # Order by price ascending
+
+    if not products.exists():
+        return Response({'error': 'No products found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_by_category_sorted_by_popularity_asc(request, category_name):
+    """Retrieve products by category name sorted by price in descending order."""
+    products = Product.objects.filter(category=category_name).order_by('popularity')  # Filter and order
+
+    if not products.exists():
+        return Response({'error': 'No products found for this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_sorted_by_popularity_desc(request):
+    """Retrieve products sorted by price in ascending order."""
+    products = Product.objects.all().order_by('-popularity')  # Order by price ascending
+
+    if not products.exists():
+        return Response({'error': 'No products found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+@api_view(['GET'])
+def get_products_by_category_sorted_by_popularity_desc(request, category_name):
+    """Retrieve products by category name sorted by price in descending order."""
+    products = Product.objects.filter(category=category_name).order_by('-popularity')  # Filter and order
+
+    if not products.exists():
+        return Response({'error': 'No products found for this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
+    return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
+# searching by name or description
+@api_view(['GET'])
+def search_products(request):
+    search_term = request.data.get('search', '')  # Search term (name or description)
+    category_id = request.data.get('category', None)  # Category ID to filter by
+
+    if not search_term:
+        return Response({"error": "Search term is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Start with the base query: filtering by name or description containing the search term
+    products = Product.objects.filter(
+        Q(name__icontains=search_term) | Q(description__icontains=search_term)
+    )
+
+    # If category is provided, filter by the category as well
+    if category_id:
+        # Validate if the category exists
+        try:
+            category = Category.objects.get(id=category_id)
+            products = products.filter(category=category)
+        except Category.DoesNotExist:
+            return Response({"error": "Category not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Serialize the filtered products
+    serializer = ProductSerializer(products, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# searching by only name
 @api_view(['GET'])
 def get_products_by_name(request):
     """Retrieve products by their name."""
@@ -303,60 +378,102 @@ def get_products_by_name(request):
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
-
-
 @api_view(['POST'])
 def add_to_cart(request):
-
-    """
-    if request.CustomUser.role != 'customer':
-        return Response({"error": "Only customers can add items to the cart."}, status=status.HTTP_403_FORBIDDEN)
-    """
-    
-    if not request.user.is_authenticated:
-        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
-
-    
+    # Extract data from the request
     serial_number = request.data.get('serial_number')
-    
+    quantity = request.data.get('quantity')
+    order_id = request.data.get('order_id')  # Optional for unauthenticated users
+
+    if not serial_number or not quantity:
+        return Response({"error": "Serial number and quantity are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        return Response({"error": "Quantity must be a valid integer."}, status=status.HTTP_400_BAD_REQUEST)
+
     # Validate that the product exists
     product = get_object_or_404(Product, serial_number=serial_number)
-    quantity = request.data.get('quantity')
     price = product.price
 
     # Stock check
-    if product.stock < quantity:
+    if product.stock < quantity :
         return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-    # Get or create the order for the customer
-    order, created = Order.objects.get_or_create(
-        customer=request.user,
-        complete=False  # Ensure it's an active cart
-    )
-    
+
+    # Determine if the user is authenticated
+    if not request.user.is_authenticated:
+        # Handle unauthenticated users
+        if order_id:
+            try:
+                # Try to fetch the existing order
+                order = Order.objects.get(id=order_id, complete=False)
+            except Order.DoesNotExist:
+                return Response({"error": "Invalid order ID or order is already complete."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Create a new order for unauthenticated users
+            order = Order.objects.create(complete=False)
+    else:
+        # Handle authenticated users
+        order, created = Order.objects.get_or_create(
+            customer=request.user,
+            complete=False  # Ensure it's an active cart
+        )
+
     # Create or update the OrderItem
     order_item, created = OrderItem.objects.get_or_create(
         order=order,
         product=product,
-        price=price,
-        defaults={'quantity': quantity}
+        defaults={'quantity': quantity, 'price': price}
     )
-    
-    if not created:  # If the OrderItem already exists, update the quantity
+
+    if not created:  # Update quantity and subtotal if item already exists
         if order_item.quantity + quantity > product.stock:
             return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
         
+        if order_item.quantity + quantity ==0:
+            order_item.delete()
+            return Response({"error": f"Order_item deleted."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
         order_item.quantity += quantity
-        order_item.subtotal= (price*(order_item.quantity))
+        order_item.subtotal = price * order_item.quantity
         order_item.save()
     else:
-        order_item.subtotal= (price*(order_item.quantity))
+        # Set subtotal for a new item
+        order_item.subtotal = price * order_item.quantity
         order_item.save()
 
-    # Optionally, return the order item or order details
+    # Optionally return the order ID and order item details
     serializer = OrderItemSerializer(order_item)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response({"order_id": order.id, "order_item": serializer.data}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def assign_user_to_order(request):
+    order_id = request.data.get('order_id')  # Order ID to be updated
+     # User ID to associate with the order
+
+    if not order_id:
+        return Response({"error": "order_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validate order existence
+    try:
+        order = Order.objects.get(id=order_id, complete=False)  # Ensure it's an active order
+    except Order.DoesNotExist:
+        return Response({"error": "Order does not exist or is already complete."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not request.user.is_authenticated:
+        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+    # Associate the user with the order
+    order.customer = request.user
+    order.save()
+
+    return Response({
+        "message": "User successfully assigned to the order.",
+        "order_id": order.id,
+        "user_username": request.user.username
+    }, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
@@ -493,10 +610,17 @@ def checkout(request):
     order.status = 'In Progress'
     order.save()
 
+        # Increase the popularity of products in the order
+    order_items = order.order_items.all()  # Get all OrderItems related to the Order
+    for order_item in order_items:
+        product = order_item.product
+        product.popularity = F('popularity') + order_item.quantity # Use F expressions to avoid race conditions
+        product.save()
+
     # Calculate the total amount for the order
-    total_amount = 0
+    total_amount = 0.0
     for item in order.order_items.all():
-        total_amount += Decimal(str(item.subtotal))
+        total_amount += float(str(item.subtotal))
         
         # Decrease product stock based on quantity in the order
         product = item.product
@@ -506,7 +630,7 @@ def checkout(request):
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
-    order_history.total_amount += total_amount  # Ensure total_amount is set
+    order_history.total_amount += Decimal(total_amount)  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
@@ -556,6 +680,12 @@ def add_review(request, product_id):
     purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if the user has already reviewed this product
+    existing_review = Review.objects.filter(user=request.user, product=product).first()
+    if existing_review:
+        return Response({"error": "You can only leave one review per product."}, status=status.HTTP_400_BAD_REQUEST)
+
 
     # Save the review
     review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
@@ -571,7 +701,7 @@ def get_reviews_by_product(request, product_id):
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
     
     # Filter reviews by product
-    reviews = Review.objects.filter(product=product)
+    reviews = Review.objects.filter(product=product, comment_status= "Approved")
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)

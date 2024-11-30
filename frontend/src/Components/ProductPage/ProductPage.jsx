@@ -27,6 +27,7 @@ const ProductPage = () => {
     const username = localStorage.getItem("username"); // Retrieve username from localStorage
     const password = localStorage.getItem("password"); // Retrieve password from localStorage
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode username:password
+
     fetch("http://127.0.0.1:8000/cart/add/", {
       method: "POST",
       headers: {
@@ -40,7 +41,7 @@ const ProductPage = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to add item to cart");
+          throw new Error("Failed to add item to cart!");
         }
         return response.json();
       })
@@ -49,17 +50,22 @@ const ProductPage = () => {
         alert("Product added to cart successfully!");
       })
       .catch((error) => {
-        console.error("This product is out of stock:", error);
-        alert("This product is out of stock.");
+        console.error("There is an error:", error);
+        alert("There is an error!");
       });
   };
 
   // Fetch reviews
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        return response.json();
+      })
       .then((data) => {
-        setCommentsList(data);
+        setCommentsList(data); // Update state with fetched reviews
       })
       .catch((error) => console.error("Error fetching reviews:", error));
   }, [productId]);
@@ -69,42 +75,45 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Handle comment submission
   const handleCommentSubmit = () => {
-    if (comment && rating > 0) {
-      const username = localStorage.getItem("username");
-      const password = localStorage.getItem("password");
-      const encodedCredentials = btoa(`${username}:${password}`);
+    if (rating > 0) {
+      if (comment || rating > 0) {
+        const username = localStorage.getItem("username");
+        const password = localStorage.getItem("password");
+        const encodedCredentials = btoa(`${username}:${password}`);
 
-      fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${encodedCredentials}`,
-        },
-        body: JSON.stringify({ rating, comment }),
-      })
-        .then((response) => {
-          if (response.status === 201) {
-            return response.json();
-          } else if (response.status === 403) {
-            throw new Error("You can only review products you've purchased.");
-          } else {
-            throw new Error("Failed to submit review.");
-          }
+        fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encodedCredentials}`,
+          },
+          body: JSON.stringify({ rating, comment }),
         })
-        .then((newReview) => {
-          setCommentsList([...commentsList, newReview]);
-          setComment("");
-          setRating(0);
-          alert("Your review has been submitted successfully.");
-        })
-        .catch((error) => {
-          console.error("Error submitting review:", error);
-          alert(error.message);
-        });
+          .then((response) => {
+            if (response.status === 201) {
+              return response.json();
+            } else if (response.status === 403) {
+              throw new Error("You can only review products you've purchased.");
+            } else {
+              throw new Error("You have already reviewed this product.");
+            }
+          })
+          .then((newReview) => {
+            setCommentsList([...commentsList, newReview]);
+            setComment("");
+            setRating(0);
+            alert("Your review has been submitted successfully.");
+          })
+          .catch((error) => {
+            console.error("Error submitting review:", error);
+            alert(error.message);
+          });
+      } else {
+        alert("Please add a comment.");
+      }
     } else {
-      alert("Please add both a comment and a rating.");
+      alert("Please provide a rating.");
     }
   };
 
@@ -144,23 +153,41 @@ const ProductPage = () => {
             </span>
             <div className="rating-tooltip">Click to view comments</div>
           </div>
+
           <div className="price-section">
-            <span className="original-price">{product.price + " TL"}</span>
-            <span className="discounted-price">
-              {product.discounted_price + " TL"}
-            </span>
-            <span className="discount-rate">{product.discount + " % OFF"}</span>
-          </div>
-          <div className="description-section">
-            <p>{product.description}</p>
+            {product.discount > 0 ? (
+              <>
+                <span className="original-price">{product.price + " TL"}</span>
+                <span className="discounted-price">
+                  {(
+                    product.price -
+                    product.price * (product.discount / 100)
+                  ).toFixed(2) + " TL"}
+                </span>
+                <span className="discount-rate">
+                  {product.discount + " % OFF"}
+                </span>
+              </>
+            ) : (
+              <span className="discounted-price">{product.price + " TL"}</span>
+            )}
           </div>
 
-          <button
-            className="add-to-cart-button"
-            onClick={() => addToCart(product.serial_number)}
-          >
-            Add to Cart
-          </button>
+          <p className="product-description">{product.description}</p>
+
+          <div className="button-stock-section">
+            {product.stock > 0 ? (
+              <button
+                className="add-to-cart-button"
+                onClick={() => addToCart(product.serial_number)}
+              >
+                Add to Cart
+              </button>
+            ) : (
+              <span className="out-of-stock-label">Out of Stock!</span>
+            )}
+          </div>
+
           <div className="additional-info">
             <p>
               <strong>Stock:</strong> {product.stock}
@@ -180,8 +207,11 @@ const ProductPage = () => {
         {commentsList.length > 0 ? (
           commentsList.map((c, index) => (
             <div key={index} className="comment">
-              <p className="comment-text">{c.comment}</p>
+              <p>User ID: {c.user}</p>
               <p className="comment-rating">Rating: {c.rating} ★</p>
+              {c.comment.length > 0 && (
+                <p className="comment-text">Comment: {c.comment}</p>
+              )}
             </div>
           ))
         ) : (

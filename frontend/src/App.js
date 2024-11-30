@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Layout from "./Components/Layout";
 import MainPage from "./Components/MainPage/MainPage";
@@ -11,31 +10,9 @@ import Cart from "./Components/Cart/Cart";
 import PaymentPage from "./Components/PaymentPage/PaymentPage";
 import OrderHistory from "./Components/OrderHistory/OrderHistory";
 import SearchPage from "./Components/Search/SearchPage";
+import Invoice from "./Components/Invoice/Invoice";
 
 function App() {
-  // State to store cart items
-  const [cartItems, setCartItems] = useState([]);
-
-  // Add item to cart
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
-  };
-
-  // Handle purchase
-  const handlePurchase = () => {
-    alert("Purchase complete!");
-    setCartItems([]); // Clear the cart after purchase
-  };
-
   return (
     <Router>
       <Routes>
@@ -45,17 +22,12 @@ function App() {
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
           <Route path="payment" element={<PaymentPage />} />
-          <Route path="orderhistory" element={<OrderHistory/>} />
-          <Route
-            path="categories/:categoryName"
-            element={<CategoryPage addToCart={addToCart} />}
-          />
+          <Route path="orderhistory" element={<OrderHistory />} />
+          <Route path="categories/:categoryName" element={<CategoryPage />} />
           <Route path="product/:productId" element={<ProductPage />} />
-          <Route
-            path="cart"
-            element={<Cart cartItems={cartItems} handlePurchase={handlePurchase} />}
-          />
+          <Route path="cart" element={<Cart />} />
           <Route path="search" element={<SearchPage />} />
+          <Route path="invoice/:orderId" element={<Invoice />} />
         </Route>
       </Routes>
     </Router>

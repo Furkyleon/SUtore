@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import './SearchPage.css';
+import "./SearchPage.css";
 
 const SearchPage = () => {
   const [products, setProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [sortCriterion, setSortCriterion] = useState("price");
+  const [sortCriterion, setSortCriterion] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const searchTerm = queryParams.get("query")?.toLowerCase() || ""; // Normalize case
+  const searchTerm = queryParams.get("query")?.toLowerCase() || "";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,14 +23,12 @@ const SearchPage = () => {
         );
 
         if (!response.ok) {
-          console.error("HTTP Error:", response.status, response.statusText);
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
         setProducts(data);
       } catch (error) {
-        console.error("Fetch Error:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -40,28 +38,62 @@ const SearchPage = () => {
     if (searchTerm) {
       fetchProducts();
     } else {
-      setLoading(false); // Avoid infinite loading if no search term
+      setLoading(false);
     }
   }, [searchTerm]);
 
-  // Client-side filtering to match the searchTerm
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm)
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm)
   );
 
-  // Sort products based on selected criterion and order
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sortCriterion === "price") {
       return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
     } else if (sortCriterion === "name") {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
-      if (nameA < nameB) return sortOrder === "asc" ? -1 : 1;
-      if (nameA > nameB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
+      return sortOrder === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    } else if (sortCriterion === "popularity") {
+      return sortOrder === "asc"
+        ? a.popularity - b.popularity
+        : b.popularity - a.popularity;
     }
     return 0;
   });
+
+  const addToCart = (serialNumber) => {
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        serial_number: serialNumber,
+        quantity: 1,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart");
+        }
+        return response.json();
+      })
+      .then(() => {
+        alert("Product added to cart successfully!");
+      })
+      .catch(() => {
+        alert("There is an error.");
+      });
+  };
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
@@ -76,8 +108,7 @@ const SearchPage = () => {
 
   return (
     <div className="search-page-wrapper">
-      <h1>Search Results for "{queryParams.get("query")}"</h1>
-
+      <h1>Search results for "{queryParams.get("query")}"</h1>
       {sortedProducts.length > 0 ? (
         <>
           <div className="sort-dropdown">
@@ -87,8 +118,9 @@ const SearchPage = () => {
               value={sortCriterion}
               onChange={handleCriterionChange}
             >
-              <option value="price">Price</option>
               <option value="name">Name</option>
+              <option value="price">Price</option>
+              <option value="popularity">Popularity</option>
             </select>
 
             <label htmlFor="sortOrder">Order: </label>
@@ -102,7 +134,7 @@ const SearchPage = () => {
             </select>
           </div>
 
-          <ul className="product-list">
+          <div className="product-list">
             {sortedProducts.map((product) => (
               <div key={product.id} className="product-card">
                 <Link to={`/product/${product.id}`}>
@@ -112,15 +144,22 @@ const SearchPage = () => {
                   />
                   <h2>{product.name}</h2>
                 </Link>
-                <p>{product.description}</p>
                 <p className="price">{product.price + " TL"}</p>
-                <button>Add to Cart</button>
+                {product.stock > 0 ? (
+                  <button onClick={() => addToCart(product.serial_number)}>
+                    Add to Cart
+                  </button>
+                ) : (
+                  <span className="out-of-stock-label">Out of Stock!</span>
+                )}
               </div>
             ))}
-          </ul>
+          </div>
         </>
       ) : (
-        <p className="no-results">No products found for "{queryParams.get("query")}".</p>
+        <p className="no-results">
+          No products found for "{queryParams.get("query")}".
+        </p>
       )}
     </div>
   );

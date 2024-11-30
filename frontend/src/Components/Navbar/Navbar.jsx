@@ -8,7 +8,7 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchSubmit = (event) => {
-    event.preventDefault(); // Prevents the default form submission behavior
+    event.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
@@ -43,6 +43,14 @@ const Navbar = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleLogout = () => {
+    localStorage.setItem("username", null);
+    localStorage.setItem("password", null);
+    alert("You have been logged out.");
+    navigate("/"); // Redirect to the main page after logout
+    setIsSidebarOpen2(false);
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -66,13 +74,9 @@ const Navbar = () => {
         <a href="/" className="SUtore">
           SUtore
         </a>
-        <a
-          className="animation"
-          href="javascript:void(0)"
-          onClick={toggleSidebar}
-        >
+        <p className="animation" onClick={toggleSidebar}>
           Categories
-        </a>
+        </p>
       </div>
 
       <div className="nav-center">
@@ -91,13 +95,9 @@ const Navbar = () => {
       </div>
 
       <div className="nav-right">
-        <a
-          className="animation2"
-          href="javascript:void(0)"
-          onClick={toggleSidebar2}
-        >
+        <p className="animation2" onClick={toggleSidebar2}>
           <img src="/loginregister.png" alt="" className="logo" />
-        </a>
+        </p>
 
         <a href="/cart" className="SUtore">
           <img src="/navbarlogo.png" alt="" className="logo2" />
@@ -168,23 +168,44 @@ const Navbar = () => {
         <button className="close-button2" onClick={toggleSidebar2}>
           ×
         </button>
-        <h2>{"Account: " + localStorage.getItem("username")}</h2>
+        <h2>
+          {localStorage.getItem("username") === "null" ||
+          !localStorage.getItem("username")
+            ? "Welcome!"
+            : `Welcome "${localStorage.getItem("username")}"`}
+        </h2>
         <ul className="sidebar-menu2">
-          <li>
-            <Link to="/login" onClick={toggleSidebar2}>
-              Login
-            </Link>
-          </li>
-          <li>
-            <Link to="/register" onClick={toggleSidebar2}>
-              Register
-            </Link>
-          </li>
-          <li>
-            <Link to="/orderhistory" onClick={toggleSidebar2}>
-              Order History
-            </Link>
-          </li>
+          {localStorage.getItem("username") === "null" && (
+            <div className="register-login">
+              <li>
+                <Link to="/register" onClick={toggleSidebar2}>
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" onClick={toggleSidebar2}>
+                  Login
+                </Link>
+              </li>
+            </div>
+          )}
+
+          {localStorage.getItem("username") !== "null" &&
+            localStorage.getItem("username") && (
+              <div>
+                <li>
+                  <Link to="/orderhistory" onClick={toggleSidebar2}>
+                    Order History
+                  </Link>
+                </li>
+
+                <li>
+                  <button onClick={handleLogout} className="logout-button">
+                    Logout
+                  </button>
+                </li>
+              </div>
+            )}
         </ul>
       </div>
     </div>
