@@ -2,16 +2,17 @@
   max-width: 500px;
   margin: 50px auto;
   padding: 20px;
-  background: #f9f9f9;
+  background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
+  text-align: center;
   margin-top: 100px;
 }
 
 .payment-page-container h2 {
-  text-align: center;
-  color: #333;
+  font-size: 1.8rem;
+  color: #2c3e50;
   margin-bottom: 20px;
 }
 
@@ -22,6 +23,7 @@
 
 .form-group {
   margin-bottom: 15px;
+  text-align: left;
 }
 
 .form-group label {
@@ -70,7 +72,7 @@
   width: 100%;
   padding: 15px;
   background: #005da9;
-  color: #fff;
+  color: #ffffff;
   font-size: 18px;
   font-weight: bold;
   border: none;
@@ -84,4 +86,61 @@
 
 .payment-button:active {
   background: #01236a;
+}
+
+.loading-message,
+.error-message {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  text-align: center;
+  padding: 20px;
+  margin: 50px auto;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+.payment-success-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height */
+  background: #f3f4f6; /* Light gray background */
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.success-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.success-image {
+  padding-top: -150px;
+  width: 560px; /* Adjust size as needed */
+  height: auto;
+  margin-bottom: -50px;
+}
+
+.success-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.success-paragraph {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-bottom: 20px;
 }

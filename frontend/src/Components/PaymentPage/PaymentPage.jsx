@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./PaymentPage.css";
 
 const PaymentPage = () => {
@@ -10,9 +11,11 @@ const PaymentPage = () => {
     billingAddress: "",
   });
   const [errors, setErrors] = useState({});
-  const [orderId, setOrderId] = useState(null); // State to store the dynamic order ID
-  const [loading, setLoading] = useState(true); // State for loading status
-  const [errorMessage, setErrorMessage] = useState(null); // State for error messages
+  const [orderId, setOrderId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false); // State for payment success
+  const navigate = useNavigate();
 
   // Fetch the current order ID when the component mounts
   useEffect(() => {
@@ -94,7 +97,12 @@ const PaymentPage = () => {
           return;
         }
 
-        alert("Payment successful!");
+        setPaymentSuccess(true); // Show payment success message
+        setTimeout(() => {
+          navigate("/"); // Redirect to main page after 3 seconds
+        }, 3000);
+
+        // Reset form
         setForm({
           name: "",
           cardNumber: "",
@@ -117,6 +125,24 @@ const PaymentPage = () => {
     return <div className="error-message">{errorMessage}</div>;
   }
 
+  if (paymentSuccess) {
+    return (
+      <div className="payment-success-message">
+        <div className="success-container">
+          <img
+            src={`${process.env.PUBLIC_URL}/images/son.png`}
+            alt="Success Icon"
+            className="success-image"
+          />
+          <h1 className="success-header">Your payment was successful</h1>
+          <p className="success-paragraph">
+            Thank you for your payment. We will be in contact with more details shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="payment-page-container">
       <h2>Payment Details</h2>
@@ -191,11 +217,9 @@ const PaymentPage = () => {
             <span className="error-text">{errors.billingAddress}</span>
           )}
         </div>
-        <a href="/orderhistory" className="href">
-          <button type="submit" className="payment-button">
-            Purchase
-          </button>
-        </a>
+        <button type="submit" className="payment-button">
+          Purchase
+        </button>
       </form>
     </div>
   );
