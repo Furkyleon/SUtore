@@ -342,15 +342,14 @@ def search_products(request):
 
     # Start with the base query: filtering by name or description containing the search term
     products = Product.objects.filter(
-        Q(name__icontains=search_term) | Q(description__icontains=search_term)
+        Q(nameicontains=search_term) | Q(descriptionicontains=search_term)
     )
 
     # If category is provided, filter by the category as well
     if category_id:
         # Validate if the category exists
         try:
-            category = Category.objects.get(id=category_id)
-            products = products.filter(category=category)
+            products = products.filter(category=category_id)
         except Category.DoesNotExist:
             return Response({"error": "Category not found."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -360,6 +359,7 @@ def search_products(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 # searching by only name
+
 @api_view(['GET'])
 def get_products_by_name(request):
     """Retrieve products by their name."""

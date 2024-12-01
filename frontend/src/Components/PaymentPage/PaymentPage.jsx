@@ -99,7 +99,7 @@ const PaymentPage = () => {
 
         setPaymentSuccess(true); // Show payment success message
         setTimeout(() => {
-          navigate("/"); // Redirect to main page after 3 seconds
+          navigate(`/invoice/${orderId}`);
         }, 3000);
 
         // Reset form
@@ -136,13 +136,14 @@ const PaymentPage = () => {
           />
           <h1 className="success-header">Your payment was successful</h1>
           <p className="success-paragraph">
-            Thank you for your payment. We will be in contact with more details shortly.
+            Thank you for your payment. We will be in contact with more details
+            shortly.
           </p>
         </div>
       </div>
     );
   }
-  
+
   return (
     <div className="payment-page-container">
       <h2>Payment Details</h2>

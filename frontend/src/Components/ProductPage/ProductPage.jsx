@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import "./ProductPage.css";
 
@@ -55,7 +56,7 @@ const ProductPage = () => {
       });
   };
 
-  // Fetch reviews
+  // Fetch reviews and calculate rating_average
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
       .then((response) => {
@@ -66,6 +67,17 @@ const ProductPage = () => {
       })
       .then((data) => {
         setCommentsList(data); // Update state with fetched reviews
+
+        // Calculate the average rating
+        const totalRating = data.reduce(
+          (sum, review) => sum + review.rating,
+          0
+        );
+        const averageRating = data.length > 0 ? totalRating / data.length : 0;
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          rating_average: averageRating,
+        }));
       })
       .catch((error) => console.error("Error fetching reviews:", error));
   }, [productId]);
@@ -145,9 +157,22 @@ const ProductPage = () => {
             style={{ cursor: "pointer" }}
           >
             <span className="stars">
-              {"★".repeat(Math.round(product.rating_average || 0))}
-              {"☆".repeat(5 - Math.round(product.rating_average || 0))}
+              {Array.from({ length: 5 }).map((_, index) => {
+                if (product.rating_average >= index + 1) {
+                  return <FaStar />;
+                } else if (
+                  product.rating_average > index &&
+                  product.rating_average < index + 1
+                ) {
+                  return <FaStarHalfAlt />;
+                } else {
+                  return <FaRegStar />;
+                }
+              })}
             </span>
+
+            <span className="rating-average">({product.rating_average})</span>
+
             <span className="review-count">
               {commentsList.length} Reviews ▼
             </span>
@@ -162,7 +187,7 @@ const ProductPage = () => {
                   {(
                     product.price -
                     product.price * (product.discount / 100)
-                  ).toFixed(2) + " TL"}
+                  ).toFixed(0) + " TL"}
                 </span>
                 <span className="discount-rate">
                   {product.discount + " % OFF"}
