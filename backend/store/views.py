@@ -449,6 +449,81 @@ def add_to_cart(request):
     return Response({"order_id": order.id, "order_item": serializer.data}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+def update_cart_item(request):
+    """
+    Updates the quantity of a cart item or deletes it if the quantity becomes zero.
+    Ensures stock always remains 0 or a positive number.
+    """
+    try:
+        # Extract data from the request
+        item_id = request.data.get('item_id')
+        quantity_change = request.data.get('quantity_change')
+
+        # Validate the input
+        if not item_id or quantity_change is None:
+            return Response({"error": "Item ID and quantity change are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find the OrderItem
+        try:
+            order_item = OrderItem.objects.get(id=item_id)
+        except OrderItem.DoesNotExist:
+            return Response({"error": "Order item not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Calculate the new quantity
+        new_quantity = order_item.quantity + int(quantity_change)
+
+        # Validate the stock of the product
+        product = order_item.product
+        if new_quantity > product.stock:
+            return Response({"error": f"Only {product.stock} items are available in stock."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the quantity becomes zero or less, delete the item
+        if new_quantity <= 0:
+            order_item.delete()
+            return Response({"message": "Item removed from cart."}, status=status.HTTP_200_OK)
+
+        # Update the quantity and subtotal
+        order_item.quantity = new_quantity
+        order_item.subtotal = new_quantity * product.price
+        order_item.save()
+
+        # Return the updated order item
+        return Response({
+            "id": order_item.id,
+            "quantity": order_item.quantity,
+            "subtotal": order_item.subtotal,
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+def delete_cart_item(request):
+    """
+    Deletes a specific item from the cart.
+    """
+    try:
+        # Extract item_id from the request
+        item_id = request.data.get('item_id')
+
+        # Validate input
+        if not item_id:
+            return Response({"error": "Item ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find and delete the OrderItem
+        try:
+            order_item = OrderItem.objects.get(id=item_id)
+            order_item.delete()
+            return Response({"message": "Item successfully removed from cart."}, status=status.HTTP_200_OK)
+        except OrderItem.DoesNotExist:
+            return Response({"error": "Item not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['POST'])
 def assign_user_to_order(request):
     order_id = request.data.get('order_id')  # Order ID to be updated
      # User ID to associate with the order
