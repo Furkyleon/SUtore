@@ -1,25 +1,27 @@
 .cart-container-wrapper {
-  width: 80%;
+  width: 85%; /* Reduced width for a more compact design */
   margin: 0 auto;
-  padding: 20px;
+  padding: 25px; /* Better padding for balanced spacing */
   background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
-  margin-top: 80px;
+  margin-top: 50px;
 }
 
 .cart-container-wrapper p {
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 10px;
   text-align: center;
+  font-size: 1.1rem;
+  color: #666; /* Softer color for secondary text */
 }
 
 .cart-container-wrapper h2 {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 20px;
-  padding-top: 50px;
+  padding-top: 10px; /* Reduced padding for tighter spacing */
   color: #333;
 }
 
@@ -30,37 +32,96 @@
 }
 
 .cart-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr 2fr 0.5fr; /* Better column proportions */
   align-items: center;
-  padding: 10px;
+  padding: 10px 15px;
   border-bottom: 1px solid #ddd;
   background-color: #fff;
-  border-radius: 5px;
+  border-radius: 8px;
   margin-bottom: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.cart-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Hover effect for items */
 }
 
 .cart-item .item-name {
   font-weight: bold;
   font-size: 1.2rem;
   color: #005da9;
+  text-align: left; /* Align name to the left */
 }
 
-.cart-item .item-quantity,
-.cart-item .item-price {
+.cart-item .item-quantity {
+  display: flex;
+  margin-left: -5px;
+  justify-content: center; /* Center-align quantity controls */
+  align-items: center;
   font-size: 1rem;
   color: #555;
+}
+
+.cart-item .item-quantity button {
+  font-size: 1.2rem; /* Larger buttons */
+  width: 36px; /* Wider buttons for accessibility */
+  height: 36px; /* Taller buttons */
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #005da9;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin: 0 8px; /* Proper spacing between buttons */
+}
+
+.cart-item .item-quantity button:hover {
+  background-color: #004080;
+  transform: translateY(-1px);
+}
+
+.cart-item .item-quantity button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.cart-item .item-price{
+  margin-left: -20px;
+  text-align: right; /* Align price and subtotal to the right */
+  font-size: 1.1rem;
+  color: #555;
+
+  
+}
+.cart-item .item-subtotal {
+  text-align: right; /* Align price and subtotal to the right */
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.cart-item .delete-button {
+  justify-self: center; /* Center-align the trash icon */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red;
+  font-size: 1.5rem; /* Larger trash icon for visibility */
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.cart-item .delete-button:hover {
+  transform: scale(1.2); /* Enlarge icon on hover */
+  color: darkred;
 }
 
 .cart-total {
   display: flex;
   justify-content: flex-end;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .cart-total span {
@@ -71,25 +132,21 @@
   display: block;
   width: 100%;
   text-align: center;
-  padding: 12px;
+  padding: 15px;
   margin-top: 20px;
   background-color: #005da9;
   color: white;
   font-size: 1.2rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.cart-container-wrapper a {
-  color: white;
-  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .purchase-button:hover {
   background-color: #004080;
+  transform: translateY(-2px);
 }
 
 .purchase-button:disabled {
@@ -102,5 +159,4 @@
   font-size: 1.2rem;
   color: #999;
   margin-top: 30px;
-  margin-bottom: 20px;
 }
