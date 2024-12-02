@@ -744,7 +744,6 @@ def checkout(request):
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def add_review(request, product_id):
     product = Product.objects.get(id=product_id)
     rating = request.data.get('rating')
@@ -781,6 +780,28 @@ def get_reviews_by_product(request, product_id):
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_rating_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    # Filter approved reviews for the product
+    reviews = Review.objects.filter(product=product)
+    
+    # Calculate the average rating
+    average_rating = reviews.aggregate(average=Avg('rating'))['average']
+    
+    
+    # Include the average rating in the response
+    response_data = {
+        "average_rating": average_rating
+    }
+    
+    return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
