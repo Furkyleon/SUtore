@@ -97,7 +97,7 @@
         <p><strong>Customer Name:</strong> {{ order.customer.username }}</p>
         
         <p class="total-price">
-            <strong>Total Price:</strong> ${{ order.get_total_cost|floatformat:2 }}
+            <strong>Total Price:</strong> {{ order.get_total_cost|floatformat:2}}₺
         </p>
 
         <div class="invoice-details">
@@ -107,8 +107,8 @@
                     <li>
                         <strong>{{ item.product.name }}</strong><br>
                         Quantity: {{ item.quantity }}<br>
-                        Price per unit: {{ item.product.price|floatformat:2 }}₺ <br>
-                        Total: ${{ item.subtotal|floatformat:2 }}
+                        Price per unit: {{ item.product.price|floatformat:2}}₺ <br>
+                        Total: {{ item.subtotal|floatformat:2}}₺
                     </li>
                 {% empty %}
                     <li>No products found in this order.</li>
