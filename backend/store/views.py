@@ -705,7 +705,7 @@ def checkout(request):
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
-    order_history.total_amount += Decimal(total_amount)  # Ensure total_amount is set
+    order_history.total_amount += Decimal(str(total_amount))  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
