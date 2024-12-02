@@ -14,15 +14,23 @@ const Cart = () => {
         const response = await fetch("http://127.0.0.1:8000/order/items/", {
           headers: {
             Authorization: `Basic ${btoa(
-              `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
             )}`,
           },
         });
         if (!response.ok) throw new Error("Failed to fetch cart items");
         const cartData = await response.json();
-        setCartItems(cartData);
+        // Check if the cart is empty
+        if (cartData.length === 0) {
+          setError("Your cart is empty!");
+        } else {
+          setCartItems(cartData);
+          setError(""); // Clear any previous error
+        }
       } catch (err) {
-        setError("Failed to load cart items. Please try again.");
+        setError("Your cart is empty.");
       } finally {
         setLoading(false);
       }
@@ -56,7 +64,9 @@ const Cart = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Basic ${btoa(
-            `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
+            `${localStorage.getItem("username")}:${localStorage.getItem(
+              "password"
+            )}`
           )}`,
         },
         body: JSON.stringify({
@@ -74,7 +84,9 @@ const Cart = () => {
       const data = await response.json();
 
       if (data.message === "Item removed from cart.") {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item.id !== itemId)
+        );
       } else {
         setCartItems((prevItems) =>
           prevItems.map((item) =>
@@ -96,7 +108,9 @@ const Cart = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Basic ${btoa(
-            `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
+            `${localStorage.getItem("username")}:${localStorage.getItem(
+              "password"
+            )}`
           )}`,
         },
         body: JSON.stringify({ item_id: itemId }),
@@ -109,7 +123,9 @@ const Cart = () => {
       }
 
       const data = await response.json();
-      setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item.id !== itemId)
+      );
     } catch (error) {
       alert("An error occurred while removing the item. Please try again.");
     }
@@ -134,10 +150,9 @@ const Cart = () => {
           <ul className="cart-items">
             {cartItems.map((item) => (
               <li key={item.id} className="cart-item">
-                
                 <span className="item-name">{products[item.product]}</span>
                 <span className="item-quantity">
-                  Quantity: {item.quantity}{" "}
+                  <strong>Quantity:</strong> <span>{item.quantity}</span>
                   <button
                     className="quantity-button"
                     onClick={() => updateQuantity(item.id, "increment")}
@@ -155,7 +170,8 @@ const Cart = () => {
                   Price per Unit: {parseFloat(item.price).toFixed(2)} TL
                 </span>
                 <span className="item-subtotal">
-                  Subtotal: {(parseFloat(item.price) * item.quantity).toFixed(2)} TL
+                  Subtotal:{" "}
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} TL
                 </span>
                 <button
                   className="delete-button"
@@ -175,9 +191,9 @@ const Cart = () => {
           </a>
         </>
       ) : (
-        <p className="empty-cart-message">
-          Your cart is empty. <a href="/">Start shopping now!</a>
-        </p>
+        <a className="start-shopping" href="/">
+          Start shopping now!
+        </a>
       )}
     </div>
   );

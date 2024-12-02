@@ -13,11 +13,11 @@ const PaymentPage = () => {
   const [errors, setErrors] = useState({});
   const [orderId, setOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for loading during submission
   const [errorMessage, setErrorMessage] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false); // State for payment success
   const navigate = useNavigate();
 
-  // Fetch the current order ID when the component mounts
   useEffect(() => {
     const fetchOrderId = async () => {
       try {
@@ -76,6 +76,7 @@ const PaymentPage = () => {
     }
 
     if (validateForm()) {
+      setIsSubmitting(true); // Set loading state to true
       try {
         const response = await fetch("http://127.0.0.1:8000/checkout/", {
           method: "POST",
@@ -113,6 +114,8 @@ const PaymentPage = () => {
       } catch (error) {
         console.error("Error during checkout:", error);
         alert("An unexpected error occurred. Please try again.");
+      } finally {
+        setIsSubmitting(false); // Reset loading state
       }
     }
   };
@@ -218,8 +221,12 @@ const PaymentPage = () => {
             <span className="error-text">{errors.billingAddress}</span>
           )}
         </div>
-        <button type="submit" className="payment-button">
-          Purchase
+        <button
+          type="submit"
+          className={`payment-button ${isSubmitting ? "disabled" : ""}`}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Loading..." : "Purchase"}
         </button>
       </form>
     </div>

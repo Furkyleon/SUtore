@@ -686,11 +686,11 @@ def checkout(request):
         # Find the active order for the user by ID
         order = Order.objects.get(id=order_id, customer=request.user)
     except Order.DoesNotExist:
-        return Response({"error": "Pending order not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Processing order not found."}, status=status.HTTP_404_NOT_FOUND)
 
     # Mark the order as complete
     order.complete = True
-    order.status = 'In Progress'
+    order.status = 'Processing'
     order.save()
 
         # Increase the popularity of products in the order

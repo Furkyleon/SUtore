@@ -125,10 +125,9 @@ class Product(models.Model):
     
 class OrderHistory(models.Model):
     ORDER_STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled'),
-        ('Shipped', 'Shipped'),
+        ('Processing', 'Processing'),
+        ('In-transit', 'In-transit'),
+        ('Delivered', 'Delivered'),
     ]
     customer = models.OneToOneField(
         CustomUser, 
@@ -160,7 +159,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=OrderHistory.ORDER_STATUS_CHOICES, default="Pending")
+    status = models.CharField(max_length=50, choices=OrderHistory.ORDER_STATUS_CHOICES, default="Processing")
 
     def __str__(self):
         return f"Order {self.id} by {self.customer}"

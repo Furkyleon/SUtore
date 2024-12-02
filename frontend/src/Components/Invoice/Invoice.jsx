@@ -65,7 +65,7 @@ const Invoice = () => {
               <br />
               Quantity: {item.quantity}
               <br />
-              Price per unit:{parseFloat(item.price).toFixed(2)} TL
+              Price per unit: {parseFloat(item.price).toFixed(2)} TL
               <br />
               Total: {parseFloat(item.subtotal).toFixed(2)} TL
             </li>
