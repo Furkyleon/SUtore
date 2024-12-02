@@ -9,7 +9,7 @@ from django.db.models import Sum
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import F, Q
-
+from decimal import Decimal
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None,  **extra_fields):
@@ -185,7 +185,7 @@ class Order(models.Model):
             for order in orders
             for item in order.order_items.all()
         )
-        return revenue - cost  # Positive for profit, negative for loss
+        return Decimal(revenue) - Decimal(cost)  # Positive for profit, negative for loss
 
 
 class OrderItem(models.Model):

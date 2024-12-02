@@ -31,13 +31,14 @@ urlpatterns = [
     path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
     path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'),  # Endpoint for assigning an order to a user
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
-    path('order/items/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
+    path('order/items/<int:order_id>/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
     path('order/', views.get_order, name='get_order'),  # Endpoint for order details
     path('order/history/', views.order_history, name='order_history'),  # URL for viewing order history
     path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
+    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
     path('cart/update/', views.update_cart_item, name='update_cart_item'),
     path('cart/delete/', views.delete_cart_item, name='delete_cart_item'),
 
