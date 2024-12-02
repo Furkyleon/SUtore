@@ -8,10 +8,11 @@ body {
 
 .register-form-container {
   text-align: center;
+  font-family: Arial, sans-serif;
 }
 
 .register-form-container .page-title {
-  margin-bottom: -20px;
+  margin-bottom: -10px;
   margin-top: -10px;
 }
 
@@ -94,7 +95,8 @@ body {
   font-size: 16px;
   color: #01236a;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .register-form-container .login-link {
