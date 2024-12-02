@@ -109,7 +109,7 @@ const StorePage = () => {
           <div key={product.id} className="product-card">
             <Link to={`/product/${product.id}`}>
               <img
-                src={"/images/" + product.category + ".png"}
+                src={`http://localhost:8000${product.image}`}
                 alt={product.name}
               />
               <h2>{product.name}</h2>

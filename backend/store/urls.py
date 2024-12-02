@@ -37,6 +37,9 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
+    path('cart/update/', views.update_cart_item, name='update_cart_item'),
+     path('cart/delete/', views.delete_cart_item, name='delete_cart_item'),
+
 
     #path('wishlist/', views.get_wishlist, name='get_wishlist'),
     #path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),

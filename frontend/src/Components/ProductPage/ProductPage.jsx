@@ -143,7 +143,7 @@ const ProductPage = () => {
       <div className="product-full-width">
         <div className="product-image-section">
           <img
-            src={"/images/" + product.category + ".png"}
+            src={`http://localhost:8000${product.image}`}
             alt={product.name}
           />
         </div>
