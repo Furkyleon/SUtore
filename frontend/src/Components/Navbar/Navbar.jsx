@@ -46,6 +46,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.setItem("username", null);
     localStorage.setItem("password", null);
+    localStorage.setItem("order_id", null);
     alert("You have been logged out.");
     navigate("/"); // Redirect to the main page after logout
     setIsSidebarOpen2(false);
