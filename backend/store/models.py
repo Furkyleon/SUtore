@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db.models import F, Q
 from decimal import Decimal
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None,  **extra_fields):
@@ -62,7 +63,7 @@ class CustomUser(AbstractUser):
 
 
 class SalesManager:
-    def __init__(self, user):
+    def _init_(self, user):
         """Initialize with a user object."""
         if not isinstance(user, CustomUser):
             raise ValueError("User must be an instance of CustomUser.")
@@ -92,7 +93,7 @@ class SalesManager:
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.name    
     
     
@@ -114,7 +115,7 @@ class Product(models.Model):
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
 
-    def _str_(self):
+    def str(self):
         return self.name
     
     @property
@@ -143,7 +144,7 @@ class OrderHistory(models.Model):
     notes = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    def __str__(self):
+    def _str_(self):
         return f"History for {self.customer.username}: {self.status} on {self.update_date.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
@@ -161,7 +162,7 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=50, choices=OrderHistory.ORDER_STATUS_CHOICES, default="Processing")
 
-    def __str__(self):
+    def _str_(self):
         return f"Order {self.id} by {self.customer}"
 
     @property
@@ -180,7 +181,7 @@ class Order(models.Model):
         orders = cls.objects.filter(date_ordered__range=(start_date, end_date), complete=True)
         revenue = sum(order.get_total_cost for order in orders)
         cost = sum(
-            item.product.price * item.quantity  # Assuming `price` is the cost price
+            item.product.price * item.quantity  # Assuming price is the cost price
             for order in orders
             for item in order.order_items.all()
         )
@@ -195,7 +196,7 @@ class OrderItem(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"
 
     def can_review(self):
@@ -205,7 +206,7 @@ class OrderItem(models.Model):
 
     
 class Review(models.Model):
-    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # Allows ratings from 1 to 5
+    RATING_CHOICES = [(i, str(i)) for i in range(0, 6)]  # Allows ratings from 1 to 5
 
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -215,12 +216,15 @@ class Review(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.IntegerField(choices=RATING_CHOICES)
+    rating = models.IntegerField(
+        choices=RATING_CHOICES,
+        validators=[MinValueValidator(0), MaxValueValidator(5)]  # Enforce range validation
+    )
     comment = models.TextField(blank=True, null=True)
     comment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending', null=True) 
     date_added = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.user.username}'s review of {self.product.name} - Rating: {self.rating}"
 
 class Wishlist(models.Model):
@@ -231,7 +235,7 @@ class Wishlist(models.Model):
     class Meta:
         unique_together = ('user', 'product')  # Prevent duplicate wishlist entries
 
-    def __str__(self):
+    def _str_(self):
         return f"Wishlist item for {self.user.username}: {self.product.name}"
 
 """class Notification(models.Model):
@@ -240,7 +244,6 @@ class Wishlist(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Notification for {self.user.username}: {self.message[:20]}"
 """
-
