@@ -32,7 +32,7 @@ body {
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 50px;
-  width: 250px;
+  width: 300px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
@@ -54,7 +54,7 @@ body {
 .category-page-wrapper .product-card h2 {
   font-size: 1.4rem;
   color: #01236a;
-  margin: 10px 0;
+  margin: 10px 0 10px;
   text-decoration: none;
 }
 
@@ -64,10 +64,11 @@ body {
 }
 
 .category-page-wrapper .product-card .price {
-  font-weight: bold;
+  font-style: normal;
   color: #01236a;
-  margin: 10px 0;
+  margin: 0 0 10px;
   align-self: center;
+  font-size: 1.2rem;
 }
 
 .category-page-wrapper .product-card button {
@@ -102,7 +103,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   font-size: 16px;
 }
 
