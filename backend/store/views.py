@@ -448,7 +448,6 @@ def add_to_cart(request):
     # Optionally return the order ID and order item details
     serializer = OrderItemSerializer(order_item)
     return Response({"order_id": order.id, "order_item": serializer.data}, status=status.HTTP_201_CREATED)
-
 @api_view(['POST'])
 def update_cart_item(request):
     """
@@ -671,7 +670,6 @@ def order_history(request):
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 @api_view(['POST'])
 def checkout(request):
     order_id = request.data.get('order_id')
@@ -751,12 +749,12 @@ def checkout(request):
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
+    
 @api_view(['POST'])
 def add_review(request, product_id):
     product = Product.objects.get(id=product_id)
     rating = request.data.get('rating')
     comment = request.data.get('comment')
-    comment_status = request.data.get('comment_status')
 
     # Check if the user has purchased this product in a completed order
     purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
@@ -775,8 +773,8 @@ def add_review(request, product_id):
         review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
     
     serializer = ReviewSerializer(review)
+   
     return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 @api_view(['GET'])
 def get_reviews_by_product(request, product_id):
     # Check if the product exists
@@ -790,6 +788,36 @@ def get_reviews_by_product(request, product_id):
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
+
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_rating_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    # Filter approved reviews for the product
+    reviews = Review.objects.filter(product=product)
+    
+    # Calculate the average rating
+    average_rating = reviews.aggregate(average=Avg('rating'))['average']
+    
+    
+    # Include the average rating in the response
+    response_data = {
+        "average_rating": average_rating
+    }
+    
+    return Response(response_data, status=status.HTTP_200_OK)
 
     # Add username to each review in the response data
     response_data = []
@@ -847,6 +875,7 @@ def get_wishlist(request):
 
     serializer = WishlistSerializer(wishlist_items, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -912,23 +941,19 @@ def mark_notifications_as_read(request):
 
     Notification.objects.filter(id__in=notification_ids, user=request.user).update(is_read=True)
     return Response({'message': 'Notifications marked as read.'})
-"""
+
 
 @api_view(['POST'])
 def apply_discount(request):
-    """
-    API endpoint to allow a Sales Manager to apply a discount to a product using the product's serial number.
-    """
     user = request.user
 
-    """
     # Ensure the user is a Sales Manager
     if not isinstance(user, CustomUser) or user.role != 'sales_manager':
         return Response(
             {"error": "You do not have permission to perform this action."},
             status=status.HTTP_403_FORBIDDEN
         )
-    """
+
     # Validate the request payload
     serial_number = request.data.get('serial_number')
     discount_percentage = request.data.get('discount_percentage')
