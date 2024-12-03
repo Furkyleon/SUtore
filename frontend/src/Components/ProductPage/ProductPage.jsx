@@ -136,11 +136,9 @@ const ProductPage = () => {
             : "You have already reviewed this product."
         );
       })
-      .then((newReview) => {
-        setCommentsList((prev) => [...prev, newReview]);
-        setComment("");
-        setRating(0);
+      .then(() => {
         alert("Your review has been submitted successfully.");
+        window.location.reload(); // Refresh the page
       })
       .catch((error) => {
         console.error("Error submitting review:", error);
