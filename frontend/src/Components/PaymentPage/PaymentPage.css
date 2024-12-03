@@ -120,24 +120,24 @@
   max-width: 500px;
 }
 
-.payment-page-container .payment-success-message {
+.payment-success-message {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f3f4f6;
+  background: #f5f2f1;
   text-align: center;
   padding: 20px;
   box-sizing: border-box;
 }
 
-.payment-page-container .success-container {
+.success-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: white;
+  background: #f9f9f9;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -145,21 +145,21 @@
   width: 100%;
 }
 
-.payment-page-container .success-image {
+.success-image {
   padding-top: -150px;
   width: 560px;
   height: auto;
   margin-bottom: -50px;
 }
 
-.payment-page-container .success-header {
+.success-header {
   font-size: 1.2rem;
   font-weight: bold;
   color: #2c3e50;
   margin-bottom: 10px;
 }
 
-.payment-page-container .success-paragraph {
+.success-paragraph {
   font-size: 1rem;
   color: #7f8c8d;
   margin-bottom: 20px;

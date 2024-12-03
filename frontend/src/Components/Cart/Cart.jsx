@@ -32,7 +32,7 @@ const Cart = () => {
           setCartItems(cartData);
           console.log(cartData);
         } catch (err) {
-          setError("Failed to load cart items. Please try again.");
+          setError("Your cart is empty.");
         } finally {
           setLoading(false);
         }
@@ -53,7 +53,7 @@ const Cart = () => {
           setCartItems(cartData);
           console.log(cartData);
         } catch (err) {
-          setError("Failed to load cart items. Please try again.");
+          setError("Your cart is empty.");
         } finally {
           setLoading(false);
         }
@@ -61,6 +61,8 @@ const Cart = () => {
     };
 
     const fetchProductDetails = async () => {
+      let myorderID = localStorage.getItem("order_id");
+      console.log("My order ID: ", myorderID);
       try {
         const response = await fetch("http://127.0.0.1:8000/products/get_all/");
         if (!response.ok) throw new Error("Failed to fetch product details");
