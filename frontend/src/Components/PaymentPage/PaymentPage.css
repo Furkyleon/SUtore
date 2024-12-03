@@ -146,21 +146,21 @@
 }
 
 .success-image {
-  padding-top: -150px;
-  width: 560px;
+  padding-top: -50px;
+  width: 250px;
   height: auto;
-  margin-bottom: -50px;
+  margin-bottom: 30px;
 }
 
 .success-header {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #2c3e50;
   margin-bottom: 10px;
 }
 
 .success-paragraph {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #7f8c8d;
   margin-bottom: 20px;
 }
