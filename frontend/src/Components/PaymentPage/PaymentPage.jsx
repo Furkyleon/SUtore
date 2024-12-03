@@ -101,7 +101,7 @@ const PaymentPage = () => {
         setPaymentSuccess(true); // Show payment success message
         setTimeout(() => {
           navigate(`/invoice/${orderId}`);
-        }, 10000);
+        }, 3000);
 
         // Reset form
         setForm({
@@ -133,14 +133,14 @@ const PaymentPage = () => {
       <div className="payment-success-message">
         <div className="success-container">
           <img
-            src={`${process.env.PUBLIC_URL}/images/son.png`}
+            src={`${process.env.PUBLIC_URL}/payment-succesfull.png`}
             alt="Success Icon"
             className="success-image"
           />
           <h1 className="success-header">Your payment was successful</h1>
           <p className="success-paragraph">
-            Thank you for your payment. We will be in contact with more details
-            shortly.
+            Thank you for your payment. <br />
+            We will be in contact with more details shortly.
           </p>
         </div>
       </div>
