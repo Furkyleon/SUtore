@@ -31,7 +31,8 @@ from rest_framework import status
 from .models import CustomUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q
+from django.db.models import Q,Avg
+
 # bu alttakilere bakılacak
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
@@ -126,7 +127,6 @@ def login(request):
     }, status=status.HTTP_201_CREATED)
     
     
-    
 @api_view(['POST'])
 def add_product(request):
     # Use the ProductSerializer to validate and save the incoming data
@@ -171,7 +171,6 @@ def get_all_products(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
 @api_view(['POST'])
 def add_category(request):
     
@@ -188,7 +187,6 @@ def get_categories(request):
     categories = Category.objects.all()  # Get all categories
     serializer = CategorySerializer(categories, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
-
 
 
 @api_view(['GET'])
@@ -285,8 +283,6 @@ def get_products_by_price_interval(request):
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
 
-
-
 @api_view(['GET'])
 def get_products_sorted_by_popularity_asc(request):
     """Retrieve products sorted by price in ascending order."""
@@ -297,6 +293,7 @@ def get_products_sorted_by_popularity_asc(request):
 
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
 
 @api_view(['GET'])
 def get_products_by_category_sorted_by_popularity_asc(request, category_name):
@@ -309,6 +306,7 @@ def get_products_by_category_sorted_by_popularity_asc(request, category_name):
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
+
 @api_view(['GET'])
 def get_products_sorted_by_popularity_desc(request):
     """Retrieve products sorted by price in ascending order."""
@@ -319,6 +317,7 @@ def get_products_sorted_by_popularity_desc(request):
 
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
 
 @api_view(['GET'])
 def get_products_by_category_sorted_by_popularity_desc(request, category_name):
@@ -331,7 +330,7 @@ def get_products_by_category_sorted_by_popularity_desc(request, category_name):
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
 
-# searching by name or description
+
 @api_view(['GET'])
 def search_products(request):
     search_term = request.data.get('search', '')  # Search term (name or description)
@@ -358,7 +357,6 @@ def search_products(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# searching by only name
 
 @api_view(['GET'])
 def get_products_by_name(request):
@@ -377,6 +375,7 @@ def get_products_by_name(request):
 
     serializer = ProductSerializer(products, many=True)  # Serialize the queryset
     return Response(serializer.data, status=status.HTTP_200_OK)  # Return serialized data
+
 
 @api_view(['POST'])
 def add_to_cart(request):
@@ -401,9 +400,15 @@ def add_to_cart(request):
     if product.stock < quantity :
         return Response({"error": f"Only {product.stock} items available in stock."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Determine if the user is authenticated
-    if not request.user.is_authenticated:
-        # Handle unauthenticated users
+
+    if request.user.is_authenticated:
+        # Handle authenticated users
+        order, created = Order.objects.get_or_create(
+            customer=request.user,
+            complete=False  # Ensure it's an active cart
+        )
+    else:
+                # Handle unauthenticated users
         if order_id:
             try:
                 # Try to fetch the existing order
@@ -413,12 +418,7 @@ def add_to_cart(request):
         else:
             # Create a new order for unauthenticated users
             order = Order.objects.create(complete=False)
-    else:
-        # Handle authenticated users
-        order, created = Order.objects.get_or_create(
-            customer=request.user,
-            complete=False  # Ensure it's an active cart
-        )
+
 
     # Create or update the OrderItem
     order_item, created = OrderItem.objects.get_or_create(
@@ -447,6 +447,7 @@ def add_to_cart(request):
     # Optionally return the order ID and order item details
     serializer = OrderItemSerializer(order_item)
     return Response({"order_id": order.id, "order_item": serializer.data}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['POST'])
 def update_cart_item(request):
@@ -497,6 +498,7 @@ def update_cart_item(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['POST'])
 def delete_cart_item(request):
     """
@@ -520,7 +522,6 @@ def delete_cart_item(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
@@ -550,11 +551,17 @@ def assign_user_to_order(request):
     }, status=status.HTTP_200_OK)
 
 
-
 @api_view(['GET'])
-def get_order_items(request):
+def get_order_items(request, order_id):
     if not request.user.is_authenticated:
-        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+           
+            order = Order.objects.get(id=order_id)
+            order_items = order.order_items.all()
+            serializer = OrderItemSerializer(order_items, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
 
     # Retrieve the active order for the customer
     try:
@@ -607,7 +614,6 @@ def get_subtotal(request):
             {"error": "No active order found."},
             status=status.HTTP_404_NOT_FOUND
         )
-
 
 
 @api_view(['GET'])
@@ -663,7 +669,6 @@ def order_history(request):
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 @api_view(['POST'])
 def checkout(request):
     order_id = request.data.get('order_id')
@@ -678,11 +683,11 @@ def checkout(request):
         # Find the active order for the user by ID
         order = Order.objects.get(id=order_id, customer=request.user)
     except Order.DoesNotExist:
-        return Response({"error": "Pending order not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Processing order not found."}, status=status.HTTP_404_NOT_FOUND)
 
     # Mark the order as complete
     order.complete = True
-    order.status = 'In Progress'
+    order.status = 'Processing'
     order.save()
 
         # Increase the popularity of products in the order
@@ -695,8 +700,7 @@ def checkout(request):
     # Calculate the total amount for the order
     total_amount = 0.0
     for item in order.order_items.all():
-        total_amount += float(str(item.subtotal))
-        
+        total_amount = total_amount + float(item.subtotal)
         # Decrease product stock based on quantity in the order
         product = item.product
         product.stock -= item.quantity
@@ -705,7 +709,7 @@ def checkout(request):
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
-    order_history.total_amount += Decimal(str(total_amount))  # Ensure total_amount is set
+    order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
@@ -742,14 +746,13 @@ def checkout(request):
         return Response({"message": "Order completed successfully, and invoice has been sent."}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def add_review(request, product_id):
     product = Product.objects.get(id=product_id)
     rating = request.data.get('rating')
     comment = request.data.get('comment')
-    comment_status = request.data.get('comment_status')
 
     # Check if the user has purchased this product in a completed order
     purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
@@ -761,11 +764,16 @@ def add_review(request, product_id):
     if existing_review:
         return Response({"error": "You can only leave one review per product."}, status=status.HTTP_400_BAD_REQUEST)
 
-
+    if comment == "":
+        review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment,comment_status="Approved")
     # Save the review
-    review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
+    else:
+        review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
+    
     serializer = ReviewSerializer(review)
+   
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET'])
 def get_reviews_by_product(request, product_id):
@@ -780,12 +788,90 @@ def get_reviews_by_product(request, product_id):
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_rating_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    # Filter approved reviews for the product
+    reviews = Review.objects.filter(product=product)
+    
+    # Calculate the average rating
+    average_rating = reviews.aggregate(average=Avg('rating'))['average']
+    
+    
+    # Include the average rating in the response
+    response_data = {
+        "average_rating": average_rating
+    }
+
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def update_review_comment_status(request, review_id):
+    # Update the comment status of a specific review.
+    
+    # Check if the review exists
+    try:
+        review = Review.objects.get(id=review_id)
+    except Review.DoesNotExist:
+        return Response({"error": "Review not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Update the comment status to "Approved"
+    review.comment_status = "Approved"
+    review.save()
+
+    return Response({"message": "Comment status updated successfully."}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_rating_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    # Filter approved reviews for the product
+    reviews = Review.objects.filter(product=product)
+    
+    # Calculate the average rating
+    average_rating = reviews.aggregate(average=Avg('rating'))['average']
+    
+    
+    # Include the average rating in the response
+    response_data = {
+        "average_rating": average_rating
+    }
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
-    """Retrieve the current user's wishlist."""
+    #Retrieve the current user's wishlist.
     wishlist_items = Wishlist.objects.filter(user=request.user)
     if not wishlist_items.exists():
         return Response({'message': 'Your wishlist is empty.'}, status=status.HTTP_200_OK)
@@ -793,10 +879,11 @@ def get_wishlist(request):
     serializer = WishlistSerializer(wishlist_items, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_wishlist(request):
-    """Add a product to the user's wishlist."""
+    #Add a product to the user's wishlist.
     product_id = request.data.get('product_id')  # Extract product_id from JSON body
 
     if not product_id:
@@ -817,7 +904,7 @@ def add_to_wishlist(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_from_wishlist(request):
-    """Remove a product from the user's wishlist."""
+    #Remove a product from the user's wishlist.
     product_id = request.data.get('product_id')  # Extract product_id from the request body
 
     if not product_id:
@@ -830,7 +917,7 @@ def remove_from_wishlist(request):
     except Wishlist.DoesNotExist:
         return Response({'error': 'Product not found in your wishlist.'}, status=status.HTTP_404_NOT_FOUND)
 
-"""
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_notifications(request):
@@ -857,23 +944,19 @@ def mark_notifications_as_read(request):
 
     Notification.objects.filter(id__in=notification_ids, user=request.user).update(is_read=True)
     return Response({'message': 'Notifications marked as read.'})
-"""
+
 
 @api_view(['POST'])
 def apply_discount(request):
-    """
-    API endpoint to allow a Sales Manager to apply a discount to a product using the product's serial number.
-    """
     user = request.user
 
-    """
     # Ensure the user is a Sales Manager
     if not isinstance(user, CustomUser) or user.role != 'sales_manager':
         return Response(
             {"error": "You do not have permission to perform this action."},
             status=status.HTTP_403_FORBIDDEN
         )
-    """
+
     # Validate the request payload
     serial_number = request.data.get('serial_number')
     discount_percentage = request.data.get('discount_percentage')
@@ -923,3 +1006,4 @@ def apply_discount(request):
         },
         status=status.HTTP_200_OK
     )
+"""

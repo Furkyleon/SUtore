@@ -24,109 +24,128 @@ const ProductPage = () => {
       .catch((error) => console.error("Error fetching product:", error));
   }, [productId]);
 
+  // Add product to cart
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username"); // Retrieve username from localStorage
-    const password = localStorage.getItem("password"); // Retrieve password from localStorage
-    const authHeader = `Basic ${btoa(`${username}:${password}`)}`; // Base64 encode username:password
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
-    fetch("http://127.0.0.1:8000/cart/add/", {
+    if (username && username !== "null" && password && password !== "null") {
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then(() => alert("Product added to cart successfully!"))
+        .catch((error) => {
+          console.log("Username:", username, "Password:", password);
+
+          console.error("Error adding to cart:", error);
+          alert("There was an error adding the product to the cart.");
+        });
+    } else {
+      let myorderID = localStorage.getItem("order_id"); // Define the variable
+
+      if (myorderID && myorderID === "null") {
+        myorderID = 0;
+        localStorage.setItem("order_id", 0);
+      }
+
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          serial_number: serialNumber,
+          quantity: 1,
+          order_id: myorderID,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then((data) => {
+          // Save the order_id to localStorage
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+            console.log("Order ID saved locally.");
+          }
+          alert("Product added to cart successfully!");
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+          console.log(myorderID);
+          console.log("Username:");
+          alert("There was an error adding the product to the cart.");
+        });
+    }
+  };
+
+  // Fetch reviews and calculate rating average
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
+      .then((response) => response.json())
+      .then((data) => setCommentsList(data))
+      .catch((error) => console.error("Error fetching reviews:", error));
+
+    fetch(`http://127.0.0.1:8000/products/${productId}/get_rating/`)
+      .then((response) => response.json())
+      .then((data) =>
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          rating_average: data.average_rating || 0,
+        }))
+      )
+      .catch((error) => console.error("Error fetching rating:", error));
+  }, [productId]);
+
+  // Handle comment submission
+  const handleCommentSubmit = () => {
+    if (!rating) {
+      alert("Please provide a rating.");
+      return;
+    }
+
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: authHeader, // Add the Authorization header
+        Authorization: authHeader,
       },
-      body: JSON.stringify({
-        serial_number: serialNumber,
-        quantity: 1, // Default quantity to add
-      }),
+      body: JSON.stringify({ rating, comment }),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to add item to cart!");
-        }
-        return response.json();
+        if (response.status === 201) return response.json();
+        throw new Error(
+          response.status === 403
+            ? "You can only review products you've purchased."
+            : "You have already reviewed this product."
+        );
       })
-      .then((data) => {
-        console.log("Item added to cart:", data);
-        alert("Product added to cart successfully!");
+      .then((newReview) => {
+        setCommentsList((prev) => [...prev, newReview]);
+        setComment("");
+        setRating(0);
+        alert("Your review has been submitted successfully.");
       })
       .catch((error) => {
-        console.error("There is an error:", error);
-        alert("There is an error!");
+        console.error("Error submitting review:", error);
+        alert(error.message);
       });
-  };
-
-  // Fetch reviews and calculate rating_average
-  useEffect(() => {
-    fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch reviews");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCommentsList(data); // Update state with fetched reviews
-
-        // Calculate the average rating
-        const totalRating = data.reduce(
-          (sum, review) => sum + review.rating,
-          0
-        );
-        const averageRating = data.length > 0 ? totalRating / data.length : 0;
-        setProduct((prevProduct) => ({
-          ...prevProduct,
-          rating_average: averageRating,
-        }));
-      })
-      .catch((error) => console.error("Error fetching reviews:", error));
-  }, [productId]);
-
-  // Scroll to top when the component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const handleCommentSubmit = () => {
-    if (rating > 0) {
-      if (comment || rating > 0) {
-        const username = localStorage.getItem("username");
-        const password = localStorage.getItem("password");
-        const encodedCredentials = btoa(`${username}:${password}`);
-
-        fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${encodedCredentials}`,
-          },
-          body: JSON.stringify({ rating, comment }),
-        })
-          .then((response) => {
-            if (response.status === 201) {
-              return response.json();
-            } else if (response.status === 403) {
-              throw new Error("You can only review products you've purchased.");
-            } else {
-              throw new Error("You have already reviewed this product.");
-            }
-          })
-          .then((newReview) => {
-            setCommentsList([...commentsList, newReview]);
-            setComment("");
-            setRating(0);
-            alert("Your review has been submitted successfully.");
-          })
-          .catch((error) => {
-            console.error("Error submitting review:", error);
-            alert(error.message);
-          });
-      } else {
-        alert("Please add a comment.");
-      }
-    } else {
-      alert("Please provide a rating.");
-    }
   };
 
   // Scroll to comments section
@@ -134,10 +153,7 @@ const ProductPage = () => {
     commentsRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (!product) {
-    return <p>Product not found.</p>;
-  }
-
+  if (!product) return <p>Loading product details...</p>;
   return (
     <div className="product-page-container">
       <div className="product-full-width">
@@ -232,7 +248,7 @@ const ProductPage = () => {
         {commentsList.length > 0 ? (
           commentsList.map((c, index) => (
             <div key={index} className="comment">
-              <p>User ID: {c.user}</p>
+              <p>{c.username}</p>
               <p className="comment-rating">Rating: {c.rating} ★</p>
               {c.comment.length > 0 && (
                 <p className="comment-text">Comment: {c.comment}</p>

@@ -7,28 +7,62 @@ const Cart = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState({});
+  const [assignError, setAssignError] = useState("");
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/order/items/", {
-          headers: {
-            Authorization: `Basic ${btoa(
-              `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
-            )}`,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch cart items");
-        const cartData = await response.json();
-        setCartItems(cartData);
-      } catch (err) {
-        setError("Failed to load cart items. Please try again.");
-      } finally {
-        setLoading(false);
+      const myorderID = localStorage.getItem("order_id");
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+
+      if (username && username !== "null" && password && password !== "null") {
+        // Authenticated user
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/order/items/${0}/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+              },
+            }
+          );
+          if (!response.ok) throw new Error("Failed to fetch cart items");
+          const cartData = await response.json();
+          setCartItems(cartData);
+          console.log(cartData);
+        } catch (err) {
+          setError("Your cart is empty.");
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Authenticated user
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/order/items/${myorderID}/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (!response.ok) throw new Error("Failed to fetch cart items");
+          const cartData = await response.json();
+          setCartItems(cartData);
+          console.log(cartData);
+        } catch (err) {
+          setError("Your cart is empty.");
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
     const fetchProductDetails = async () => {
+      let myorderID = localStorage.getItem("order_id");
+      console.log("My order ID: ", myorderID);
       try {
         const response = await fetch("http://127.0.0.1:8000/products/get_all/");
         if (!response.ok) throw new Error("Failed to fetch product details");
@@ -55,9 +89,6 @@ const Cart = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(
-            `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
-          )}`,
         },
         body: JSON.stringify({
           item_id: itemId,
@@ -74,7 +105,9 @@ const Cart = () => {
       const data = await response.json();
 
       if (data.message === "Item removed from cart.") {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item.id !== itemId)
+        );
       } else {
         setCartItems((prevItems) =>
           prevItems.map((item) =>
@@ -95,9 +128,6 @@ const Cart = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(
-            `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
-          )}`,
         },
         body: JSON.stringify({ item_id: itemId }),
       });
@@ -109,7 +139,9 @@ const Cart = () => {
       }
 
       const data = await response.json();
-      setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item.id !== itemId)
+      );
     } catch (error) {
       alert("An error occurred while removing the item. Please try again.");
     }
@@ -129,15 +161,15 @@ const Cart = () => {
       <h2>Shopping Cart</h2>
       {loading && <p>Loading cart items...</p>}
       {error && <p className="error">{error}</p>}
+      {assignError && <p className="error">{assignError}</p>}
       {!loading && !error && cartItems.length > 0 ? (
         <>
           <ul className="cart-items">
             {cartItems.map((item) => (
               <li key={item.id} className="cart-item">
-                
                 <span className="item-name">{products[item.product]}</span>
                 <span className="item-quantity">
-                  Quantity: {item.quantity}{" "}
+                  <strong>Quantity:</strong> <span>{item.quantity}</span>
                   <button
                     className="quantity-button"
                     onClick={() => updateQuantity(item.id, "increment")}
@@ -155,7 +187,8 @@ const Cart = () => {
                   Price per Unit: {parseFloat(item.price).toFixed(2)} TL
                 </span>
                 <span className="item-subtotal">
-                  Subtotal: {(parseFloat(item.price) * item.quantity).toFixed(2)} TL
+                  Subtotal:{" "}
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} TL
                 </span>
                 <button
                   className="delete-button"
@@ -175,9 +208,9 @@ const Cart = () => {
           </a>
         </>
       ) : (
-        <p className="empty-cart-message">
-          Your cart is empty. <a href="/">Start shopping now!</a>
-        </p>
+        <a className="start-shopping" href="/">
+          Start shopping now!
+        </a>
       )}
     </div>
   );

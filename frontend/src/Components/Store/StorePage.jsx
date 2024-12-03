@@ -20,36 +20,71 @@ const StorePage = () => {
       .catch((error) => console.error("Fetch Error:", error));
   }, []);
 
+  // Add product to cart
   const addToCart = (serialNumber) => {
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
-    fetch("http://127.0.0.1:8000/cart/add/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: authHeader,
-      },
-      body: JSON.stringify({
-        serial_number: serialNumber,
-        quantity: 1,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to add item to cart");
-        }
-        return response.json();
+    if (username && username !== "null" && password && password !== "null") {
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
       })
-      .then((data) => {
-        console.log("Item added to cart:", data);
-        alert("Product added to cart successfully!");
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then(() => alert("Product added to cart successfully!"))
+        .catch((error) => {
+          console.log("Username:", username, "Password:", password);
+
+          console.error("Error adding to cart:", error);
+          alert("There was an error adding the product to the cart.");
+        });
+    } else {
+      let myorderID = localStorage.getItem("order_id"); // Define the variable
+
+      if (myorderID && myorderID === "null") {
+        myorderID = 0;
+        localStorage.setItem("order_id", 0);
+      }
+
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          serial_number: serialNumber,
+          quantity: 1,
+          order_id: myorderID,
+        }),
       })
-      .catch((error) => {
-        console.error("There is an error:", error);
-        alert("There is an error.");
-      });
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then((data) => {
+          // Save the order_id to localStorage
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+            console.log("Order ID saved locally.");
+          }
+          alert("Product added to cart successfully!");
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+          console.log(myorderID);
+          console.log("Username:");
+          alert("There was an error adding the product to the cart.");
+        });
+    }
   };
 
   const sortProducts = (products) => {

@@ -94,7 +94,8 @@ body {
   font-size: 16px;
   color: #01236a;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .login-form-container .register-link {

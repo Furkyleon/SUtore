@@ -1,73 +1,71 @@
-/* Scope all styles to .invoice-container to avoid conflicts */
 .invoice-container {
-    font-family: 'Arial', sans-serif;
-    margin: 0 auto;
-    padding: 80px;
-    background-color: #f4f7fc;
-    color: #333;
-    max-width: 80%;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .invoice-container h1 {
-    text-align: center;
-    color: #2c3e50;
-    font-size: 2.5em;
-    margin-top: 30px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #2980b9;
-  }
-  
-  .invoice-container h3 {
-    color: #2980b9;
-    font-size: 1.6em;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .invoice-container p {
-    font-size: 1.1em;
-    margin-top: 10px;
-    color: #555;
-  }
-  
-  .invoice-container .total-price {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #27ae60;
-    margin: 20px 0;
-  }
-  
-  .invoice-container .invoice-details ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .invoice-container .invoice-details li {
-    background: #fafafa;
-    margin-bottom: 15px;
-    padding: 15px;
-    border-left: 4px solid #2980b9;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .invoice-container .invoice-details li strong {
-    font-size: 1.2em;
-    color: #2c3e50;
-  }
-  
-  .invoice-container .invoice-details li span {
-    color: #7f8c8d;
-    font-size: 1.1em;
-  }
-  
-  .invoice-container .footer {
-    text-align: center;
-    margin-top: 40px;
-    font-size: 1.1em;
-    color: #95a5a6;
-  }
+  margin-top: 80px;
+  margin-bottom: 20px;
+  font-family: "Arial", sans-serif;
+  padding: 80px;
+  background-color: #f9f9f9;
+  color: #333;
+  max-width: 80%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  
+.invoice-container h1 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2.5em;
+  margin-top: 30px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #2980b9;
+}
+
+.invoice-container h3 {
+  color: #2980b9;
+  font-size: 1.6em;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.invoice-container p {
+  font-size: 1.1em;
+  margin-top: 10px;
+  color: #555;
+}
+
+.invoice-container .total-price {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #27ae60;
+  margin: 20px 0;
+}
+
+.invoice-container .invoice-details ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.invoice-container .invoice-details li {
+  background: #fafafa;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-left: 4px solid #2980b9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-container .invoice-details li strong {
+  font-size: 1.2em;
+  color: #2c3e50;
+}
+
+.invoice-container .invoice-details li span {
+  color: #7f8c8d;
+  font-size: 1.1em;
+}
+
+.invoice-container .footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.1em;
+  color: #95a5a6;
+}

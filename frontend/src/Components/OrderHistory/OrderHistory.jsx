@@ -31,7 +31,7 @@ const OrderHistory = () => {
       })
       .catch((error) => {
         console.error("Error fetching order history:", error);
-        setError("Failed to load order history. Please try again.");
+        setError("You did not order anything.");
         setLoading(false);
       });
   }, []);
@@ -51,7 +51,9 @@ const OrderHistory = () => {
             <li key={order.order_id} className="order-item">
               <div className="order-header">
                 <span className="order-id">Order ID: {order.order_id}</span>
-                <span className="order-status">Order Status: {order.status}</span>
+                <span className="order-status">
+                  Order Status: {order.status}
+                </span>
                 <span className="order-date">
                   Date: {new Date(order.date_ordered).toLocaleDateString()}
                 </span>
@@ -87,7 +89,9 @@ const OrderHistory = () => {
           ))}
         </ul>
       ) : (
-        <p className="empty-history-message">You have no order history.</p>
+        <a className="start-shopping" href="/">
+          Start shopping now!
+        </a>
       )}
     </div>
   );

@@ -6,55 +6,64 @@ from . import views
 
 urlpatterns = [
     path('', views.store, name="store"),
-    path('register/', views.register, name='register'),  # User registration
-    path('login/', views.login, name='login'),    # User login
+    path('register/', views.register, name='register'),
+    path('login/', views.login, name='login'),
+
     path('products/add_product/', views.add_product, name='add_product'),
-    path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'),  # Delete product
+    path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
-    path('categories/add/', views.add_category, name='add_category'),  # URL for adding a new category
-    path('categories/get_all/', views.get_categories, name='get_categories'),  # New endpoint for retrieving categories
-    path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),  # New endpoint for retrieving products by category
+    path('categories/add/', views.add_category, name='add_category'),
+    path('categories/get_all/', views.get_categories, name='get_categories'),
+    path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
+
+    path('cart/add/', views.add_to_cart, name='add_to_cart'), 
+    path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'), 
+    path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'), 
+    path('cart/update/', views.update_cart_item, name='update_cart_item'),
+    path('cart/delete/', views.delete_cart_item, name='delete_cart_item'),
+
+    path('checkout/', views.checkout, name='checkout'),
+
+    path('order/items/<int:order_id>/', views.get_order_items, name='get_order_items'),
+    path('order/', views.get_order, name='get_order'),
+    path('order/history/', views.order_history, name='order_history'),
+    
+    path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
+    path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
+    path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
+    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+    
+    # path('apply-discount/', views.apply_discount, name='apply_discount'),
+
+    # path('wishlist/', views.get_wishlist, name='get_wishlist'),
+    # path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
+    # path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+    # path('notifications/', views.get_notifications, name='get_notifications'),
+    # path('notifications/mark-read/', views.mark_notifications_as_read, name='mark_notifications_as_read'),
+    
+]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+"""
+    - Frontend ile halledilen API'lar (ileride kullanılabilir)
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
+    path('products/search_products/', views.search_products, name='search_products'),
+    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
+    path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
     path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
     path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
     path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
-    
-    path('products/search_products/', views.search_products, name='search_products'), # search products by name or description
-    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
-    
-    path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
-    path('cart/add/', views.add_to_cart, name='add_to_cart'),  # Endpoint for adding an item to the cart
-    path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'),  # Endpoint for assigning an order to a user
-    path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'),  # Endpoint for calculating subtotal
-    path('order/items/', views.get_order_items, name='get_order_items'),  # Endpoint for order items
-    path('order/', views.get_order, name='get_order'),  # Endpoint for order details
-    path('order/history/', views.order_history, name='order_history'),  # URL for viewing order history
-    path('checkout/', views.checkout, name='checkout'),                 # URL for completing the checkout process
-    path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
-    path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
-    path('cart/update/', views.update_cart_item, name='update_cart_item'),
-     path('cart/delete/', views.delete_cart_item, name='delete_cart_item'),
-
-
-    #path('wishlist/', views.get_wishlist, name='get_wishlist'),
-    #path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
-    #path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
-    #path('notifications/', views.get_notifications, name='get_notifications'),
-    #path('notifications/mark-read/', views.mark_notifications_as_read, name='mark_notifications_as_read'),
-    path('apply-discount/', views.apply_discount, name='apply_discount'),
-    
-]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-    #path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
-    #path('reset-password-confirm/<uidb64>/<token>/', views.reset_password_confirm, name='reset-password-confirm'),  # Reset password
-
 """
 
+    # path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
+    # path('reset-password-confirm/<uidb64>/<token>/', views.reset_password_confirm, name='reset-password-confirm'),  # Reset password
+
+"""
 # Customer Profile
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="customer_profile")
