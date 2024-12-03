@@ -16,19 +16,6 @@ urlpatterns = [
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
-    path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
-    path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
-    path('products/search_products/', views.search_products, name='search_products'),
-    # path('products/search/', views.get_products_by_name, name='get_products_by_name'),
-
-    # path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
-    # path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
-    # path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
-    # path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
-    # path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
-    # path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
-    # path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
-
     path('cart/add/', views.add_to_cart, name='add_to_cart'), 
     path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'), 
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'), 
@@ -55,14 +42,28 @@ urlpatterns = [
     # path('notifications/', views.get_notifications, name='get_notifications'),
     # path('notifications/mark-read/', views.mark_notifications_as_read, name='mark_notifications_as_read'),
     
-    
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+"""
+    - Frontend ile halledilen API'lar (ileride kullanılabilir)
+
+    path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
+    path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
+    path('products/search_products/', views.search_products, name='search_products'),
+    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
+    path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
+    path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
+    path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
+    path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
+    path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
+    path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
+    path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+"""
 
     # path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
     # path('reset-password-confirm/<uidb64>/<token>/', views.reset_password_confirm, name='reset-password-confirm'),  # Reset password
 
 """
-
 # Customer Profile
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="customer_profile")
