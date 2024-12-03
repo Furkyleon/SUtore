@@ -203,9 +203,19 @@ const Cart = () => {
           <div className="cart-total">
             <span>Total: {calculateTotal()} TL</span>
           </div>
-          <a href="/payment">
-            <button className="purchase-button">Go to Payment</button>
-          </a>
+          <button
+            className="purchase-button"
+            onClick={() => {
+              if (localStorage.getItem("username") === "null") {
+                alert("You need to login to purchase something!");
+                window.location.href = "/login";
+              } else {
+                window.location.href = "/payment";
+              }
+            }}
+          >
+            Go to Payment
+          </button>
         </>
       ) : (
         <a className="start-shopping" href="/">
