@@ -2,12 +2,7 @@
 from rest_framework import serializers
 from .models import *
 
-"""
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '_all_'  # Alternatively, specify fields as a list, e.g., ['productID', 'name', 'price']
-"""      
+
 from .models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -94,7 +89,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price', 'subtotal', 'date_added']
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'subtotal', 'date_added', 'discount_subtotal']
         
     def validate(self, data):
         if data['quantity'] > data['product'].stock:
@@ -111,7 +106,7 @@ class OrderSerializer(serializers.ModelSerializer):
 class OrderHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderHistory
-        fields = ['id', 'customer', 'status', 'update_date', 'notes', 'total_amount']
+        fields = ['id', 'customer', 'status', 'update_date', 'notes', 'total_amount', 'discount_total_amount']
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -123,3 +118,59 @@ class WishlistSerializer(serializers.ModelSerializer):
         model = Wishlist
         fields = ['id', 'user', 'product', 'added_date']
         read_only_fields = ['user', 'added_date']
+        
+        
+class InvoiceSerializer(serializers.ModelSerializer):
+    customer = serializers.StringRelatedField()  # Show customer's username or string representation
+    order = serializers.PrimaryKeyRelatedField(read_only=True)  # Reference the order by its ID
+
+    class Meta:
+        model = Invoice
+        fields = [
+            'id',
+            'order',
+            'customer',
+            'total_amount',
+            'discounted_total',
+            'date'
+        ]
+        read_only_fields = ['id', 'date', 'total_amount', 'discounted_total']
+        
+        
+class RefundRequestSerializer(serializers.ModelSerializer):
+    """
+    Serializer for RefundRequest model.
+    """
+
+    # Make customer and order_item read-only fields
+    customer = serializers.StringRelatedField(read_only=True)
+    order_item = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = RefundRequest
+        fields = [
+            'id',
+            'customer',
+            'order_item',
+            'request_date',
+            'status',
+            'reason',
+        ]
+        read_only_fields = ['id', 'customer', 'order_item', 'request_date']
+
+    def validate(self, data):
+        """
+        Custom validation logic for refund requests.
+        Ensures refunds are only requested within a 30-day window.
+        """
+        user = self.context.get("request").user  # Get the current user making the request
+        order_item = data.get('order_item')
+
+        if not order_item:
+            raise serializers.ValidationError({"error": "Order item is required for refund requests."})
+
+        # Check if the item can be refunded based on the purchase date
+        if order_item.order.date_ordered and (timezone.now() - order_item.order.date_ordered > timedelta(days=30)):
+            raise serializers.ValidationError({"error": "Refunds can only be requested within 30 days of purchase."})
+
+        return data
