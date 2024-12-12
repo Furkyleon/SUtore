@@ -27,14 +27,13 @@ const Wishlist = () => {
         );
 
         if (!wishlistResponse.ok) {
-          const errorData = await wishlistResponse.json();
-          if (errorData.message === "Your wishlist is empty.") {
-            setWishlist([]);
-          } else {
-            throw new Error(errorData.message || "Something went wrong.");
-          }
+          throw new Error("Something went wrong.");
+        }
+
+        const wishlistData = await wishlistResponse.json();
+        if (wishlistData.message === "Your wishlist is empty.") {
+          setWishlist([]);
         } else {
-          const wishlistData = await wishlistResponse.json();
           setWishlist(wishlistData);
         }
 
