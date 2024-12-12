@@ -107,7 +107,7 @@ class Product(models.Model):
     description = models.CharField(max_length=200)
     price = models.FloatField()
     discount = models.FloatField(default=0.0, null=True)  # Discount percentage (0-100)
-    discount_price = models.FloatField(default=0, null=True)
+    discount_price = models.FloatField(default=0, null=price)
     stock = models.IntegerField(default=0)
     popularity = models.IntegerField(default=0)  # Tracks popularity, based on views or purchases
     digital = models.BooleanField(default=False,null=True, blank=True)
@@ -143,9 +143,10 @@ class OrderHistory(models.Model):
     update_date = models.DateTimeField(default=timezone.now)
     notes = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
+    discount_total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     def _str_(self):
         return f"History for {self.customer.username}: {self.status} on {self.update_date.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 
 class Order(models.Model):
@@ -168,6 +169,11 @@ class Order(models.Model):
     @property
     def get_total_cost(self):
         return sum(item.subtotal for item in self.order_items.all())
+    
+    @property
+    def get_discount_total_cost(self):
+        return sum(item.discount_subtotal for item in self.order_items.all())
+    
     
     @classmethod
     def calculate_revenue(cls, start_date, end_date):
@@ -194,6 +200,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def _str_(self):
@@ -238,7 +245,7 @@ class Wishlist(models.Model):
     def _str_(self):
         return f"Wishlist item for {self.user.username}: {self.product.name}"
 
-"""class Notification(models.Model):
+class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -246,4 +253,32 @@ class Wishlist(models.Model):
 
     def _str_(self):
         return f"Notification for {self.user.username}: {self.message[:20]}"
-"""
+
+
+class Invoice(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='invoices')
+    date = models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Invoice for Order {self.order.id} by {self.customer.username}"
+    
+    
+class RefundRequest(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+    
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="refund_requests")
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name="refund_request")
+    request_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    reason = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Refund request {self.id} by {self.customer.username}"
+
