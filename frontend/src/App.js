@@ -11,6 +11,7 @@ import PaymentPage from "./Components/PaymentPage/PaymentPage";
 import OrderHistory from "./Components/OrderHistory/OrderHistory";
 import SearchPage from "./Components/Search/SearchPage";
 import Invoice from "./Components/Invoice/Invoice";
+import Wishlist from "./Components/Wishlist/Wishlist";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="invoice/:orderId" element={<Invoice />} />
+          <Route path="wishlist" element={<Wishlist />} />
         </Route>
       </Routes>
     </Router>

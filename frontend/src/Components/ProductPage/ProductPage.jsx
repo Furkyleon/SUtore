@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import {
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
+  FaHeart,
+  FaRegHeart,
+} from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import "./ProductPage.css";
 
@@ -10,24 +16,97 @@ const ProductPage = () => {
   const [rating, setRating] = useState(0);
   const [commentsList, setCommentsList] = useState([]);
   const commentsRef = useRef(null);
+  const [wishlist, setWishlist] = useState([]);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
-  // Fetch product details
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/products/get_all/`)
-      .then((response) => response.json())
-      .then((data) => {
-        const selectedProduct = data.find(
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    const fetchProductDetails = async () => {
+      try {
+        // Fetch all products and select the current product
+        const productResponse = await fetch(
+          `http://127.0.0.1:8000/products/get_all/`
+        );
+        const products = await productResponse.json();
+        const selectedProduct = products.find(
           (item) => item.id === parseInt(productId)
         );
         setProduct(selectedProduct);
-      })
-      .catch((error) => console.error("Error fetching product:", error));
+
+        // Fetch wishlist and check if the product is in it
+        const wishlistResponse = await fetch(
+          "http://127.0.0.1:8000/wishlist/",
+          {
+            headers: {
+              Authorization: authHeader,
+            },
+          }
+        );
+        const wishlistData = await wishlistResponse.json();
+        setWishlist(wishlistData);
+
+        // Check if the product is in the wishlist
+        setIsInWishlist(
+          wishlistData.some((item) => item.product === selectedProduct.id)
+        );
+
+        fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
+          .then((response) => response.json())
+          .then((data) => setCommentsList(data))
+          .catch((error) => console.error("Error fetching reviews:", error));
+
+        fetch(`http://127.0.0.1:8000/products/${productId}/get_rating/`)
+          .then((response) => response.json())
+          .then((data) =>
+            setProduct((prevProduct) => ({
+              ...prevProduct,
+              rating_average: data.average_rating || 0,
+            }))
+          )
+          .catch((error) => console.error("Error fetching rating:", error));
+      } catch (error) {
+        console.error("Error fetching product or wishlist data:", error);
+      }
+    };
+
+    fetchProductDetails();
   }, [productId]);
 
-  // Add product to cart
+  const toggleWishlist = async () => {
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    try {
+      const url = isInWishlist
+        ? "http://127.0.0.1:8000/wishlist/remove/"
+        : "http://127.0.0.1:8000/wishlist/add/";
+      const method = isInWishlist ? "DELETE" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({ product_id: product.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update wishlist");
+      }
+
+      setIsInWishlist(!isInWishlist);
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+    }
+  };
+
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (username && username !== "null" && password && password !== "null") {
@@ -91,34 +170,13 @@ const ProductPage = () => {
     }
   };
 
-  // Fetch reviews and calculate rating average
-  useEffect(() => {
-    fetch(`http://127.0.0.1:8000/products/${productId}/get_reviews/`)
-      .then((response) => response.json())
-      .then((data) => setCommentsList(data))
-      .catch((error) => console.error("Error fetching reviews:", error));
-
-    fetch(`http://127.0.0.1:8000/products/${productId}/get_rating/`)
-      .then((response) => response.json())
-      .then((data) =>
-        setProduct((prevProduct) => ({
-          ...prevProduct,
-          rating_average: data.average_rating || 0,
-        }))
-      )
-      .catch((error) => console.error("Error fetching rating:", error));
-  }, [productId]);
-
-  // Handle comment submission
   const handleCommentSubmit = () => {
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
     if (!rating) {
       alert("Please provide a rating.");
       return;
     }
-
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
-    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     fetch(`http://127.0.0.1:8000/products/${productId}/add_review/`, {
       method: "POST",
@@ -214,17 +272,27 @@ const ProductPage = () => {
 
           <p className="product-description">{product.description}</p>
 
-          <div className="button-stock-section">
-            {product.stock > 0 ? (
-              <button
-                className="add-to-cart-button"
-                onClick={() => addToCart(product.serial_number)}
-              >
-                Add to Cart
-              </button>
-            ) : (
-              <span className="out-of-stock-label">Out of Stock!</span>
-            )}
+          <div className="add-to-cart-wishlist-section">
+            <div className="button-stock-section">
+              {product.stock > 0 ? (
+                <button
+                  className="add-to-cart-button"
+                  onClick={() => addToCart(product.serial_number)}
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <span className="out-of-stock-label">Out of Stock!</span>
+              )}
+            </div>
+
+            <div className="wishlist-icon" onClick={toggleWishlist}>
+              {isInWishlist ? (
+                <FaHeart className="filled-heart" />
+              ) : (
+                <FaRegHeart className="empty-heart" />
+              )}
+            </div>
           </div>
 
           <div className="additional-info">

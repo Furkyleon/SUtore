@@ -38,6 +38,29 @@ body {
   flex: 1;
   padding: 20px 30px;
   box-sizing: border-box;
+  position: relative;
+}
+
+.product-page-container .add-to-cart-wishlist-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: -15px;
+}
+
+.product-page-container .wishlist-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-top: 25px;
+}
+
+.product-page-container .wishlist-icon .filled-heart {
+  color: red;
+}
+
+.product-page-container .wishlist-icon .empty-heart {
+  color: gray;
 }
 
 .product-page-container .product-name {
