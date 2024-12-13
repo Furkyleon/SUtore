@@ -6,9 +6,12 @@ from . import views
 
 urlpatterns = [
     path('', views.store, name="store"),
+
+    # Login and Register
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
 
+    # Product and Category
     path('products/add_product/', views.add_product, name='add_product'),
     path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
@@ -16,31 +19,44 @@ urlpatterns = [
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
+    # Wishlist and Notification
+    path('wishlist/', views.get_wishlist, name='get_wishlist'),
+    path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('notifications/', views.get_notifications, name='get_notifications'),
+    path('notifications/mark-read/', views.mark_notifications_as_read, name='mark_notifications_as_read'),
+
+    # Shopping Cart
     path('cart/add/', views.add_to_cart, name='add_to_cart'), 
     path('cart/assign_to_user/', views.assign_user_to_order, name='assign_user_to_order'), 
     path('cart/get-subtotal/', views.get_subtotal, name='get_subtotal'), 
     path('cart/update/', views.update_cart_item, name='update_cart_item'),
     path('cart/delete/', views.delete_cart_item, name='delete_cart_item'),
 
+    # Payment and Order History
     path('checkout/', views.checkout, name='checkout'),
-
     path('order/items/<int:order_id>/', views.get_order_items, name='get_order_items'),
     path('order/', views.get_order, name='get_order'),
     path('order/history/', views.order_history, name='order_history'),
-    
+    path('request-refund/', views.request_refund, name="request_refund"),
+    # order cancelling api needed
+
+    # Reviews
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
-    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+
+    # Sales Manager
+    path('sales-manager/apply-discount/', views.apply_discount, name='apply_discount'),
+    path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
+    path('sales-manager/pending-refund-requests/', views.get_pending_refund_requests, name='pending-refund-requests'),
+    path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
+    # renevue calculation
     
-    # path('apply-discount/', views.apply_discount, name='apply_discount'),
-
-    # path('wishlist/', views.get_wishlist, name='get_wishlist'),
-    # path('wishlist/add/', views.add_to_wishlist, name='add_to_wishlist'),
-    # path('wishlist/remove/', views.remove_from_wishlist, name='remove_from_wishlist'),
-
-    # path('notifications/', views.get_notifications, name='get_notifications'),
-    # path('notifications/mark-read/', views.mark_notifications_as_read, name='mark_notifications_as_read'),
+    # Product Manager
+    path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
+    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+    # disapprove api can be added ?
     
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -58,101 +74,5 @@ urlpatterns = [
     path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
-"""
-
-    # path('request-password-reset/', views.request_password_reset, name='request-password-reset'),  # Request password reset
-    # path('reset-password-confirm/<uidb64>/<token>/', views.reset_password_confirm, name='reset-password-confirm'),  # Reset password
 
 """
-# Customer Profile
-class CustomerProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="customer_profile")
-    address = models.CharField(max_length=255, null=False)
-    phone_number = PhoneNumberField()
-    tax_id = models.CharField(max_length=50, blank =True, null=True)
-    # Role specification to denote this is a customer
-    is_customer = models.BooleanField(default=True)
-    
-    def __str__(self):
-        return f"{self.user.username}'s Customer Profile"
-
-# Sales Manager Profile
-class SalesManagerProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="sales_manager_profile")
-
-    def __str__(self):
-        return f"{self.user.username}'s Sales Manager Profile"
-
-# Product Manager Profile
-class ProductManagerProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="product_manager_profile")
-    managed_categories = models.CharField(max_length=255)  # Could be a ManyToMany if categories are models
-
-    def __str__(self):
-        return f"{self.user.username}'s Product Manager Profile"
-    
-
-class DeliveryList(models.Model):
-    delivery_id = models.AutoField(primary_key=True)
-    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="deliveries")
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    delivery_address = models.TextField()
-    delivery_date = models.DateTimeField(auto_now_add=True)
-    is_completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Delivery {self.delivery_id} for {self.customer.username}"
-
-    def mark_as_completed(self):
-        #Mark this delivery as completed.
-        self.is_completed = True
-        self.save()
-    
-
-class PaymentInformation(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    card_token = models.CharField(max_length=255)  # Token from payment processor
-    card_last4 = models.CharField(max_length=4)  # Last 4 digits only
-    card_expiry_month = models.PositiveSmallIntegerField()
-    card_expiry_year = models.PositiveSmallIntegerField()
-    card_brand = models.CharField(max_length=20)  # e.g., Visa, Mastercard
-
-    def __str__(self):
-        return f"{self.card_brand} ending in {self.card_last4}"
-
-
-
-class Review(models.Model):
-    RATING_CHOICES = [(i, i) for i in range(1, 6)]  # For a 1-5 star rating system; change to 1-10 for that range
-
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # or use your Customer model here
-    rating = models.IntegerField(choices=RATING_CHOICES)  # Rating out of 5 or 10
-    comment = models.TextField()
-    approved = models.BooleanField(default=False)  # Manager approval before visible
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def _str_(self):
-        return f"Review by {self.user} on {self.product.name} - {self.rating} stars"
-      
-    
-
-
-
-
-class ShippingAddress(models.Model):
-	customer = models.ForeignKey(CustomerProfile, on_delete=models.SET_NULL, null=True)
-	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-	address = models.CharField(max_length=200, null=False)
-	city = models.CharField(max_length=200, null=False)
-	state = models.CharField(max_length=200, null=False)
-	zipcode = models.CharField(max_length=200, null=False)
-	date_added = models.DateTimeField(auto_now_add=True)
-
-	def _str_(self):
-		return self.address
-  
-  
-  """

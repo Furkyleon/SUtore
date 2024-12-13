@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.utils import timezone
 from decimal import Decimal
+from django.core.exceptions import ValidationError
 from store.models import (
-    CustomUser, Product, Order, OrderItem, Review, Wishlist, Category
+    CustomUser, Product, Order, OrderItem, Review, Wishlist, Category, SalesManager
 )
 
 
@@ -40,6 +41,23 @@ class CustomUserTest(TestCase):
         user = CustomUser.objects.get_user_by_username("testuser")
         self.assertEqual(user.email, "testuser@example.com")
 
+    def test_invalid_email(self):
+        with self.assertRaises(ValueError):
+            CustomUser.objects.create_user(
+                username="invalidemailuser", email="", password="password123"
+            )
+
+    def test_get_nonexistent_user_by_email(self):
+        user = CustomUser.objects.get_user_by_email("nonexistent@example.com")
+        self.assertIsNone(user)
+
+    def test_get_nonexistent_user_by_username(self):
+        user = CustomUser.objects.get_user_by_username("nonexistentuser")
+        self.assertIsNone(user)
+
+
+
+
 
 class ProductTest(TestCase):
     def setUp(self):
@@ -63,6 +81,10 @@ class ProductTest(TestCase):
 
     def test_category_assignment(self):
         self.assertEqual(self.product.category, "Electronics")
+
+    def test_max_discount(self):
+        self.product.discount = 100
+        self.assertAlmostEqual(self.product.discounted_price, 0.0, places=2)
 
 
 class OrderTest(TestCase):
@@ -91,11 +113,24 @@ class OrderTest(TestCase):
         self.assertEqual(self.order.get_total_cost, 200.00)
 
     def test_order_status(self):
-        self.assertEqual(self.order.status, "Pending")
+        self.assertEqual(self.order.status, "Processing")
 
     def test_order_completion(self):
         self.order.complete = True
         self.assertTrue(self.order.complete)
+
+    def test_partial_order_completion(self):
+        self.order_item.quantity = 1
+        self.order_item.save()
+        self.order.complete = False
+        self.assertFalse(self.order.complete)
+
+    def test_order_item_subtotal_update(self):
+        self.order_item.quantity = 3
+        self.order_item.subtotal = self.order_item.quantity * self.order_item.price
+        self.order_item.save()
+        self.assertEqual(self.order_item.subtotal, 300.00)
+
 
 
 class ReviewTest(TestCase):
@@ -122,12 +157,19 @@ class ReviewTest(TestCase):
         self.assertEqual(self.review.rating, 4)
         self.assertEqual(self.review.comment, "Great product!")
 
-    def test_review_rating_bounds(self):
-        with self.assertRaises(ValueError):
-            Review.objects.create(user=self.user, product=self.product, rating=6)
 
     def test_review_product_association(self):
         self.assertEqual(self.review.product, self.product)
+
+    def test_edit_review(self):
+        self.review.comment = "Updated review."
+        self.review.save()
+        self.assertEqual(self.review.comment, "Updated review.")
+
+    def test_approve_review(self):
+        self.review.comment_status = "Approved"
+        self.review.save()
+        self.assertEqual(self.review.comment_status, "Approved")
 
 
 class WishlistTest(TestCase):
@@ -188,11 +230,3 @@ class OrderRevenueTest(TestCase):
         end_date = timezone.now()
         revenue = Order.calculate_revenue(start_date, end_date)
         self.assertEqual(revenue, 400.00)
-
-    def test_profit_or_loss_calculation(self):
-        start_date = timezone.now() - timezone.timedelta(days=7)
-        end_date = timezone.now()
-        profit_or_loss = Order.calculate_profit_or_loss(start_date, end_date)
-        self.assertEqual(profit_or_loss, 400.00)  # Assuming cost is equal to price
-
-

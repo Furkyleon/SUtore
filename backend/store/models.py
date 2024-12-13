@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db.models import F, Q
 from decimal import Decimal
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None,  **extra_fields):
@@ -62,7 +63,7 @@ class CustomUser(AbstractUser):
 
 
 class SalesManager:
-    def __init__(self, user):
+    def _init_(self, user):
         """Initialize with a user object."""
         if not isinstance(user, CustomUser):
             raise ValueError("User must be an instance of CustomUser.")
@@ -92,7 +93,7 @@ class SalesManager:
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.name    
     
     
@@ -106,7 +107,7 @@ class Product(models.Model):
     description = models.CharField(max_length=200)
     price = models.FloatField()
     discount = models.FloatField(default=0.0, null=True)  # Discount percentage (0-100)
-    discount_price = models.FloatField(default=0, null=True)
+    discount_price = models.FloatField(default=0, null=price)
     stock = models.IntegerField(default=0)
     popularity = models.IntegerField(default=0)  # Tracks popularity, based on views or purchases
     digital = models.BooleanField(default=False,null=True, blank=True)
@@ -114,7 +115,7 @@ class Product(models.Model):
     warranty_status = models.CharField(max_length=50, blank=True, null=True)  # Warranty status (e.g., "1 year", "2 years")
     distributor_info = models.TextField(blank=True, null=True)  # Distributor details
 
-    def _str_(self):
+    def str(self):
         return self.name
     
     @property
@@ -142,9 +143,10 @@ class OrderHistory(models.Model):
     update_date = models.DateTimeField(default=timezone.now)
     notes = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
-    def __str__(self):
+    discount_total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    def _str_(self):
         return f"History for {self.customer.username}: {self.status} on {self.update_date.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 
 class Order(models.Model):
@@ -161,12 +163,17 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=50, choices=OrderHistory.ORDER_STATUS_CHOICES, default="Processing")
 
-    def __str__(self):
+    def _str_(self):
         return f"Order {self.id} by {self.customer}"
 
     @property
     def get_total_cost(self):
         return sum(item.subtotal for item in self.order_items.all())
+    
+    @property
+    def get_discount_total_cost(self):
+        return sum(item.discount_subtotal for item in self.order_items.all())
+    
     
     @classmethod
     def calculate_revenue(cls, start_date, end_date):
@@ -180,7 +187,7 @@ class Order(models.Model):
         orders = cls.objects.filter(date_ordered__range=(start_date, end_date), complete=True)
         revenue = sum(order.get_total_cost for order in orders)
         cost = sum(
-            item.product.price * item.quantity  # Assuming `price` is the cost price
+            item.product.price * item.quantity  # Assuming price is the cost price
             for order in orders
             for item in order.order_items.all()
         )
@@ -193,9 +200,10 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"
 
     def can_review(self):
@@ -205,7 +213,7 @@ class OrderItem(models.Model):
 
     
 class Review(models.Model):
-    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # Allows ratings from 1 to 5
+    RATING_CHOICES = [(i, str(i)) for i in range(0, 6)]  # Allows ratings from 1 to 5
 
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -215,12 +223,15 @@ class Review(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.IntegerField(choices=RATING_CHOICES)
+    rating = models.IntegerField(
+        choices=RATING_CHOICES,
+        validators=[MinValueValidator(0), MaxValueValidator(5)]  # Enforce range validation
+    )
     comment = models.TextField(blank=True, null=True)
     comment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending', null=True) 
     date_added = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.user.username}'s review of {self.product.name} - Rating: {self.rating}"
 
 class Wishlist(models.Model):
@@ -231,16 +242,43 @@ class Wishlist(models.Model):
     class Meta:
         unique_together = ('user', 'product')  # Prevent duplicate wishlist entries
 
-    def __str__(self):
+    def _str_(self):
         return f"Wishlist item for {self.user.username}: {self.product.name}"
 
-"""class Notification(models.Model):
+class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Notification for {self.user.username}: {self.message[:20]}"
-"""
+
+
+class Invoice(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='invoices')
+    date = models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Invoice for Order {self.order.id} by {self.customer.username}"
+    
+    
+class RefundRequest(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+    
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="refund_requests")
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name="refund_request")
+    request_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    reason = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Refund request {self.id} by {self.customer.username}"
 

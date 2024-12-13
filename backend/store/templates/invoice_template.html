@@ -7,6 +7,9 @@
     <style>
       /* General Styling */
       body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-family: "Arial", sans-serif;
         margin: 0;
         padding: 0;
@@ -98,6 +101,8 @@
       <p class="total-price">
         <strong>Total Price:</strong> {{ order.get_total_cost|floatformat:2 }}
         TL
+        <strong>Discounted Total Price:</strong> {{ order.get_discount_total_cost|floatformat:2 }}
+        TL
       </p>
 
       <div class="invoice-details">
@@ -108,7 +113,9 @@
             <strong>{{ item.product.name }}</strong><br />
             Quantity: {{ item.quantity }}<br />
             Price per unit: {{ item.product.price|floatformat:2 }} TL <br />
+            Discounted Price per unit: {{ item.product.discount_price|floatformat:2 }} TL <br />
             Total: {{ item.subtotal|floatformat:2 }} TL
+            Discount Total: {{ item.discount_subtotal|floatformat:2 }} TL
           </li>
           {% empty %}
           <li>No products found in this order.</li>
@@ -118,7 +125,7 @@
     </div>
 
     <div class="footer">
-      <p>Thank you for shopping with us! <a href="#">Visit our store</a></p>
+      <p>Thank you for shopping with us!</p>
     </div>
   </body>
 </html>

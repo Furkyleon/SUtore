@@ -1,37 +1,31 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 #from .models import Product
 from .serializers import *
-from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 #from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from django.db import models
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import get_user_model
 from decimal import Decimal
-from .utils import send_order_confirmation_email 
 from io import BytesIO
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import pdfkit
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
 from .models import CustomUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q,Avg
+from django.db import transaction
+from django.utils.dateparse import parse_datetime
+from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 # bu alttakilere bakılacak
 # @login_required
@@ -134,7 +128,8 @@ def add_product(request):
     if serializer.is_valid():
         # Save the product to the database
         product = serializer.save()
-        
+        product.discount_price = product.price * (1 - product.discount / 100)
+        product.save()
         # Return the created product data in the response
         return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
     
@@ -395,6 +390,7 @@ def add_to_cart(request):
     # Validate that the product exists
     product = get_object_or_404(Product, serial_number=serial_number)
     price = product.price
+    discount_price = product.discount_price
 
     # Stock check
     if product.stock < quantity :
@@ -438,10 +434,12 @@ def add_to_cart(request):
         
         order_item.quantity += quantity
         order_item.subtotal = price * order_item.quantity
+        order_item.discount_subtotal = discount_price * order_item.quantity
         order_item.save()
     else:
         # Set subtotal for a new item
         order_item.subtotal = price * order_item.quantity
+        order_item.discount_subtotal = discount_price * order_item.quantity
         order_item.save()
 
     # Optionally return the order ID and order item details
@@ -486,6 +484,7 @@ def update_cart_item(request):
         # Update the quantity and subtotal
         order_item.quantity = new_quantity
         order_item.subtotal = new_quantity * product.price
+        order_item.discount_subtotal = new_quantity * product.discount_price
         order_item.save()
 
         # Return the updated order item
@@ -493,6 +492,7 @@ def update_cart_item(request):
             "id": order_item.id,
             "quantity": order_item.quantity,
             "subtotal": order_item.subtotal,
+            "discount_subtotal": order_item.discount_subtotal,
         }, status=status.HTTP_200_OK)
 
     except Exception as e:
@@ -565,7 +565,7 @@ def get_order_items(request, order_id):
 
     # Retrieve the active order for the customer
     try:
-        order = Order.objects.get(customer=request.user, complete=False)
+        order = Order.objects.get(customer=request.user)
         order_items = order.order_items.all()
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -668,6 +668,7 @@ def order_history(request):
     except OrderHistory.DoesNotExist:
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
+ 
 
 @api_view(['POST'])
 def checkout(request):
@@ -685,9 +686,12 @@ def checkout(request):
     except Order.DoesNotExist:
         return Response({"error": "Processing order not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if (order.complete):
+        return Response({"error": "Order already checkouted."}, status=status.HTTP_404_NOT_FOUND)
     # Mark the order as complete
     order.complete = True
     order.status = 'Processing'
+    order.date_ordered = datetime.now()
     order.save()
 
         # Increase the popularity of products in the order
@@ -699,17 +703,30 @@ def checkout(request):
 
     # Calculate the total amount for the order
     total_amount = 0.0
+    discount_total_amount = 0.0
     for item in order.order_items.all():
         total_amount = total_amount + float(item.subtotal)
+        discount_total_amount = discount_total_amount + float(item.discount_subtotal)
         # Decrease product stock based on quantity in the order
         product = item.product
         product.stock -= item.quantity
         product.save()
 
+
+    # Create an invoice
+    invoice = Invoice.objects.create(
+        order=order,
+        customer=request.user,
+        total_amount=total_amount,
+        discounted_total=discount_total_amount
+    )
+
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
+    order_history.update_date = datetime.now()
     order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)  # Ensure total_amount is set
+    order_history.discount_total_amount = Decimal(order_history.discount_total_amount) + Decimal(discount_total_amount)  # Ensure total_amount is set
     order_history.save()
 
     # Step 1: Render the email body template (order confirmation)
@@ -746,7 +763,8 @@ def checkout(request):
         return Response({"message": "Order completed successfully, and invoice has been sent."}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
 
 @api_view(['POST'])
 def add_review(request, product_id):
@@ -806,25 +824,23 @@ def get_rating_by_product(request, product_id):
         product = Product.objects.get(id=product_id)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-    # Filter approved reviews for the product
-    reviews = Review.objects.filter(product=product)
     
-    # Calculate the average rating
-    average_rating = reviews.aggregate(average=Avg('rating'))['average']
-    
-    
-    # Include the average rating in the response
+    # Filter reviews for the product
+    all_reviews = Review.objects.filter(product=product)
+
+    # Log all reviews and their ratings for debugging
+    print("All Reviews:", all_reviews)
+    ratings = [review.rating for review in all_reviews]
+    print("Ratings (All Reviews):", ratings)
+
+    # Calculate the average rating from approved reviews
+    average_rating = all_reviews.aggregate(average=Avg('rating'))['average']
+    average_rating = average_rating if average_rating is not None else 0  # Handle no approved reviews case
+
+    # Include the average rating and reviews in the response
     response_data = {
         "average_rating": average_rating
     }
-
-    # Add username to each review in the response data
-    response_data = []
-    for review in serializer.data:
-        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
-        review['username'] = user.username  # Add the username to the serialized data
-        response_data.append(review)
-    
     return Response(response_data, status=status.HTTP_200_OK)
 
 
@@ -845,29 +861,6 @@ def update_review_comment_status(request, review_id):
     return Response({"message": "Comment status updated successfully."}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-def get_rating_by_product(request, product_id):
-    # Check if the product exists
-    try:
-        product = Product.objects.get(id=product_id)
-    except Product.DoesNotExist:
-        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-    # Filter approved reviews for the product
-    reviews = Review.objects.filter(product=product)
-    
-    # Calculate the average rating
-    average_rating = reviews.aggregate(average=Avg('rating'))['average']
-    
-    
-    # Include the average rating in the response
-    response_data = {
-        "average_rating": average_rating
-    }
-    
-    return Response(response_data, status=status.HTTP_200_OK)
-
-
-"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
@@ -921,7 +914,7 @@ def remove_from_wishlist(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_notifications(request):
-    Get notifications for the logged-in user.
+    
     notifications = Notification.objects.filter(user=request.user, is_read=False)
     response_data = [
         {
@@ -937,7 +930,7 @@ def get_notifications(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notifications_as_read(request):
-    Mark notifications as read.
+    
     notification_ids = request.data.get('notification_ids', [])
     if not notification_ids:
         return Response({'error': 'No notification IDs provided'}, status=400)
@@ -995,15 +988,284 @@ def apply_discount(request):
     product.discount_price = discount_price
     product.save()
 
+    # Notify all users with this product in their wishlist
+    wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
+
+    for entry in wishlist_entries:
+        if entry.user.email:  # Ensure email exists before sending
+            try:
+                send_mail(
+                    subject="Exclusive Discount Alert!",
+                    message=f"Good news! '{product.name}' now has a discount of {discount_percentage}%.\n"
+                            f"Original price: ${original_price}, discounted price: ${discount_price}.",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[entry.user.email],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                print(f"Could not send email to {entry.user.email}: {e}")
+
+    # Send success response
     return Response(
         {
-            "message": f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price}).",
+            "message": f"Discount applied successfully to '{product.name}'. Notifications sent to wishlist users.",
             "serial_number": product.serial_number,
             "product_name": product.name,
             "original_price": original_price,
-            "discounted_price": product.discount_price,
-            "price": product.price
+            "discounted_price": discount_price,
+            "discount_percentage": discount_percentage,
         },
         status=status.HTTP_200_OK
+    
     )
-"""
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product_stock(request):
+    """
+    Endpoint for a product manager to update a product's stock.
+    Sends notifications to users who added the product to their wishlist
+    if the stock is updated from 0 to a positive number.
+    """
+    # Ensure only product managers can access this
+    if not request.user.role == 'product_manager':
+        return Response({'error': 'You are not authorized to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
+
+    # Extract product id and stock value
+    product_id = request.data.get('product_id')
+    new_stock = request.data.get('new_stock')
+
+    if not product_id or new_stock is None:
+        return Response({'error': 'Product ID and new stock must be provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Fetch the product
+        product = Product.objects.get(id=product_id)
+        product.stock = int(new_stock)  # Update the stock value
+        product.save()
+
+
+        return Response({'message': f"Stock updated for product '{product.name}'."}, status=status.HTTP_200_OK)
+
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+    except ValueError:
+        return Response({'error': 'Invalid stock value.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_invoices(request):
+    """
+    API endpoint for sales managers to view all invoices within a given date range.
+    Only accessible by users with role 'sales_manager'.
+    """
+    user = request.user
+
+    # Ensure the user is a Sales Manager
+    if not hasattr(user, 'role') or user.role != 'sales_manager':
+        return Response(
+            {"error": "You do not have permission to view this data."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Extract query parameters for date range
+    start_date = request.query_params.get('start_date')
+    end_date = request.query_params.get('end_date')
+
+    # Validate presence of both parameters
+    if not start_date or not end_date:
+        return Response(
+            {"error": "Both 'start_date' and 'end_date' parameters are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Parse the dates safely
+    try:
+        start_date = parse_datetime(start_date)
+        end_date = parse_datetime(end_date)
+        
+        if not start_date or not end_date:
+            raise ValueError("Invalid date format provided.")
+
+        # Ensure that the date range is valid
+        if start_date > end_date:
+            return Response(
+                {"error": "'start_date' cannot be later than 'end_date'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    except ValueError as e:
+        return Response(
+            {"error": f"Invalid date format: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Fetch invoices in the date range
+    invoices = Invoice.objects.filter(date__range=(start_date, end_date))
+
+    if not invoices.exists():
+        return Response(
+            {"message": "No invoices found in the given date range."},
+            status=status.HTTP_200_OK
+        )
+
+    # Serialize the data
+    invoice_data = [
+        {
+            "order_id": invoice.order.id,
+            "customer_username": invoice.customer.username,
+            "date": invoice.date,
+            "total_amount": float(invoice.total_amount),
+            "discounted_total": float(invoice.discounted_total)
+        }
+        for invoice in invoices
+    ]
+
+    # Return the response
+    return Response(
+        {"invoices": invoice_data},
+        status=status.HTTP_200_OK
+    )
+    
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def request_refund(request):
+    """
+    Customer can request a refund for a purchased product within 30 days.
+    """
+    user = request.user
+    # Ensure the user is a Sales Manager
+    if user.role != 'customer':
+        return Response(
+            {"error": "You do not have permission to view this data."},
+            status=status.HTTP_403_FORBIDDEN)
+    
+    
+    order_item_id = request.data.get("order_item_id")
+    reason = request.data.get("reason", "")
+    
+    # Ensure order_item_id is provided
+    if not order_item_id:
+        return Response({"error": "Order item ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Fetch the order item
+    
+        order_item = OrderItem.objects.get(id=order_item_id)
+        
+        # Check if the order status is 'Delivered'
+        if order_item.order.status != 'Delivered':
+            return Response(
+                {"error": "Refunds are only allowed for delivered items."},
+                status=status.HTTP_400_BAD_REQUEST
+        )
+        
+        
+        # Check if the order item is less than 30 days old
+        if now() - order_item.order.date_ordered > timedelta(days=30):
+            return Response({"error": "Refunds are only allowed within 30 days of purchase."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if a refund request has already been created for this order item
+        if RefundRequest.objects.filter(order_item=order_item).exists():
+            return Response(
+                {"error": "A refund request already exists for this order item."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        
+        # Create refund request
+        refund_request = RefundRequest.objects.create(
+            customer=user,
+            order_item=order_item,
+            reason=reason
+        )
+
+        return Response(
+            {"message": "Refund request submitted successfully.", "refund_request_id": refund_request.id},
+            status=status.HTTP_201_CREATED
+        )
+    except OrderItem.DoesNotExist:
+        return Response({"error": "Order item not found or you don't have permission to refund this product."}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def review_refund_request(request):
+    """
+    Sales Manager can approve/reject refund requests.
+    """
+    user = request.user
+    if user.role != "sales_manager":
+        return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+
+    refund_request_id = request.data.get("refund_request_id")
+    decision = request.data.get("decision")  # Accept/Reject
+
+    # Ensure the refund_request_id and decision are provided
+    if not refund_request_id or decision not in ['Approved', 'Rejected']:
+        return Response({"error": "Invalid request. Ensure refund_request_id and decision are provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        refund_request = RefundRequest.objects.get(id=refund_request_id)
+
+        if refund_request.status != 'Pending':
+            return Response({"error": "This refund request has already been reviewed."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the status
+        refund_request.status = decision
+        refund_request.save()
+
+        if decision == 'Approved':
+            # Refund logic
+            order_item = refund_request.order_item
+            product = order_item.product
+
+            # Adjust product stock
+            product.stock += order_item.quantity
+            product.save()
+
+            # Simulate refund logic here (e.g., refund the amount to customer's payment gateway)
+            refund_amount = order_item.discount_subtotal
+            
+            # Add logic to refund the amount to customer's payment system, if needed.
+
+            return Response(
+            {
+                "message": "Refund approved, stock updated, and refund amount processed.",
+                "refund_amount": str(refund_amount),
+                "product": order_item.product.name,
+                "quantity_returned": order_item.quantity,
+            },
+            status=status.HTTP_200_OK,
+        )
+        else:
+            return Response({"message": "Refund rejected."}, status=status.HTTP_200_OK)
+
+    except RefundRequest.DoesNotExist:
+        return Response({"error": "Refund request not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_pending_refund_requests(request):
+    user = request.user
+
+    # Ensure the user is a sales manager
+    if not user.role == 'sales_manager':
+        return Response(
+            {"error": "You do not have permission to view refund requests."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Retrieve only pending refund requests
+    pending_requests = RefundRequest.objects.filter(status='Pending')
+
+    # Serialize the data
+    serializer = RefundRequestSerializer(pending_requests, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
