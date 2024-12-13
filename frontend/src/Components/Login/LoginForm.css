@@ -8,7 +8,7 @@ body {
 .login-form-container {
   text-align: center;
   margin-top: 50px;
-  font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif
 }
 
 .login-form-container .page-title {
@@ -41,6 +41,7 @@ body {
 .login-form-container .wrapper h1 {
   font-size: 40px;
   text-align: center;
+  color: #fff;
 }
 
 .login-form-container .wrapper .input-box {

@@ -4,8 +4,8 @@
   color: #fff;
   padding: 0 20px;
   display: flex;
-  align-items: center; /* Align items vertically */
-  justify-content: space-between; /* Space out left, center, and right sections */
+  align-items: center;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
@@ -15,11 +15,11 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.nav-center {
-  flex: 1; /* Allow the center section to grow and take available space */
+.navbar .nav-center {
+  flex: 1;
   display: flex;
-  justify-content: center; /* Center the search bar horizontally */
-  align-items: center; /* Center the search bar vertically */
+  justify-content: center;
+  align-items: center;
 }
 
 .navbar .nav-left {
@@ -242,6 +242,7 @@
 .navbar .sidebar2 h2 {
   font-size: 22.5px;
   font-weight: bold;
+  text-decoration: underline;
   margin-bottom: 25px;
   color: #01236a;
   text-shadow: 1px 1px 2px #f9f9f9;
@@ -251,6 +252,22 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.navbar .sidebar-menu2 li.sales-manager a {
+  color: white;
+  background-color: #01236a;
+}
+
+.navbar .sidebar-menu2 li.sales-manager p.customer {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.navbar .sidebar-menu2 li.sales-manager p.admin {
+  margin-bottom: 20px;
+  font-size: 20px;
 }
 
 .navbar .sidebar-menu2 .register-login {
@@ -294,19 +311,19 @@
   transform: scale(1.05);
 }
 
-.search-bar {
+.navbar .search-bar {
   display: flex;
   align-items: center;
   background-color: #fff;
   border-radius: 8px;
-  padding: 5px 10px;
-  width: 400px;
+  padding: 3px 10px;
+  width: 450px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #ccc;
-  margin-right: 140px;
+  margin-right: 170px;
 }
 
-.search-input {
+.navbar .search-input {
   border: none;
   outline: none;
   flex: 1;
@@ -316,24 +333,24 @@
   color: #333;
 }
 
-.search-button {
+.navbar .search-button {
   background-color: #01236a;
   border: none;
   color: white;
-  padding: 5px 12px;
+  padding: 5px 10px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.search-button:hover {
-  background-color: #01489b;
-  transform: translateY(-1px);
+.navbar .search-button:hover {
+  background-color: #005da9;
+  transform: scale(1.1);
 }
 
-.search-button:active {
+.navbar .search-button:active {
   background-color: #011b4d;
   transform: translateY(0);
 }

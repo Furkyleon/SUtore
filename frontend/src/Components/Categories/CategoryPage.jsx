@@ -162,7 +162,26 @@ const CategoryPage = () => {
                     />
                     <h2>{product.name}</h2>
                   </Link>
-                  <p className="price">{product.price + " TL"}</p>
+                  <p className="price">
+                    {product.discount > 0 ? (
+                      <>
+                        <span className="original-price">
+                          {product.price.toFixed(2)} TL
+                        </span>
+                        <span className="discounted-price">
+                          {(
+                            product.price -
+                            product.price * (product.discount / 100)
+                          ).toFixed(2)}{" "}
+                          TL
+                        </span>
+                      </>
+                    ) : (
+                      <span className="original-price2">
+                        {product.price.toFixed(2)} TL
+                      </span>
+                    )}
+                  </p>
                   {product.stock > 0 ? (
                     <button
                       onClick={() => {

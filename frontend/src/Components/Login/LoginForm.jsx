@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./LoginForm.css";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import "./LoginForm.css";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -9,14 +9,10 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-
-  
-
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
 
     const credentials = { username, password };
-    console.log(username, password);
 
     try {
       // Make the login request
@@ -36,45 +32,42 @@ const LoginForm = () => {
         localStorage.setItem("password", password);
         localStorage.setItem("role", responseData.user.role);
 
-        console.log(username, password);
+        console.log(username, password, responseData.user.role);
 
         alert(`Welcome, ${responseData.user.username || "user"}!`);
-        navigate("/"); // Redirect to the main page
+        navigate("/");
 
-        // giriş yapılan kullanıcının sepeti doluysa
-
-
-          try {
-            const response = await fetch(
-              "http://127.0.0.1:8000/cart/assign_to_user/",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Basic ${btoa(
-                    `${localStorage.getItem("username")}:${localStorage.getItem(
-                      "password"
-                    )}`
-                  )}`,
-                },
-                body: JSON.stringify({
-                  order_id: localStorage.getItem("order_id"),
-                }),
-              }
-            );
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.log("Error1");
-              return;
+        // giriş yapılan kullanıcının sepeti doluysa ?
+        try {
+          const response = await fetch(
+            "http://127.0.0.1:8000/cart/assign_to_user/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Basic ${btoa(
+                  `${localStorage.getItem("username")}:${localStorage.getItem(
+                    "password"
+                  )}`
+                )}`,
+              },
+              body: JSON.stringify({
+                order_id: localStorage.getItem("order_id"),
+              }),
             }
+          );
 
-            const data = await response.json();
-            console.log("Order assigned successfully:", data);
-          } catch (error) {
-            console.log("Error2");
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.log("Error1");
+            return;
           }
-        
+
+          const data = await response.json();
+          console.log("Order assigned successfully:", data);
+        } catch (error) {
+          console.log("Error2");
+        }
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Login failed");

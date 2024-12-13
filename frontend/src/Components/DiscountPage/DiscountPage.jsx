@@ -8,6 +8,9 @@ const DiscountPage = () => {
   const [error, setError] = useState("");
   const [discountInputs, setDiscountInputs] = useState({});
 
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortCriterion, setSortCriterion] = useState("name");
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -68,12 +71,8 @@ const DiscountPage = () => {
       if (!response.ok) throw new Error("Failed to apply discount!");
 
       const data = await response.json();
-      alert(
-        `Discount applied successfully: ${data.product_name} - ${data.discounted_price.toFixed(
-          2
-        )} TL`
-      );
 
+      // Update products state
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === productId
@@ -86,11 +85,34 @@ const DiscountPage = () => {
             : product
         )
       );
+
+      // Update discountInputs state
+      setDiscountInputs((prevInputs) => ({
+        ...prevInputs,
+        [productId]: data.discount_percentage || 0,
+      }));
+
+      alert(
+        `Discount applied successfully: ${
+          data.product_name
+        } - ${data.discounted_price.toFixed(2)} TL`
+      );
     } catch (error) {
       console.error("Error applying discount:", error);
       alert("There was an error applying the discount.");
     }
   };
+
+  const sortedProducts = products.sort((a, b) => {
+    if (sortCriterion === "name") {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return sortOrder === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    }
+    return 0;
+  });
 
   return (
     <div className="discount-page-wrapper">
@@ -101,17 +123,19 @@ const DiscountPage = () => {
 
       {!loading && !error && (
         <div className="product-list">
-          {products.length > 0 ? (
-            products.map((product) => (
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map((product) => (
               <div key={product.id} className="product-card">
-                {/* Navigate to product page on click */}
                 <Link to={`/product/${product.id}`} className="product-link">
                   <img
-                    src={`http://localhost:8000${product.image || "/placeholder.jpg"}`}
+                    src={`http://localhost:8000${
+                      product.image || "/placeholder.jpg"
+                    }`}
                     alt={product.name || "Unnamed Product"}
                   />
                   <h2>{product.name || "Unnamed Product"}</h2>
                 </Link>
+
                 <p className="price">
                   {product.discount > 0 ? (
                     <>
@@ -127,25 +151,31 @@ const DiscountPage = () => {
                       </span>
                     </>
                   ) : (
-                    <span className="discounted-price">
+                    <span className="original-price2">
                       {product.price.toFixed(2)} TL
                     </span>
                   )}
                 </p>
                 <div className="discount-controls">
-                  <label htmlFor={`discount-${product.id}`}>
-                    Discount (%):
-                  </label>
-                  <input
-                    type="number"
-                    id={`discount-${product.id}`}
-                    min="0"
-                    max="100"
-                    value={discountInputs[product.id] || ""}
-                    onChange={(e) =>
-                      handleInputChange(product.id, parseFloat(e.target.value))
-                    }
-                  />
+                  <div className="discount">
+                    <label htmlFor={`discount-${product.id}`}>
+                      Discount (%):
+                    </label>
+                    <input
+                      type="number"
+                      id={`discount-${product.id}`}
+                      min="0"
+                      max="100"
+                      value={discountInputs[product.id] || "0"}
+                      onChange={(e) =>
+                        handleInputChange(
+                          product.id,
+                          parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+
                   <button
                     className="apply-btn"
                     onClick={() => applyDiscount(product.id)}

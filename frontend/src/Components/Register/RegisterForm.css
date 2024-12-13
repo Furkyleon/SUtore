@@ -42,6 +42,7 @@ body {
 .register-form-container .wrapper h1 {
   font-size: 40px;
   text-align: center;
+  color: #fff;
 }
 
 .register-form-container .wrapper .input-box {

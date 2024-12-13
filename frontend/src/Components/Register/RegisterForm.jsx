@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./RegisterForm.css";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import "./RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const RegisterForm = () => {
       if (response.ok) {
         const responseData = await response.json();
         alert(`Welcome, ${responseData.user.username || "user"}!`);
-        navigate("/login"); // Redirect to the login page
+        navigate("/login");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.error || "Register failed");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
 import { IoMdSearch } from "react-icons/io";
+import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const Navbar = () => {
     localStorage.setItem("password", null);
     localStorage.setItem("order_id", null);
     alert("You have been logged out.");
-    navigate("/"); // Redirect to the main page after logout
+    navigate("/");
     setIsSidebarOpen2(false);
   };
 
@@ -173,7 +173,7 @@ const Navbar = () => {
           {localStorage.getItem("username") === "null" ||
           !localStorage.getItem("username")
             ? "Welcome!"
-            : `Welcome "${localStorage.getItem("username")}"`}
+            : `Welcome ${localStorage.getItem("username")}!`}
         </h2>
         <ul className="sidebar-menu2">
           {localStorage.getItem("username") === "null" && (
@@ -194,22 +194,26 @@ const Navbar = () => {
           {localStorage.getItem("username") !== "null" &&
             localStorage.getItem("username") && (
               <div>
+                {localStorage.getItem("role") === "sales_manager" && (
+                  <li className="sales-manager">
+                    <p className="admin">Admin Interface:</p>
+
+                    <Link to="/sales-manager" onClick={toggleSidebar2}>
+                      Sales Manager Page
+                    </Link>
+
+                    <p className="customer">Customer Operations:</p>
+                  </li>
+                )}
+
                 <li>
                   <Link to="/wishlist" onClick={toggleSidebar2}>
                     Wishlist
                   </Link>
                 </li>
 
-                {localStorage.getItem("role") === "sales_manager" && (
                 <li>
-                  <Link to="/salesmanager" onClick={toggleSidebar2}>
-                    Sales Manager Page
-                  </Link>
-                </li>
-              )}
-
-                <li>
-                  <Link to="/orderhistory" onClick={toggleSidebar2}>
+                  <Link to="/order-history" onClick={toggleSidebar2}>
                     Order History
                   </Link>
                 </li>

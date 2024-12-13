@@ -54,7 +54,7 @@ body {
 .category-page-wrapper .product-card h2 {
   font-size: 1.4rem;
   color: #01236a;
-  margin: 10px 0 10px;
+  margin: 10px 0 15px;
   text-decoration: none;
 }
 
@@ -64,11 +64,32 @@ body {
 }
 
 .category-page-wrapper .product-card .price {
-  font-style: normal;
   color: #01236a;
   margin: 0 0 10px;
   align-self: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-page-wrapper .product-card .price .original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.category-page-wrapper .product-card .price .original-price2 {
+  color: #000000;
+  font-size: 1.3rem;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.category-page-wrapper .product-card .price .discounted-price {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
 }
 
 .category-page-wrapper .product-card button {
@@ -79,6 +100,8 @@ body {
   border-radius: 5px;
   cursor: pointer;
   align-self: center;
+  margin-top: 5px;
+  font-size: 1.1rem;
 }
 
 .category-page-wrapper .product-card button:hover {
@@ -88,7 +111,7 @@ body {
 .category-page-wrapper .product-card .out-of-stock-label {
   color: red;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.1rem;
   text-align: center;
   margin-top: 10px;
 }

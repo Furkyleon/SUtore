@@ -1,85 +1,119 @@
 .sales-manager-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    width: 100%;
-  }
-  
-  h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .section {
-    margin: 20px 0;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .section:nth-child(2) {
-    background-color: #e3f2fd; /* Light Blue for Discounts */
-  }
-  
-  .section:nth-child(3) {
-    background-color: #e8f5e9; /* Light Green for Invoices */
-  }
-  
-  .section:nth-child(4) {
-    background-color: #fff8e1; /* Light Yellow for Revenue */
-  }
-  
-  .section:nth-child(5) {
-    background-color: #ffebee; /* Light Red for Refunds */
-  }
-  
-  h2 {
-    margin-bottom: 15px;
-    font-size: 20px;
-    font-weight: bold;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  input[type="date"] {
-    margin-right: 10px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  .action-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-size: 14px;
-  }
-  
-  .action-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .invoice-list, .refund-list, .chart-placeholder {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 14px;
-    color: #555;
-    border: 1px dashed #ddd;
-  }
-  
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  width: 50%;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sales-manager-container h1 {
+  text-align: center;
+  color: #333;
+  font-size: 2rem;
+  font-weight: bold;
+  padding-top: 10px;
+  margin-bottom: 0px;
+}
+
+.sales-manager-container .discount-refund {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.sales-manager-container .discount-refund h2 {
+  font-size: 1.3rem;
+}
+
+.sales-manager-container .discount-refund .section {
+  border-radius: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0px;
+  flex: 1;
+}
+
+.sales-manager-container .section {
+  margin: 30px 0;
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sales-manager-container .section:nth-child(1) {
+  background-color: #e3f2fd; /* Light Blue for Discounts */
+}
+
+.sales-manager-container .section:nth-child(2) {
+  background-color: #e8f5e9; /* Light Green for Invoices */
+}
+
+.sales-manager-container .section:nth-child(3) {
+  background-color: #fff8e1; /* Light Yellow for Revenue */
+}
+
+.sales-manager-container .section:nth-child(4) {
+  background-color: #ffebee; /* Light Red for Refunds */
+}
+
+.sales-manager-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sales-manager-container label {
+  display: block;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.sales-manager-container .date-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.sales-manager-container input[type="date"] {
+  margin-right: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.sales-manager-container .action-button {
+  padding: 10px 15px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.sales-manager-container .action-button:hover {
+  background-color: #01236a;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  transform: scale(1.1);
+}
+
+.sales-manager-container .invoice-list,
+.sales-manager-container .chart-placeholder {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  border: 1px dashed #ddd;
+}

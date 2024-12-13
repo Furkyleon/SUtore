@@ -164,7 +164,7 @@ const StorePage = () => {
                   </span>
                 </>
               ) : (
-                <span className="discounted-price">
+                <span className="original-price2">
                   {product.price.toFixed(2)} TL
                 </span>
               )}

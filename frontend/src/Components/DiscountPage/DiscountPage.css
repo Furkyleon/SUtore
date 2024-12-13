@@ -1,87 +1,108 @@
 .discount-page-wrapper {
-  width: 90%;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
   text-align: center;
-  margin-top: 50px;
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  margin-top: 60px;
 }
 
-h1 {
+.discount-page-wrapper h1 {
+  color: #01236a;
   font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 40px;
+  text-decoration: none;
 }
 
-.product-list {
+.discount-page-wrapper .product-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 50px;
 }
 
-.product-card {
+.discount-page-wrapper .product-card {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  width: 260px;
-  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
+  justify-content: flex-end;
   transition: transform 0.3s ease;
 }
 
-.product-card:hover {
-  transform: translateY(-5px);
+.discount-page-wrapper .product-card:hover {
+  transform: scale(1.05);
 }
 
-.product-card img {
+.discount-page-wrapper .product-card img {
   width: 100%;
   height: 180px;
   object-fit: contain;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-.product-card h2 {
-  font-size: 1.2rem;
+.discount-page-wrapper .product-card h2 {
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   text-align: center;
-  color: #444;
+  color: #01236a;
 }
 
-.product-card .price {
-  font-size: 1rem;
-  margin-bottom: 10px;
+.discount-page-wrapper .product-card .price {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
-.product-card .price .original-price {
+.discount-page-wrapper .product-card .price .original-price {
   text-decoration: line-through;
   color: #999;
-  margin-right: 10px;
+  margin-bottom: 10px;
 }
 
-.product-card .price .discounted-price {
-  color: #28a745;
+.discount-page-wrapper .product-card .price .original-price2 {
+  color: #000000;
+  font-size: 1.3rem;
   font-weight: bold;
+  margin-top: 20px;
 }
 
-.discount-controls {
-  width: 100%;
+.discount-page-wrapper .product-card .price .discounted-price {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.discount-page-wrapper .discount-controls {
+  width: 80%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.discount-controls label {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 5px;
+.discount-page-wrapper .discount-controls .discount {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
 }
 
-.discount-controls input {
-  width: 80%;
+.discount-page-wrapper .discount-controls .discount label {
+  font-size: 1.05rem;
+  color: #666;
+  margin-right: 3px;
+  margin-top: 7px;
+}
+
+.discount-page-wrapper .discount-controls .discount input {
+  width: 35%;
   padding: 8px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
@@ -89,8 +110,8 @@ h1 {
   text-align: center;
 }
 
-.discount-controls .apply-btn {
-  background-color: #28a745;
+.discount-page-wrapper .discount-controls .apply-btn {
+  background-color: #ff9800;
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -98,30 +119,31 @@ h1 {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 10px;
 }
 
-.discount-controls .apply-btn:hover {
+.discount-page-wrapper .discount-controls .apply-btn:hover {
   background-color: #218838;
 }
 
-.product-link {
+.discount-page-wrapper .product-link {
   text-decoration: none;
   color: inherit;
 }
 
-.error {
+.discount-page-wrapper .error {
   color: #ff0000;
   font-size: 1.2rem;
   margin-top: 10px;
 }
 
 @media (max-width: 768px) {
-  .product-list {
+  .discount-page-wrapper .product-list {
     flex-direction: column;
     align-items: center;
   }
 
-  .product-card {
+  .discount-page-wrapper .product-card {
     width: 90%;
   }
 }

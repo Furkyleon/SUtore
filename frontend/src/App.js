@@ -14,6 +14,8 @@ import Invoice from "./Components/Invoice/Invoice";
 import Wishlist from "./Components/Wishlist/Wishlist";
 import SalesManager from "./Components/SalesManager/SalesManager";
 import DiscountPage from "./Components/DiscountPage/DiscountPage";
+import RefundPage from "./Components/RefundPage/RefundPage"
+
 function App() {
   return (
     <Router>
@@ -24,15 +26,16 @@ function App() {
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
           <Route path="payment" element={<PaymentPage />} />
-          <Route path="orderhistory" element={<OrderHistory />} />
+          <Route path="order-history" element={<OrderHistory />} />
           <Route path="categories/:categoryName" element={<CategoryPage />} />
           <Route path="product/:productId" element={<ProductPage />} />
           <Route path="cart" element={<Cart />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="invoice/:orderId" element={<Invoice />} />
           <Route path="wishlist" element={<Wishlist />} />
-          <Route path="salesmanager" element={<SalesManager />} />
-          <Route path="discountpage" element={<DiscountPage />} />
+          <Route path="sales-manager" element={<SalesManager />} />
+          <Route path="sales-manager/discount-page" element={<DiscountPage />} />
+          <Route path="sales-manager/refund-page" element={<RefundPage />} />
         </Route>
       </Routes>
     </Router>
