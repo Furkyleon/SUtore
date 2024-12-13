@@ -9,6 +9,9 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
 
@@ -31,6 +34,7 @@ const LoginForm = () => {
         // Save credentials in localStorage for Basic Authentication
         localStorage.setItem("username", username);
         localStorage.setItem("password", password);
+        localStorage.setItem("role", responseData.user.role);
 
         console.log(username, password);
 

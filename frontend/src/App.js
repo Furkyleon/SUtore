@@ -12,7 +12,8 @@ import OrderHistory from "./Components/OrderHistory/OrderHistory";
 import SearchPage from "./Components/Search/SearchPage";
 import Invoice from "./Components/Invoice/Invoice";
 import Wishlist from "./Components/Wishlist/Wishlist";
-
+import SalesManager from "./Components/SalesManager/SalesManager";
+import DiscountPage from "./Components/DiscountPage/DiscountPage";
 function App() {
   return (
     <Router>
@@ -30,6 +31,8 @@ function App() {
           <Route path="search" element={<SearchPage />} />
           <Route path="invoice/:orderId" element={<Invoice />} />
           <Route path="wishlist" element={<Wishlist />} />
+          <Route path="salesmanager" element={<SalesManager />} />
+          <Route path="discountpage" element={<DiscountPage />} />
         </Route>
       </Routes>
     </Router>

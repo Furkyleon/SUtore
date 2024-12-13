@@ -200,6 +200,14 @@ const Navbar = () => {
                   </Link>
                 </li>
 
+                {localStorage.getItem("role") === "sales_manager" && (
+                <li>
+                  <Link to="/salesmanager" onClick={toggleSidebar2}>
+                    Sales Manager Page
+                  </Link>
+                </li>
+              )}
+
                 <li>
                   <Link to="/orderhistory" onClick={toggleSidebar2}>
                     Order History
