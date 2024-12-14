@@ -65,17 +65,17 @@
   padding: 0;
   margin: 0;
   border-top: 1px solid #ddd;
-  padding-top: 10px;
+  padding-top: 20px;
 }
 
 .order-history-container .order-item-detail {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 3fr 1.5fr 1.5fr 1fr;
   gap: 10px;
   align-items: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #555;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .order-history-container .order-item-detail .item-name {
@@ -85,8 +85,26 @@
 
 .order-item-detail .item-quantity,
 .order-item-detail .item-price {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #555;
+}
+
+.order-item-detail .refund-button {
+  padding: 8px 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #01236a;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-item-detail .refund-button:hover {
+  color: #fff;
+  background-color: #ff9800;
 }
 
 /* Responsive Design */

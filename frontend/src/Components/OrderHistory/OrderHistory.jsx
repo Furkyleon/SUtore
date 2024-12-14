@@ -40,6 +40,36 @@ const OrderHistory = () => {
     navigate(`/invoice/${orderId}`);
   };
 
+  const requestRefund = (orderItemId) => {
+    const reason = prompt("Please provide a reason for your refund request:");
+    if (!reason) return;
+
+    fetch("http://127.0.0.1:8000/request-refund/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(
+          `${localStorage.getItem("username")}:${localStorage.getItem(
+            "password"
+          )}`
+        )}`,
+      },
+      body: JSON.stringify({ order_item_id: orderItemId, reason }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(`Error: ${data.error}`);
+        } else {
+          alert("Refund request submitted successfully.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error requesting refund:", error);
+        alert("Failed to submit refund request.");
+      });
+  };
+
   return (
     <div className="order-history-container">
       <h2>Order History</h2>
@@ -51,14 +81,12 @@ const OrderHistory = () => {
             <li key={order.order_id} className="order-item">
               <div className="order-header">
                 <span className="order-id">Order ID: {order.order_id}</span>
-                <span className="order-status">
-                  Order Status: {order.status}
-                </span>
+                <span className="order-status">Status: {order.status}</span>
                 <span className="order-date">
                   Date: {new Date(order.date_ordered).toLocaleDateString()}
                 </span>
                 <span className="order-total">
-                  Total:{" "}
+                  Order Total:{" "}
                   {order.items
                     .reduce(
                       (total, item) => total + parseFloat(item.subtotal),
@@ -81,7 +109,15 @@ const OrderHistory = () => {
                     <span className="item-quantity">
                       Quantity: {item.quantity}
                     </span>
-                    <span className="item-price">{item.subtotal} TL</span>
+                    <span className="item-price">
+                      Total: {item.subtotal} TL
+                    </span>
+                    <button
+                      className="refund-button"
+                      onClick={() => requestRefund(item.id)}
+                    >
+                      Request Refund
+                    </button>
                   </li>
                 ))}
               </ul>

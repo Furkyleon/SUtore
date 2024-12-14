@@ -995,7 +995,7 @@ def apply_discount(request):
         if entry.user.email:  # Ensure email exists before sending
             try:
                 send_mail(
-                    subject="Exclusive Discount Alert!",
+                    subject=f"Discount Alert for '{product.name}'!",
                     message=f"Good news! '{product.name}' now has a discount of {discount_percentage}%.\n"
                             f"Original price: ${original_price}, discounted price: ${discount_price}.",
                     from_email=settings.EMAIL_HOST_USER,
@@ -1138,7 +1138,7 @@ def request_refund(request):
     Customer can request a refund for a purchased product within 30 days.
     """
     user = request.user
-    # Ensure the user is a Sales Manager
+    # Ensure the user is a Customer
     if user.role != 'customer':
         return Response(
             {"error": "You do not have permission to view this data."},
