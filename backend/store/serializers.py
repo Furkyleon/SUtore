@@ -32,27 +32,16 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
     
-    
 class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(write_only=True)  # Accept category name as input
+    category_name = serializers.StringRelatedField(source='category', read_only=True)  # Return category name in respons
     class Meta:
         model = Product
         fields = [
-            'id',            
-            'name',
-            'price',
-            'digital',
-            'discount',
-            'stock',
-            'popularity',
-            'model',
-            'serial_number',
-            'warranty_status',
-            'distributor_info',
-            'category',
-            'discount_price',
-            'description',
-            'image',
-        ]
+                    'id', 'name', 'image', 'model', 'category', 'category_name', 'description',
+                    'price', 'discount', 'discount_price', 'stock', 'popularity',
+                    'digital', 'serial_number', 'warranty_status', 'distributor_info'
+                ]
         
     def validate_price(self, value):
         """Check that the price is not negative."""
@@ -73,10 +62,17 @@ class ProductSerializer(serializers.ModelSerializer):
         return value
     
     def validate_category(self, value):
-        """Ensure that the category exists in the database."""
-        if not Category.objects.filter(name=value).exists():
-            raise serializers.ValidationError("Category does not exist.")
-        return value
+        """Validate the category name and resolve it to a Category instance."""
+        try:
+            return Category.objects.get(name=value)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError(f"Category '{value}' does not exist.")
+
+    def create(self, validated_data):
+        """Override create to handle category as a resolved object."""
+        category = validated_data.pop('category')  # This will be the resolved Category instance
+        product = Product.objects.create(category=category, **validated_data)
+        return product
 
     
 class CategorySerializer(serializers.ModelSerializer):
@@ -97,11 +93,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return data
     
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True, source='order_items')  # Ensure `source` matches related_name in OrderItem model
+    items = OrderItemSerializer(many=True, read_only=True, source='order_items')  # Ensure source matches related_name in OrderItem model
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'date_ordered', 'complete', 'transaction_id', 'status', 'items']  # Ensure `items` is included here
+        fields = ['id', 'customer', 'date_ordered', 'complete', 'transaction_id', 'status', 'items']  # Ensure items is included here
 
 class OrderHistorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -174,3 +170,11 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": "Refunds can only be requested within 30 days of purchase."})
 
         return data
+
+class DeliverySerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='order_item.product.name', read_only=True)
+    quantity = serializers.IntegerField(source='order_item.quantity', read_only=True)
+    status = serializers.CharField(source='status', read_only=True)
+    class Meta:
+        model = Delivery
+        fields = ['id', 'customer', 'product_name', 'quantity', 'delivery_address', 'status', 'total_price', 'created_at', 'updated_at']

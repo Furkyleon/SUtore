@@ -123,27 +123,22 @@ def login(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Require user authentication
 def add_product(request):
-    # Check if the authenticated user is a product manager
+    """API for product managers to add a product."""
     if request.user.role != 'product_manager':
         return Response(
             {"error": "Only product managers can add new products."},
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # Use the ProductSerializer to validate and save the incoming data
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
-        # Save the product to the database
         product = serializer.save()
         product.discount_price = product.price * (1 - product.discount / 100)
         product.save()
 
-        # Return the created product data in the response
         return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
 
-    # Return errors if the serializer is not valid
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -177,14 +172,30 @@ def get_all_products(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_category(request):
-    
+    """API for product managers to add a new product category."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can add categories."}, status=status.HTTP_403_FORBIDDEN)
     serializer = CategorySerializer(data=request.data) 
     if serializer.is_valid():
         category = serializer.save()
         return Response(CategorySerializer(category).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_category(request, category_name):
+    """API for product managers to delete a product category."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can delete categories."}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        category = Category.objects.get(name=category_name)
+        category.delete()
+        return Response({"message": f"Category '{category_name}' deleted successfully."}, status=status.HTTP_200_OK)
+    except Category.DoesNotExist:
+        return Response({"error": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def get_categories(request):
@@ -279,7 +290,7 @@ def get_products_by_price_interval(request):
         return Response({'error': 'Both min_price and max_price must be valid numbers.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Filter products by price interval
-    products = Product.objects.filter(price__gte=min_price, price__lte=max_price)
+    products = Product.objects.filter(price_gte=min_price, price_lte=max_price)
 
     if not products.exists():
         return Response({'error': 'No products found in this price range.'}, status=status.HTTP_404_NOT_FOUND)
@@ -703,7 +714,7 @@ def checkout(request):
     order.date_ordered = datetime.now()
     order.save()
 
-        # Increase the popularity of products in the order
+    # Increase the popularity of products in the order
     order_items = order.order_items.all()  # Get all OrderItems related to the Order
     for order_item in order_items:
         product = order_item.product
@@ -737,6 +748,15 @@ def checkout(request):
     order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)  # Ensure total_amount is set
     order_history.discount_total_amount = Decimal(order_history.discount_total_amount) + Decimal(discount_total_amount)  # Ensure total_amount is set
     order_history.save()
+
+    # Create delivery entries for each order item
+    for item in order_items:
+        Delivery.objects.create(
+            order_item=item,
+            customer=request.user,
+            delivery_address=request.user.address,
+            total_price=item.discount_subtotal
+        )
 
     # Step 1: Render the email body template (order confirmation)
     html_message = render_to_string('order_confirmation.html', {'order': order})
@@ -781,7 +801,7 @@ def add_review(request, product_id):
     comment = request.data.get('comment')
 
     # Check if the user has purchased this product in a completed order
-    purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
+    purchased_items = OrderItem.objects.filter(order_customer=request.user, order_complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -1072,8 +1092,8 @@ def view_invoices(request):
     """
     user = request.user
 
-    # Ensure the user is a Sales Manager
-    if not hasattr(user, 'role') or user.role != 'sales_manager':
+    # Ensure the user is a Sales Manager, Product Manager
+    if not hasattr(user, 'role') or user.role != 'sales_manager' or user.role != 'product_manager':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN
@@ -1330,3 +1350,37 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_deliveries(request):
+    """
+    Retrieve all deliveries. Only accessible by Product Managers.
+    """
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can access delivery data."}, status=status.HTTP_403_FORBIDDEN)
+
+    # Fetch all deliveries
+    deliveries = Delivery.objects.all()
+
+    if not deliveries.exists():
+        return Response({"message": "No deliveries found."}, status=status.HTTP_200_OK)
+
+    # Serialize the deliveries
+    serialized_deliveries = []
+    for delivery in deliveries:
+        serialized_deliveries.append({
+            "delivery_id": delivery.id,
+            "customer_id": delivery.customer.id,
+            "customer_username": delivery.customer.username,
+            "product_id": delivery.order_item.product.id,
+            "product_name": delivery.order_item.product.name,
+            "quantity": delivery.order_item.quantity,
+            "total_price": float(delivery.total_price),
+            "delivery_address": delivery.delivery_address,
+            "status": delivery.status,
+            "created_at": delivery.created_at,
+            "updated_at": delivery.updated_at,
+        })
+
+    return Response(serialized_deliveries, status=status.HTTP_200_OK)

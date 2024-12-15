@@ -13,6 +13,8 @@ urlpatterns = [
 
     # Product and Category
     path('products/get_all/', views.get_all_products, name='get_all_products'),
+    path('categories/add/', views.add_category, name='add_category'),
+    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
@@ -70,9 +72,6 @@ urlpatterns = [
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
 
-    path('products/search_products/', views.search_products, name='search_products'),
-    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
-    path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
-    
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
