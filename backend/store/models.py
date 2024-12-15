@@ -129,6 +129,7 @@ class OrderHistory(models.Model):
         ('Processing', 'Processing'),
         ('In-transit', 'In-transit'),
         ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
     ]
     customer = models.OneToOneField(
         CustomUser, 

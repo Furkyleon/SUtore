@@ -1269,3 +1269,37 @@ def get_pending_refund_requests(request):
     serializer = RefundRequestSerializer(pending_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cancel_order(request, order_id):
+    """Cancel an order for the authenticated user."""
+    try:
+        # Fetch the order
+        order = Order.objects.get(id=order_id, customer=request.user)
+        
+        if order.status != 'Processing':
+            if order.status == 'Cancelled':
+                return Response(
+                {"error": "This order is already cancelled."},
+                status=status.HTTP_400_BAD_REQUEST
+            ) 
+            else:
+                return Response(
+                    {"error": "Completed orders cannot be cancelled."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Mark the order as canceled
+        order.status = 'Cancelled'
+        order.save()
+
+        return Response(
+            {"message": f"Order {order.id} has been cancelled successfully."},
+            status=status.HTTP_200_OK
+        )
+    except Order.DoesNotExist:
+        return Response(
+            {"error": "Order not found or does not belong to you."},
+            status=status.HTTP_404_NOT_FOUND
+        )
