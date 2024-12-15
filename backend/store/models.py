@@ -87,6 +87,61 @@ class SalesManager:
         product.price = round(discounted_price, 2)
         product.save()
         return f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price})."
+
+class ProductManager:
+    def __init__(self, user):
+        """Initialize with a user object."""
+        if not isinstance(user, CustomUser):
+            raise ValueError("User must be an instance of CustomUser.")
+        if user.role != 'product_manager':
+            raise PermissionError("The user is not authorized as a Product Manager.")
+        self.user = user
+
+    def add_product(self, product_data):
+        """Add a new product."""
+        product = Product(**product_data)
+        product.save()
+        return f"Product '{product.name}' added successfully."
+
+    def remove_product(self, product_id):
+        """Remove a product by ID."""
+        try:
+            product = Product.objects.get(id=product_id)
+            product.delete()
+            return f"Product '{product.name}' removed successfully."
+        except Product.DoesNotExist:
+            raise ValueError("Product not found.")
+
+    def manage_stock(self, product_id, quantity):
+        """Update stock for a product."""
+        try:
+            product = Product.objects.get(id=product_id)
+            product.stock = quantity
+            product.save()
+            return f"Stock updated for product '{product.name}'. New stock: {product.stock}"
+        except Product.DoesNotExist:
+            raise ValueError("Product not found.")
+
+    def approve_comment(self, review_id):
+        """Approve a comment."""
+        try:
+            review = Review.objects.get(id=review_id)
+            review.comment_status = 'Approved'
+            review.save()
+            return f"Comment for product '{review.product.name}' approved."
+        except Review.DoesNotExist:
+            raise ValueError("Review not found.")
+
+    def disapprove_comment(self, review_id):
+        """Disapprove a comment."""
+        try:
+            review = Review.objects.get(id=review_id)
+            review.comment_status = 'Rejected'
+            review.save()
+            return f"Comment for product '{review.product.name}' disapproved."
+        except Review.DoesNotExist:
+            raise ValueError("Review not found.")
+
     
     
 

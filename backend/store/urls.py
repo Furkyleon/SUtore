@@ -13,7 +13,7 @@ urlpatterns = [
 
     # Product and Category
     path('products/add_product/', views.add_product, name='add_product'),
-    path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'), 
+    path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
     path('categories/add/', views.add_category, name='add_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
@@ -57,6 +57,7 @@ urlpatterns = [
     # Product Manager
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
     path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+    path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     # disapprove api can be added ?
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
