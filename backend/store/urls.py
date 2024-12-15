@@ -13,8 +13,6 @@ urlpatterns = [
 
     # Product and Category
     path('products/get_all/', views.get_all_products, name='get_all_products'),
-    path('categories/add/', views.add_category, name='add_category'),
-    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
@@ -56,22 +54,26 @@ urlpatterns = [
     path('products/add_product/', views.add_product, name='add_product'),
     path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('categories/add/', views.add_category, name='add_category'),
-    # delete category api needed
+    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
     path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
+    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
     path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
     # disapprove comment api can be added ?
     
-    # Sort and Search api's
+    # Sorting
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
     path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
     path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
-    
     path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
     path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
-    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
-
+    
+    # Searching
+    path('products/search_products/', views.search_products, name='search_products'),
+    path('products/search/', views.get_products_by_name, name='get_products_by_name'),
+    path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
+    
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
