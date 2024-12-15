@@ -89,7 +89,7 @@ class SalesManager:
         return f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price})."
 
 class ProductManager:
-    def _init_(self, user):
+    def init(self, user):
         """Initialize with a user object."""
         if not isinstance(user, CustomUser):
             raise ValueError("User must be an instance of CustomUser.")
@@ -252,7 +252,7 @@ class Order(models.Model):
     def generate_deliveries(self):
         """Generate delivery entries for all items in the order."""
         for item in self.order_items.all():
-            DeliveryList.objects.create(
+            Delivery.objects.create(
                 order_item=item,
                 customer=self.customer,
                 delivery_address=self.customer.address,
@@ -324,7 +324,7 @@ class Invoice(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def _str_(self):
+    def str(self):
         return f"Invoice for Order {self.order.id} by {self.customer.username}"
     
     
@@ -341,7 +341,7 @@ class RefundRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     reason = models.TextField(blank=True, null=True)
 
-    def _str_(self):
+    def str(self):
         return f"Refund request {self.id} by {self.customer.username}"
 
 class Delivery(models.Model):
@@ -371,7 +371,5 @@ class Delivery(models.Model):
         self.total_price = Decimal(self.order_item.quantity) * Decimal(self.order_item.product.price)
         self.save()
 
-    def __str__(self):
+    def _str_(self):
         return f"Delivery {self.id} for {self.order_item.product.name} - {self.status}"
-
-
