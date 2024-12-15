@@ -249,6 +249,15 @@ class Order(models.Model):
         )
         return Decimal(revenue) - Decimal(cost)  # Positive for profit, negative for loss
 
+    def generate_deliveries(self):
+        """Generate delivery entries for all items in the order."""
+        for item in self.order_items.all():
+            DeliveryList.objects.create(
+                order_item=item,
+                customer=self.customer,
+                delivery_address=self.customer.address,
+            )
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
@@ -264,9 +273,6 @@ class OrderItem(models.Model):
 
     def can_review(self):
         return self.order.complete  # Only allows reviews if the order is complete
-    
-
-
     
 class Review(models.Model):
     RATING_CHOICES = [(i, str(i)) for i in range(0, 6)]  # Allows ratings from 1 to 5
@@ -337,3 +343,35 @@ class RefundRequest(models.Model):
 
     def _str_(self):
         return f"Refund request {self.id} by {self.customer.username}"
+
+class Delivery(models.Model):
+    order_item = models.OneToOneField(
+        OrderItem,
+        on_delete=models.CASCADE,
+        related_name='delivery'
+    )
+    customer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='deliveries',
+        limit_choices_to={'role': 'customer'}
+    )
+    delivery_address = models.CharField(max_length=255)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def status(self):
+        """Derive the delivery status from the associated order."""
+        return self.order_item.order.status
+
+    def calculate_total_price(self):
+        """Calculate and update the total price for the delivery."""
+        self.total_price = Decimal(self.order_item.quantity) * Decimal(self.order_item.product.price)
+        self.save()
+
+    def __str__(self):
+        return f"Delivery {self.id} for {self.order_item.product.name} - {self.status}"
+
+

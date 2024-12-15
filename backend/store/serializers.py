@@ -170,3 +170,11 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": "Refunds can only be requested within 30 days of purchase."})
 
         return data
+
+class DeliverySerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='order_item.product.name', read_only=True)
+    quantity = serializers.IntegerField(source='order_item.quantity', read_only=True)
+    status = serializers.CharField(source='status', read_only=True)
+    class Meta:
+        model = Delivery
+        fields = ['id', 'customer', 'product_name', 'quantity', 'delivery_address', 'status', 'total_price', 'created_at', 'updated_at']

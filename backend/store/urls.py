@@ -72,5 +72,6 @@ urlpatterns = [
     path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
 
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

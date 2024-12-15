@@ -716,7 +716,7 @@ def checkout(request):
     order.date_ordered = datetime.now()
     order.save()
 
-        # Increase the popularity of products in the order
+    # Increase the popularity of products in the order
     order_items = order.order_items.all()  # Get all OrderItems related to the Order
     for order_item in order_items:
         product = order_item.product
@@ -750,6 +750,15 @@ def checkout(request):
     order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)  # Ensure total_amount is set
     order_history.discount_total_amount = Decimal(order_history.discount_total_amount) + Decimal(discount_total_amount)  # Ensure total_amount is set
     order_history.save()
+
+    # Create delivery entries for each order item
+    for item in order_items:
+        Delivery.objects.create(
+            order_item=item,
+            customer=request.user,
+            delivery_address=request.user.address,
+            total_price=item.discount_subtotal
+        )
 
     # Step 1: Render the email body template (order confirmation)
     html_message = render_to_string('order_confirmation.html', {'order': order})
@@ -1086,8 +1095,8 @@ def view_invoices(request):
     """
     user = request.user
 
-    # Ensure the user is a Sales Manager
-    if not hasattr(user, 'role') or user.role != 'sales_manager':
+    # Ensure the user is a Sales Manager, Product Manager
+    if not hasattr(user, 'role') or user.role != 'sales_manager' or user.role != 'product_manager':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN
@@ -1342,3 +1351,37 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_deliveries(request):
+    """
+    Retrieve all deliveries. Only accessible by Product Managers.
+    """
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can access delivery data."}, status=status.HTTP_403_FORBIDDEN)
+
+    # Fetch all deliveries
+    deliveries = Delivery.objects.all()
+
+    if not deliveries.exists():
+        return Response({"message": "No deliveries found."}, status=status.HTTP_200_OK)
+
+    # Serialize the deliveries
+    serialized_deliveries = []
+    for delivery in deliveries:
+        serialized_deliveries.append({
+            "delivery_id": delivery.id,
+            "customer_id": delivery.customer.id,
+            "customer_username": delivery.customer.username,
+            "product_id": delivery.order_item.product.id,
+            "product_name": delivery.order_item.product.name,
+            "quantity": delivery.order_item.quantity,
+            "total_price": float(delivery.total_price),
+            "delivery_address": delivery.delivery_address,
+            "status": delivery.status,
+            "created_at": delivery.created_at,
+            "updated_at": delivery.updated_at,
+        })
+
+    return Response(serialized_deliveries, status=status.HTTP_200_OK)
