@@ -86,7 +86,6 @@ def register(request):
     }, status=status.HTTP_201_CREATED)
     
 
-
 @api_view(['POST'])
 def login(request):
     serializer = LoginSerializer(data=request.data)
@@ -566,7 +565,6 @@ def assign_user_to_order(request):
 def get_order_items(request, order_id):
     if not request.user.is_authenticated:
         try:
-           
             order = Order.objects.get(id=order_id)
             order_items = order.order_items.all()
             serializer = OrderItemSerializer(order_items, many=True)
@@ -576,7 +574,7 @@ def get_order_items(request, order_id):
 
     # Retrieve the active order for the customer
     try:
-        order = Order.objects.get(customer=request.user)
+        order = Order.objects.get(customer=request.user, complete=False)
         order_items = order.order_items.all()
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -642,6 +640,7 @@ def get_order(request):
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 def order_history(request):
     if not request.user.is_authenticated:
@@ -679,7 +678,6 @@ def order_history(request):
     except OrderHistory.DoesNotExist:
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
- 
 
 @api_view(['POST'])
 def checkout(request):
@@ -774,7 +772,6 @@ def checkout(request):
         return Response({"message": "Order completed successfully, and invoice has been sent."}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
@@ -938,6 +935,7 @@ def get_notifications(request):
     ]
     return Response(response_data)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notifications_as_read(request):
@@ -1030,6 +1028,7 @@ def apply_discount(request):
     
     )
 
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product_stock(request):
@@ -1062,8 +1061,6 @@ def update_product_stock(request):
         return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
     except ValueError:
         return Response({'error': 'Invalid stock value.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 @api_view(['GET'])
@@ -1140,8 +1137,7 @@ def view_invoices(request):
         status=status.HTTP_200_OK
     )
     
-    
-    
+ 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def request_refund(request):
@@ -1259,6 +1255,7 @@ def review_refund_request(request):
     except RefundRequest.DoesNotExist:
         return Response({"error": "Refund request not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_pending_refund_requests(request):
@@ -1279,6 +1276,7 @@ def get_pending_refund_requests(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cancel_order(request, order_id):
@@ -1295,7 +1293,7 @@ def cancel_order(request, order_id):
             ) 
             else:
                 return Response(
-                    {"error": "Completed orders cannot be cancelled."},
+                    {"error": "Orders that have been shipped or delivered cannot be cancelled."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
@@ -1312,6 +1310,7 @@ def cancel_order(request, order_id):
             {"error": "Order not found or does not belong to you."},
             status=status.HTTP_404_NOT_FOUND
         )
+
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
@@ -1331,4 +1330,3 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-

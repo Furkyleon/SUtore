@@ -36,10 +36,48 @@ const OrderHistory = () => {
       });
   }, []);
 
+  // Cancel an order
+  const cancelOrder = (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+
+    fetch(`http://127.0.0.1:8000/order/cancel/${orderId}/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${btoa(
+          `${localStorage.getItem("username")}:${localStorage.getItem(
+            "password"
+          )}`
+        )}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(`Error: ${data.error}`);
+        } else {
+          alert(data.message);
+          // Update the order status locally
+          setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order.order_id === orderId
+                ? { ...order, status: "Cancelled" }
+                : order
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error cancelling order:", error);
+        alert("Failed to cancel order.");
+      });
+  };
+
+  // View invoice
   const viewInvoice = (orderId) => {
     navigate(`/invoice/${orderId}`);
   };
 
+  // Request refund
   const requestRefund = (orderItemId) => {
     const reason = prompt("Please provide a reason for your refund request:");
     if (!reason) return;
@@ -100,6 +138,13 @@ const OrderHistory = () => {
                   onClick={() => viewInvoice(order.order_id)}
                 >
                   View Invoice
+                </button>
+
+                <button
+                  className="cancel-order-button"
+                  onClick={() => cancelOrder(order.order_id)}
+                >
+                  Cancel Order
                 </button>
               </div>
               <ul className="order-items">

@@ -141,6 +141,22 @@
   background-color: #01236a;
 }
 
+.order-history-container .cancel-order-button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #db2d2d;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.order-history-container .cancel-order-button:hover {
+  background-color: #ff4d4d;
+}
+
 .order-history-container a.start-shopping {
   display: flex;
   font-weight: bold;
