@@ -122,7 +122,15 @@ def login(request):
     
     
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Require user authentication
 def add_product(request):
+    # Check if the authenticated user is a product manager
+    if request.user.role != 'product_manager':
+        return Response(
+            {"error": "Only product managers can add new products."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
     # Use the ProductSerializer to validate and save the incoming data
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
@@ -130,20 +138,23 @@ def add_product(request):
         product = serializer.save()
         product.discount_price = product.price * (1 - product.discount / 100)
         product.save()
+
         # Return the created product data in the response
         return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
-    
+
     # Return errors if the serializer is not valid
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
-#@permission_classes([IsAuthenticated])
-def delete_product(request, serial_number):
-    
+@permission_classes([IsAuthenticated])
+def delete_product(request, product_id):
+    """API for product managers to remove a product."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can remove products."}, status=status.HTTP_403_FORBIDDEN)
     try:
         # Retrieve the product by serial_number
-        product = Product.objects.get(serial_number=serial_number)
+        product = Product.objects.get(id=product_id)
     except Product.DoesNotExist:
         return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1248,8 +1259,6 @@ def review_refund_request(request):
     except RefundRequest.DoesNotExist:
         return Response({"error": "Refund request not found."}, status=status.HTTP_404_NOT_FOUND)
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_pending_refund_requests(request):
@@ -1269,3 +1278,57 @@ def get_pending_refund_requests(request):
     serializer = RefundRequestSerializer(pending_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cancel_order(request, order_id):
+    """Cancel an order for the authenticated user."""
+    try:
+        # Fetch the order
+        order = Order.objects.get(id=order_id, customer=request.user)
+        
+        if order.status != 'Processing':
+            if order.status == 'Cancelled':
+                return Response(
+                {"error": "This order is already cancelled."},
+                status=status.HTTP_400_BAD_REQUEST
+            ) 
+            else:
+                return Response(
+                    {"error": "Completed orders cannot be cancelled."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Mark the order as cancelled
+        order.status = 'Cancelled'
+        order.save()
+
+        return Response(
+            {"message": f"Order {order.id} has been cancelled successfully."},
+            status=status.HTTP_200_OK
+        )
+    except Order.DoesNotExist:
+        return Response(
+            {"error": "Order not found or does not belong to you."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def manage_stock(request, product_id):
+    """API for product managers to update product stock."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can manage stock."}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        product = Product.objects.get(id=product_id)
+        new_stock = request.data.get('stock')
+        if new_stock is None or not isinstance(new_stock, int):
+            return Response({"error": "Invalid stock value."}, status=status.HTTP_400_BAD_REQUEST)
+
+        product.stock = new_stock
+        product.save()
+        return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+

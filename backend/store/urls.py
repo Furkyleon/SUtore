@@ -13,7 +13,7 @@ urlpatterns = [
 
     # Product and Category
     path('products/add_product/', views.add_product, name='add_product'),
-    path('products/delete_product/<str:serial_number>/', views.delete_product, name='delete_product'), 
+    path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
     path('categories/add/', views.add_category, name='add_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
@@ -40,6 +40,7 @@ urlpatterns = [
     path('order/history/', views.order_history, name='order_history'),
     path('request-refund/', views.request_refund, name="request_refund"),
     # order cancelling api needed
+    path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 
     # Reviews
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
@@ -51,17 +52,13 @@ urlpatterns = [
     path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
     path('sales-manager/pending-refund-requests/', views.get_pending_refund_requests, name='pending-refund-requests'),
     path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
-    # renevue calculation
+    # revenue calculation
     
     # Product Manager
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
     path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+    path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     # disapprove api can be added ?
-    
-]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-"""
-    - Frontend ile halledilen API'lar (ileride kullanılabilir)
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
@@ -75,4 +72,6 @@ urlpatterns = [
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
 
-"""
+]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    
