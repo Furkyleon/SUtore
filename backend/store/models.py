@@ -63,7 +63,7 @@ class CustomUser(AbstractUser):
 
 
 class SalesManager:
-    def _init_(self, user):
+    def init(self, user):
         """Initialize with a user object."""
         if not isinstance(user, CustomUser):
             raise ValueError("User must be an instance of CustomUser.")
@@ -89,7 +89,7 @@ class SalesManager:
         return f"Discount applied. {product.name} is now priced at ${product.price} (Original: ${original_price})."
 
 class ProductManager:
-    def __init__(self, user):
+    def _init_(self, user):
         """Initialize with a user object."""
         if not isinstance(user, CustomUser):
             raise ValueError("User must be an instance of CustomUser.")
@@ -148,7 +148,7 @@ class ProductManager:
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
-    def _str_(self):
+    def str(self):
         return self.name    
     
     
@@ -158,7 +158,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     model = models.CharField(max_length=100, blank=True, null=True)  # Model of the product
-    category = models.CharField(max_length=200, null=True)  # Make sure to have this
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='product')
     description = models.CharField(max_length=200)
     price = models.FloatField()
     discount = models.FloatField(default=0.0, null=True)  # Discount percentage (0-100)
@@ -200,7 +200,7 @@ class OrderHistory(models.Model):
     notes = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    def _str_(self):
+    def str(self):
         return f"History for {self.customer.username}: {self.status} on {self.update_date.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
@@ -219,7 +219,7 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=50, choices=OrderHistory.ORDER_STATUS_CHOICES, default="Processing")
 
-    def _str_(self):
+    def str(self):
         return f"Order {self.id} by {self.customer}"
 
     @property
@@ -259,7 +259,7 @@ class OrderItem(models.Model):
     discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-    def _str_(self):
+    def str(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"
 
     def can_review(self):
@@ -287,7 +287,7 @@ class Review(models.Model):
     comment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending', null=True) 
     date_added = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def str(self):
         return f"{self.user.username}'s review of {self.product.name} - Rating: {self.rating}"
 
 class Wishlist(models.Model):
@@ -298,7 +298,7 @@ class Wishlist(models.Model):
     class Meta:
         unique_together = ('user', 'product')  # Prevent duplicate wishlist entries
 
-    def _str_(self):
+    def str(self):
         return f"Wishlist item for {self.user.username}: {self.product.name}"
 
 class Notification(models.Model):
@@ -307,7 +307,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def str(self):
         return f"Notification for {self.user.username}: {self.message[:20]}"
 
 
@@ -318,7 +318,7 @@ class Invoice(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def __str__(self):
+    def _str_(self):
         return f"Invoice for Order {self.order.id} by {self.customer.username}"
     
     
@@ -335,6 +335,5 @@ class RefundRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     reason = models.TextField(blank=True, null=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Refund request {self.id} by {self.customer.username}"
-

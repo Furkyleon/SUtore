@@ -16,6 +16,7 @@ urlpatterns = [
     path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
     path('categories/add/', views.add_category, name='add_category'),
+    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
@@ -73,5 +74,3 @@ urlpatterns = [
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
 
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-    

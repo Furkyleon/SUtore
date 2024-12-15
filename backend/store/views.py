@@ -124,27 +124,22 @@ def login(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Require user authentication
 def add_product(request):
-    # Check if the authenticated user is a product manager
+    """API for product managers to add a product."""
     if request.user.role != 'product_manager':
         return Response(
             {"error": "Only product managers can add new products."},
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # Use the ProductSerializer to validate and save the incoming data
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
-        # Save the product to the database
         product = serializer.save()
         product.discount_price = product.price * (1 - product.discount / 100)
         product.save()
 
-        # Return the created product data in the response
         return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
 
-    # Return errors if the serializer is not valid
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -178,14 +173,30 @@ def get_all_products(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_category(request):
-    
+    """API for product managers to add a new product category."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can add categories."}, status=status.HTTP_403_FORBIDDEN)
     serializer = CategorySerializer(data=request.data) 
     if serializer.is_valid():
         category = serializer.save()
         return Response(CategorySerializer(category).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_category(request, category_name):
+    """API for product managers to delete a product category."""
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can delete categories."}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        category = Category.objects.get(name=category_name)
+        category.delete()
+        return Response({"message": f"Category '{category_name}' deleted successfully."}, status=status.HTTP_200_OK)
+    except Category.DoesNotExist:
+        return Response({"error": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def get_categories(request):
@@ -280,7 +291,7 @@ def get_products_by_price_interval(request):
         return Response({'error': 'Both min_price and max_price must be valid numbers.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Filter products by price interval
-    products = Product.objects.filter(price__gte=min_price, price__lte=max_price)
+    products = Product.objects.filter(price_gte=min_price, price_lte=max_price)
 
     if not products.exists():
         return Response({'error': 'No products found in this price range.'}, status=status.HTTP_404_NOT_FOUND)
@@ -784,7 +795,7 @@ def add_review(request, product_id):
     comment = request.data.get('comment')
 
     # Check if the user has purchased this product in a completed order
-    purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
+    purchased_items = OrderItem.objects.filter(order_customer=request.user, order_complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -1331,4 +1342,3 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
