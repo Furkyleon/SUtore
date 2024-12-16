@@ -1,0 +1,73 @@
+.invoices-container {
+  margin-top: 80px;
+  margin-bottom: 20px;
+  font-family: "Arial", sans-serif;
+  padding: 40px 80px;
+  background-color: #f9f9f9;
+  color: #333;
+  max-width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.invoices-container h1 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2.5em;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #2980b9;
+}
+
+.invoices-container .no-invoices-message {
+  font-size: 1.2em;
+  color: #7f8c8d;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.invoices-container .invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 40px;
+  font-size: 1.1em;
+}
+
+.invoices-container .invoices-table th,
+.invoices-container .invoices-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ccc;
+}
+
+.invoices-container .invoices-table th {
+  background-color: #2980b9;
+  color: #fff;
+  font-size: 1.2em;
+  border-radius: 4px 4px 0 0;
+}
+
+.invoices-container .invoices-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.invoices-container .invoices-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.invoices-container .back-button {
+  background-color: #01236a;
+  color: #fff;
+  font-size: 1.1em;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.invoices-container .back-button:hover {
+  background-color: #005da9;
+}

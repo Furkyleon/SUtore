@@ -1084,8 +1084,6 @@ def update_product_stock(request):
         return Response({'error': 'Invalid stock value.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_invoices(request):
@@ -1096,11 +1094,12 @@ def view_invoices(request):
     user = request.user
 
     # Ensure the user is a Sales Manager, Product Manager
-    if not hasattr(user, 'role') or user.role != 'sales_manager' or user.role != 'product_manager':
+    if user.role == 'customer':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN
         )
+
 
     # Extract query parameters for date range
     start_date = request.query_params.get('start_date')
@@ -1159,7 +1158,6 @@ def view_invoices(request):
         {"invoices": invoice_data},
         status=status.HTTP_200_OK
     )
-    
     
     
 @api_view(['POST'])

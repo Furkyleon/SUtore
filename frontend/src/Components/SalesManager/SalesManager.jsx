@@ -6,7 +6,6 @@ const SalesManagerPage = () => {
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [invoices, setInvoices] = useState([]);
   const [error, setError] = useState("");
 
   const handleNavigateToDiscountPage = () => {
@@ -47,8 +46,16 @@ const SalesManagerPage = () => {
       }
 
       const data = await response.json();
-      setInvoices(data.invoices || []);
-      setError(data.message || "");
+
+      // Navigate to invoices page with the fetched invoices
+      if (data.invoices && data.invoices.length > 0) {
+        navigate("/sales-manager/invoices", {
+          state: { invoices: data.invoices },
+        });
+      } else {
+        // If no invoices found, navigate anyway with an empty array
+        navigate("/sales-manager/invoices", { state: { invoices: [] } });
+      }
     } catch (error) {
       console.error("Error fetching invoices:", error);
       setError("Failed to fetch invoices. Please try again.");
@@ -96,6 +103,8 @@ const SalesManagerPage = () => {
 
       <div className="section">
         <h2>View Invoices</h2>
+
+        {error && <p className="error-message">{error}</p>}
 
         <div className="date-input">
           <label htmlFor="start-date">Start Date:</label>
