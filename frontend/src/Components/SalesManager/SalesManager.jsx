@@ -4,9 +4,16 @@ import "./SalesManager.css";
 
 const SalesManagerPage = () => {
   const navigate = useNavigate();
+
+  // For Revenue Calculation
+  const [revStartDate, setRevStartDate] = useState("");
+  const [revEndDate, setRevEndDate] = useState("");
+  const [revenueError, setRevenueError] = useState("");
+
+  // For Invoices
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [error, setError] = useState("");
+  const [invoiceError, setInvoiceError] = useState("");
 
   const handleNavigateToDiscountPage = () => {
     navigate("/sales-manager/discount-page");
@@ -16,13 +23,37 @@ const SalesManagerPage = () => {
     navigate("/sales-manager/refund-page");
   };
 
+  const handleNavigateToRevenuePage = () => {
+    // Reset error each time we attempt a new calculation
+    setRevenueError("");
+
+    if (!revStartDate || !revEndDate) {
+      setRevenueError(
+        "Both start date and end date are required for revenue calculation."
+      );
+      return;
+    }
+
+    navigate("/sales-manager/calculate-revenue", {
+      state: {
+        start_date: revStartDate,
+        end_date: revEndDate,
+      },
+    });
+  };
+
   const fetchInvoices = async () => {
+    // Reset error each time we attempt to fetch invoices
+    setInvoiceError("");
+
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (!startDate || !endDate) {
-      setError("Both start date and end date are required.");
+      setInvoiceError(
+        "Both start date and end date are required to view invoices."
+      );
       return;
     }
 
@@ -39,7 +70,7 @@ const SalesManagerPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(
+        setInvoiceError(
           errorData.error || "An error occurred while fetching invoices."
         );
         return;
@@ -47,18 +78,12 @@ const SalesManagerPage = () => {
 
       const data = await response.json();
 
-      // Navigate to invoices page with the fetched invoices
-      if (data.invoices && data.invoices.length > 0) {
-        navigate("/sales-manager/invoices", {
-          state: { invoices: data.invoices },
-        });
-      } else {
-        // If no invoices found, navigate anyway with an empty array
-        navigate("/sales-manager/invoices", { state: { invoices: [] } });
-      }
+      navigate("/sales-manager/invoices", {
+        state: { invoices: data.invoices || [] },
+      });
     } catch (error) {
       console.error("Error fetching invoices:", error);
-      setError("Failed to fetch invoices. Please try again.");
+      setInvoiceError("Failed to fetch invoices. Please try again.");
     }
   };
 
@@ -90,22 +115,32 @@ const SalesManagerPage = () => {
 
       <div className="section">
         <h2>Revenue Calculation</h2>
-
         <div className="date-input">
           <label htmlFor="revenue-start-date">Start Date:</label>
-          <input type="date" id="revenue-start-date" />
+          <input
+            type="date"
+            id="revenue-start-date"
+            value={revStartDate}
+            onChange={(e) => setRevStartDate(e.target.value)}
+          />
           <label htmlFor="revenue-end-date">End Date:</label>
-          <input type="date" id="revenue-end-date" />
+          <input
+            type="date"
+            id="revenue-end-date"
+            value={revEndDate}
+            onChange={(e) => setRevEndDate(e.target.value)}
+          />
         </div>
 
-        <button className="action-button">Calculate Revenue</button>
+        {revenueError && <p className="error-message">{revenueError}</p>}
+
+        <button className="action-button" onClick={handleNavigateToRevenuePage}>
+          Calculate Revenue
+        </button>
       </div>
 
       <div className="section">
         <h2>View Invoices</h2>
-
-        {error && <p className="error-message">{error}</p>}
-
         <div className="date-input">
           <label htmlFor="start-date">Start Date:</label>
           <input
@@ -122,6 +157,8 @@ const SalesManagerPage = () => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
+
+        {invoiceError && <p className="error-message">{invoiceError}</p>}
 
         <button className="action-button" onClick={fetchInvoices}>
           Display Invoices

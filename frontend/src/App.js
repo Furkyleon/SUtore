@@ -11,11 +11,12 @@ import PaymentPage from "./Components/PaymentPage/PaymentPage";
 import OrderHistory from "./Components/OrderHistory/OrderHistory";
 import SearchPage from "./Components/Search/SearchPage";
 import Invoice from "./Components/Invoice/Invoice";
-import InvoicesPage from "./Components/Invoice/InvoicesPage";
 import Wishlist from "./Components/Wishlist/Wishlist";
 import SalesManager from "./Components/SalesManager/SalesManager";
 import DiscountPage from "./Components/DiscountPage/DiscountPage";
 import RefundPage from "./Components/RefundPage/RefundPage"
+import InvoicesPage from "./Components/SalesManager/InvoicesPage";
+import RevenueCalc from "./Components/SalesManager/RevenueCalc";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="sales-manager/discount-page" element={<DiscountPage />} />
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
           <Route path="sales-manager/invoices" element={<InvoicesPage />}></Route>
+          <Route path="sales-manager/calculate-revenue" element={<RevenueCalc />}></Route>
         </Route>
       </Routes>
     </Router>
