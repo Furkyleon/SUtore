@@ -580,7 +580,6 @@ def assign_user_to_order(request):
 def get_order_items(request, order_id):
     if not request.user.is_authenticated:
         try:
-           
             order = Order.objects.get(id=order_id)
             order_items = order.order_items.all()
             serializer = OrderItemSerializer(order_items, many=True)
@@ -1335,7 +1334,7 @@ def cancel_order(request, order_id):
             ) 
             else:
                 return Response(
-                    {"error": "Completed orders cannot be cancelled."},
+                    {"error": "Orders that have been shipped or delivered cannot be cancelled."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
