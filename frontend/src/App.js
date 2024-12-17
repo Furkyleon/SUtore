@@ -14,7 +14,7 @@ import Invoice from "./Components/Invoice/Invoice";
 import Wishlist from "./Components/Wishlist/Wishlist";
 import SalesManager from "./Components/SalesManager/SalesManager";
 import DiscountPage from "./Components/DiscountPage/DiscountPage";
-import RefundPage from "./Components/RefundPage/RefundPage"
+import RefundPage from "./Components/SalesManager/RefundPage"
 import InvoicesPage from "./Components/SalesManager/InvoicesPage";
 import RevenueCalc from "./Components/SalesManager/RevenueCalc";
 
