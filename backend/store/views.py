@@ -34,6 +34,7 @@ def store(request):
      context = {}
      return render(request, 'store.html', context)
 
+
 @csrf_exempt  # Exempt from CSRF verification
 @api_view(['POST'])
 def register(request):
@@ -85,7 +86,6 @@ def register(request):
         }
     }, status=status.HTTP_201_CREATED)
     
-
 
 @api_view(['POST'])
 def login(request):
@@ -141,6 +141,7 @@ def add_product(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_product(request, product_id):
@@ -184,6 +185,7 @@ def add_category(request):
         return Response(CategorySerializer(category).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_category(request, category_name):
@@ -197,6 +199,7 @@ def delete_category(request, category_name):
         return Response({"message": f"Category '{category_name}' deleted successfully."}, status=status.HTTP_200_OK)
     except Category.DoesNotExist:
         return Response({"error": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 def get_categories(request):
@@ -587,12 +590,24 @@ def get_order_items(request, order_id):
 
     # Retrieve the active order for the customer
     try:
-        order = Order.objects.get(customer=request.user)
+        order = Order.objects.get(customer=request.user, complete=False)
         order_items = order.order_items.all()
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_order_items_for_refund(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, customer=request.user)
+        order_items = order.order_items.all() 
+        serializer = OrderItemSerializer(order_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -653,6 +668,7 @@ def get_order(request):
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 def order_history(request):
     if not request.user.is_authenticated:
@@ -690,7 +706,6 @@ def order_history(request):
     except OrderHistory.DoesNotExist:
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
- 
 
 @api_view(['POST'])
 def checkout(request):
@@ -794,7 +809,6 @@ def checkout(request):
         return Response({"message": "Order completed successfully, and invoice has been sent."}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
@@ -1050,6 +1064,7 @@ def apply_discount(request):
     
     )
 
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product_stock(request):
@@ -1167,14 +1182,17 @@ def request_refund(request):
     Customer can request a refund for a purchased product within 30 days.
     """
     user = request.user
+
+    """
     # Ensure the user is a Customer
     if user.role != 'customer':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN)
-    
-    
+    """
+
     order_item_id = request.data.get("order_item_id")
+    print(order_item_id)
     reason = request.data.get("reason", "")
     
     # Ensure order_item_id is provided
@@ -1185,6 +1203,8 @@ def request_refund(request):
         # Fetch the order item
     
         order_item = OrderItem.objects.get(id=order_item_id)
+        print(order_item)
+        print(order_item.order.status)
         
         # Check if the order status is 'Delivered'
         if order_item.order.status != 'Delivered':
@@ -1277,6 +1297,7 @@ def review_refund_request(request):
     except RefundRequest.DoesNotExist:
         return Response({"error": "Refund request not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_pending_refund_requests(request):
@@ -1296,6 +1317,7 @@ def get_pending_refund_requests(request):
     serializer = RefundRequestSerializer(pending_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1331,6 +1353,7 @@ def cancel_order(request, order_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
+
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def manage_stock(request, product_id):
@@ -1349,6 +1372,7 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -1384,6 +1408,7 @@ def get_all_deliveries(request):
 
     return Response(serialized_deliveries, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def calculate_revenue(request):
@@ -1402,8 +1427,6 @@ def calculate_revenue(request):
     try:
         start_date = parse_datetime(start_date)
         end_date = parse_datetime(end_date)
-
-
 
         if not start_date or not end_date:
             raise ValueError("Invalid date format.")

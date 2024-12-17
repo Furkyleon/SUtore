@@ -78,12 +78,14 @@ const OrderHistory = () => {
   };
 
   // Request refund
-  const requestRefund = (orderItemId) => {
+  const requestRefund = (productId, orderId) => {
+    console.log(productId, orderId);
     const reason = prompt("Please provide a reason for your refund request:");
     if (!reason) return;
 
-    fetch("http://127.0.0.1:8000/request-refund/", {
-      method: "POST",
+    // First fetch the order items by orderId
+    fetch(`http://127.0.0.1:8000/order/itemsforrefund/${orderId}/`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${btoa(
@@ -92,19 +94,49 @@ const OrderHistory = () => {
           )}`
         )}`,
       },
-      body: JSON.stringify({ order_item_id: orderItemId, reason }),
     })
       .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          alert(`Error: ${data.error}`);
-        } else {
-          alert("Refund request submitted successfully.");
+      .then((orderItems) => {
+        // Find the specific order item with the given productId
+        console.log("Fetched Order Items:", orderItems);
+        const orderItem = orderItems.find((item) => item.product === productId);
+
+        if (!orderItem) {
+          alert("Error: Order item not found for the given product and order.");
+          return;
         }
+
+        const orderItemId = orderItem.id;
+
+        // Send a refund request using the retrieved orderItemId
+        fetch("http://127.0.0.1:8000/request-refund/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+          body: JSON.stringify({ order_item_id: orderItemId, reason }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              alert(`Error: ${data.error}`);
+            } else {
+              alert("Refund request submitted successfully.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error requesting refund:", error);
+            alert("Failed to submit refund request.");
+          });
       })
       .catch((error) => {
-        console.error("Error requesting refund:", error);
-        alert("Failed to submit refund request.");
+        console.error("Error fetching order items:", error);
+        alert("Failed to retrieve order items.");
       });
   };
 
@@ -159,7 +191,7 @@ const OrderHistory = () => {
                     </span>
                     <button
                       className="refund-button"
-                      onClick={() => requestRefund(item.id)}
+                      onClick={() => requestRefund(item.id, order.order_id)}
                     >
                       Request Refund
                     </button>
