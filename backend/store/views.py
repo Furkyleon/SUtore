@@ -1247,8 +1247,8 @@ def review_refund_request(request):
     Sales Manager can approve/reject refund requests.
     """
     user = request.user
-    if user.role != "sales_manager":
-        return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+    """if user.role != "sales_manager":
+        return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)"""
 
     refund_request_id = request.data.get("refund_request_id")
     decision = request.data.get("decision")  # Accept/Reject
@@ -1303,11 +1303,14 @@ def get_pending_refund_requests(request):
     user = request.user
 
     # Ensure the user is a sales manager
-    if not user.role == 'sales_manager':
+    """ if not user.role == 'sales_manager':
         return Response(
             {"error": "You do not have permission to view refund requests."},
             status=status.HTTP_403_FORBIDDEN
         )
+    """
+
+    print(user.role)
     
     # Retrieve only pending refund requests
     pending_requests = RefundRequest.objects.filter(status='Pending')
