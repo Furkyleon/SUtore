@@ -6,6 +6,12 @@ import "./Navbar.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]); // State to hold categories
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
+
+  const sidebarRef = useRef(null);
+  const sidebarRef2 = useRef(null);
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -13,11 +19,6 @@ const Navbar = () => {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
   };
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
-  const sidebarRef = useRef(null);
-  const sidebarRef2 = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -51,6 +52,24 @@ const Navbar = () => {
     navigate("/");
     setIsSidebarOpen2(false);
   };
+
+  // Fetch categories from the backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/categories/get_all/");
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories.");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -114,51 +133,16 @@ const Navbar = () => {
         </button>
         <h2>All categories:</h2>
         <ul className="sidebar-menu">
-          <li>
-            <Link to="/store" onClick={toggleSidebar}>
-              All products <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Telephone" onClick={toggleSidebar}>
-              Telephone <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Television" onClick={toggleSidebar}>
-              Television <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Laptop" onClick={toggleSidebar}>
-              Laptop <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/White Goods" onClick={toggleSidebar}>
-              White Goods <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Accessory" onClick={toggleSidebar}>
-              Accessory <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Console" onClick={toggleSidebar}>
-              Console <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Photography" onClick={toggleSidebar}>
-              Photography <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Self Care" onClick={toggleSidebar}>
-              Self Care <span className="arrow">›</span>
-            </Link>
-          </li>
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link
+                to={`/categories/${encodeURIComponent(category.name)}`}
+                onClick={toggleSidebar}
+              >
+                {category.name} <span className="arrow">›</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -197,12 +181,19 @@ const Navbar = () => {
                 {localStorage.getItem("role") === "sales_manager" && (
                   <li className="sales-manager">
                     <p className="admin">Admin Interface:</p>
-
                     <Link to="/sales-manager" onClick={toggleSidebar2}>
                       Sales Manager Page
                     </Link>
-
                     <p className="customer">Customer Operations:</p>
+                  </li>
+                )}
+
+                {localStorage.getItem("role") === "product_manager" && (
+                  <li className="product-manager">
+                    <p className="admin">Product Manager Interface:</p>
+                    <Link to="/product-manager" onClick={toggleSidebar2}>
+                      Product Manager Page
+                    </Link>
                   </li>
                 )}
 

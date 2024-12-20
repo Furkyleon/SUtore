@@ -1,0 +1,102 @@
+.product-manager-container {
+    padding: 40px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    width: 50%;
+    margin: 80px auto 20px auto;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-manager-container h1 {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .sections {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+  
+  .section {
+    flex: 1 1 calc(45% - 20px);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .section:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .section h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .light-blue {
+    background-color: #e3f2fd; /* Light Blue for Product Management */
+  }
+  
+  .light-green {
+    background-color: #e8f5e9; /* Light Green for Category Management */
+  }
+  
+  .light-yellow {
+    background-color: #fff8e1; /* Light Yellow for Comment Management */
+  }
+  
+  .light-red {
+    background-color: #ffebee; /* Light Red for Stock Management */
+  }
+  
+  .light-purple {
+    background-color: #ede7f6; /* Light Purple for Invoices */
+  }
+  
+  .light-teal {
+    background-color: #e0f7fa; /* Light Teal for Delivery */
+  }
+  
+  .action-button {
+    padding: 10px 15px;
+    background-color: #005da9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .action-button:hover {
+    background-color: #01236a;
+    transform: scale(1.1);
+  }
+  
+  .action-button:active {
+    background-color: #011b4d;
+  }
+  .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .success-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+    
