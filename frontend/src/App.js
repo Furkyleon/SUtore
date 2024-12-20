@@ -17,6 +17,15 @@ import DiscountPage from "./Components/DiscountPage/DiscountPage";
 import RefundPage from "./Components/SalesManager/RefundPage"
 import InvoicesPage from "./Components/SalesManager/InvoicesPage";
 import RevenueCalc from "./Components/SalesManager/RevenueCalc";
+import ProductManager from "./Components/ProductManager/ProductManager";
+import AddProduct from "./Components/ProductManager/AddProduct";
+import DeleteProduct from "./Components/ProductManager/DeleteProduct";
+import CategoryManagement from "./Components/ProductManager/CategoryManagement";
+import CommentManagement from "./Components/ProductManager/CommentManagement";
+import StockManagement from "./Components/ProductManager/StockManagement";
+import PManagerInvoicesPage from "./Components/ProductManager/PManagerInvoicesPage";
+import DeliveryManagementPage from "./Components/ProductManager/DeliveryManagementPage";
+
 
 function App() {
   return (
@@ -40,6 +49,15 @@ function App() {
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
           <Route path="sales-manager/invoices" element={<InvoicesPage />}></Route>
           <Route path="sales-manager/calculate-revenue" element={<RevenueCalc />}></Route>
+          <Route path="product-manager" element={<ProductManager />} />
+          <Route path="product-manager/add-product" element={<AddProduct />} />
+          <Route path="product-manager/delete-product" element={<DeleteProduct />} />
+          <Route path="product-manager/category-management" element={<CategoryManagement />} />
+          <Route path="product-manager/comment-management" element={<CommentManagement />} />
+          <Route path="product-manager/stock-management" element={<StockManagement />} />
+          <Route path="product-manager/invoice-page" element={<PManagerInvoicesPage />} />
+          <Route path="product-manager/deliveries-page" element={<DeliveryManagementPage />} />
+          
         </Route>
       </Routes>
     </Router>

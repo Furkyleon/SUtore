@@ -1,0 +1,109 @@
+.add-product-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  margin-top: 100px;
+  margin-bottom: 50px;
+}
+
+.add-product-container h1 {
+  text-align: center;
+  color: #01236a;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.add-product-container .error-message {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.add-product-container .success-message {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.add-product-container .form-group {
+  margin-bottom: 20px;
+}
+
+.add-product-container .form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.add-product-container .form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.add-product-container .form-group input,
+.add-product-container .form-group textarea,
+.add-product-container .form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-product-container .form-group input:focus,
+.add-product-container .form-group textarea:focus,
+.add-product-container .form-group select:focus {
+  border-color: #005da9;
+  box-shadow: 0 0 5px rgba(0, 93, 169, 0.5);
+  outline: none;
+}
+
+.add-product-container .form-group select {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.add-product-container .form-group select option {
+  font-size: 1rem;
+  padding: 5px;
+}
+
+.add-product-container textarea {
+  resize: none;
+  height: 40px;
+}
+
+.add-product-container .action-button {
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #005da9;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-product-container .action-button:hover {
+  background-color: #01236a;
+  transform: scale(1.05);
+}
+
+.add-product-container .action-button:active {
+  background-color: #011b4d;
+  transform: scale(0.98);
+}
