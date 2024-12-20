@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./InvoicesPage.css";
+import "./SMInvoicesPage.css";
 
 const InvoicesPage = () => {
   const location = useLocation();

@@ -156,6 +156,7 @@ const DiscountPage = () => {
                     </span>
                   )}
                 </p>
+                
                 <div className="discount-controls">
                   <div className="discount">
                     <label htmlFor={`discount-${product.id}`}>

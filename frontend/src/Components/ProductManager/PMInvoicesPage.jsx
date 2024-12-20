@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./PManagerInvoicesPage.css";
+import "./PMInvoicesPage.css";
 
 const ProductManagerInvoicesPage = () => {
   const [startDate, setStartDate] = useState("");

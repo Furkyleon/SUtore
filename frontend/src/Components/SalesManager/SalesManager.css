@@ -7,12 +7,12 @@
   margin-bottom: 20px;
   text-align: center;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px #0000001a;
 }
 
 .sales-manager-container h1 {
   text-align: center;
-  color: #333;
+  color: #01236a;
   font-size: 2rem;
   font-weight: bold;
   padding-top: 10px;
@@ -38,7 +38,7 @@
 }
 
 .sales-manager-container .section {
-  margin: 30px 0;
+  margin-top: 30px;
   padding: 20px;
   border-radius: 25px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -64,6 +64,7 @@
   margin-bottom: 15px;
   font-size: 1.5rem;
   font-weight: bold;
+  color: #333;
 }
 
 .sales-manager-container label {

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "./AddProduct.css";
 
 const AddProductPage = () => {
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     image: null,
@@ -27,7 +24,9 @@ const AddProductPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/categories/get_all/");
+        const response = await fetch(
+          "http://127.0.0.1:8000/categories/get_all/"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch categories.");
         }
@@ -71,23 +70,39 @@ const AddProductPage = () => {
     });
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/products/add_product/", {
-        method: "POST",
-        headers: {
-          Authorization: authHeader,
-        },
-        body: productData,
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/products/add_product/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: authHeader,
+          },
+          body: productData,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "An error occurred while adding the product.");
+        setError(
+          errorData.error || "An error occurred while adding the product."
+        );
         return;
       }
 
-      const data = await response.json();
       setSuccessMessage("Product added successfully!");
-      navigate("/product-manager", { state: { product: data } });
+      setFormData({
+        name: "",
+        image: null,
+        model: "",
+        category: "",
+        description: "",
+        price: "",
+        discount: "0",
+        stock: "",
+        serial_number: "",
+        warranty_status: "",
+        distributor_info: "",
+      });
     } catch (error) {
       console.error("Error adding product:", error);
       setError("Failed to add product. Please try again.");
@@ -97,10 +112,7 @@ const AddProductPage = () => {
   return (
     <div className="add-product-container">
       <h1>Add Product</h1>
-      {error && <p className="error-message">{error}</p>}
-      {successMessage && <p className="success-message">{successMessage}</p>}
 
-      {/* Row 1: Name and Serial Number */}
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -109,6 +121,30 @@ const AddProductPage = () => {
             id="name"
             name="name"
             value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="model">Model</label>
+          <input
+            type="text"
+            id="model"
+            name="model"
+            value={formData.model}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="stock">Stock</label>
+          <input
+            type="number"
+            id="stock"
+            name="stock"
+            value={formData.stock}
             onChange={handleChange}
             required
           />
@@ -126,7 +162,6 @@ const AddProductPage = () => {
         </div>
       </div>
 
-      {/* Row 2: Price and Discount */}
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="price">Price</label>
@@ -151,32 +186,6 @@ const AddProductPage = () => {
         </div>
       </div>
 
-      {/* Row 3: Stock and Model */}
-      <div className="form-row">
-        <div className="form-group">
-          <label htmlFor="stock">Stock</label>
-          <input
-            type="number"
-            id="stock"
-            name="stock"
-            value={formData.stock}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="model">Model</label>
-          <input
-            type="text"
-            id="model"
-            name="model"
-            value={formData.model}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      {/* Row 4: Category */}
       <div className="form-group">
         <label htmlFor="category">Category</label>
         <select
@@ -197,16 +206,20 @@ const AddProductPage = () => {
         </select>
       </div>
 
-      {/* Row 5: Image */}
       <div className="form-group">
         <label htmlFor="image">Image</label>
-        <input type="file" id="image" name="image" onChange={handleFileChange} />
+        <input
+          type="file"
+          id="image"
+          name="image"
+          onChange={handleFileChange}
+        />
       </div>
 
-      {/* Row 6: Description */}
       <div className="form-group">
         <label htmlFor="description">Description</label>
         <textarea
+          className="description-textarea"
           id="description"
           name="description"
           value={formData.description}
@@ -215,7 +228,6 @@ const AddProductPage = () => {
         />
       </div>
 
-      {/* Row 7: Warranty and Distributor Info */}
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="warranty_status">Warranty Status</label>
@@ -237,6 +249,9 @@ const AddProductPage = () => {
           />
         </div>
       </div>
+
+      {error && <p className="error-message">{error}</p>}
+      {successMessage && <p className="success-message">{successMessage}</p>}
 
       <button className="action-button" onClick={handleAddProduct}>
         Add Product

@@ -48,6 +48,7 @@ const Navbar = () => {
     localStorage.setItem("username", null);
     localStorage.setItem("password", null);
     localStorage.setItem("order_id", null);
+    localStorage.setItem("role", null);
     alert("You have been logged out.");
     navigate("/");
     setIsSidebarOpen2(false);
@@ -57,7 +58,9 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/categories/get_all/");
+        const response = await fetch(
+          "http://127.0.0.1:8000/categories/get_all/"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch categories.");
         }
@@ -116,12 +119,14 @@ const Navbar = () => {
 
       <div className="nav-right">
         <p className="animation2" onClick={toggleSidebar2}>
-          <img src="/loginregister.png" alt="" className="logo" />
+          <img src="/userprofile.png" alt="" className="logo" />
         </p>
-
-        <a href="/cart" className="SUtore">
-          <img src="/navbarlogo.png" alt="" className="logo2" />
-        </a>
+        {localStorage.getItem("role") !== "sales_manager" &&
+          localStorage.getItem("role") !== "product_manager" && (
+            <a href="/cart" className="SUtore">
+              <img src="/navbarlogo.png" alt="" className="logo2" />
+            </a>
+          )}
       </div>
 
       <div
@@ -184,30 +189,28 @@ const Navbar = () => {
                     <Link to="/sales-manager" onClick={toggleSidebar2}>
                       Sales Manager Page
                     </Link>
-                    <p className="customer">Customer Operations:</p>
                   </li>
                 )}
 
                 {localStorage.getItem("role") === "product_manager" && (
                   <li className="product-manager">
-                    <p className="admin">Product Manager Interface:</p>
+                    <p className="admin">Admin Interface:</p>
                     <Link to="/product-manager" onClick={toggleSidebar2}>
                       Product Manager Page
                     </Link>
                   </li>
                 )}
 
-                <li>
-                  <Link to="/wishlist" onClick={toggleSidebar2}>
-                    Wishlist
-                  </Link>
-                </li>
-
-                <li>
-                  <Link to="/order-history" onClick={toggleSidebar2}>
-                    Order History
-                  </Link>
-                </li>
+                {localStorage.getItem("role") === "customer" && (
+                  <li>
+                    <Link to="/wishlist" onClick={toggleSidebar2}>
+                      Wishlist
+                    </Link>
+                    <Link to="/order-history" onClick={toggleSidebar2}>
+                      Order History
+                    </Link>
+                  </li>
+                )}
 
                 <li>
                   <button onClick={handleLogout} className="logout-button">

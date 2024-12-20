@@ -21,14 +21,16 @@
   color: red;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  margin-top: -20px;
 }
 
 .add-product-container .success-message {
-  color: green;
+  color: blue;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  margin-top: -20px;
 }
 
 .add-product-container .form-group {
@@ -60,6 +62,10 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.add-product-container .form-group .description-textarea {
+  height: 100px;
+}
+
 .add-product-container .form-group input:focus,
 .add-product-container .form-group textarea:focus,
 .add-product-container .form-group select:focus {
@@ -86,7 +92,7 @@
 .add-product-container .action-button {
   display: block;
   width: 100%;
-  padding: 10px 20px;
+  padding: 15px 20px;
   background-color: #005da9;
   color: white;
   font-size: 1rem;

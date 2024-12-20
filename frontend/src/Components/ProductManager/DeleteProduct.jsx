@@ -30,15 +30,13 @@ const DeleteProductPage = () => {
   }, []);
 
   const handleDeleteProduct = async (productId) => {
-    setDeleteError("");
-
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/products/delete_product/${productId}/`,
+        `http://127.0.0.1:8000/products/delete/${productId}/`,
         {
           method: "DELETE",
           headers: {
@@ -47,13 +45,8 @@ const DeleteProductPage = () => {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setDeleteError(errorData.error || "Failed to delete product.");
-        return;
-      }
+      if (!response.ok) throw new Error("Failed to delete product!");
 
-      // Remove the deleted product from the local state
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== productId)
       );
@@ -61,7 +54,7 @@ const DeleteProductPage = () => {
       alert("Product deleted successfully!");
     } catch (error) {
       console.error("Error deleting product:", error);
-      setDeleteError("An error occurred while deleting the product.");
+      setDeleteError("There was an error deleting the product.");
     }
   };
 
@@ -87,16 +80,33 @@ const DeleteProductPage = () => {
                   />
                   <h2>{product.name || "Unnamed Product"}</h2>
                 </Link>
+
                 <p className="price">
-                  <span className="original-price">
-                    {product.price.toFixed(2)} TL
-                  </span>
+                  {product.discount > 0 ? (
+                    <>
+                      <span className="original-price">
+                        {product.price.toFixed(2)} TL
+                      </span>{" "}
+                      <span className="discounted-price">
+                        {(
+                          product.price -
+                          product.price * (product.discount / 100)
+                        ).toFixed(2)}{" "}
+                        TL
+                      </span>
+                    </>
+                  ) : (
+                    <span className="original-price2">
+                      {product.price.toFixed(2)} TL
+                    </span>
+                  )}
                 </p>
+
                 <button
                   className="delete-btn"
                   onClick={() => handleDeleteProduct(product.id)}
                 >
-                  Delete Product
+                  Delete
                 </button>
               </div>
             ))

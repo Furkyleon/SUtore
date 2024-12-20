@@ -6,72 +6,81 @@ const ProductManager = () => {
   const navigate = useNavigate();
 
   const handleAddProduct = () => {
-    navigate("./add-product"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/add-product");
   };
 
   const handleDeleteProduct = () => {
-    navigate("./delete-product"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/delete-product");
   };
 
   const handleCategory = () => {
-    navigate("./category-management"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/category-management");
   };
 
   const handleComments = () => {
-    navigate("./comment-management"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/comment-management");
   };
 
   const handleStock = () => {
-    navigate("./stock-management"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/stock-management");
   };
 
   const handleInvoices = () => {
-    navigate("./invoice-page"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/invoice-page");
   };
 
   const handleDeliveries = () => {
-    navigate("./deliveries-page"); // Adjust the path to match your route for the Add Product page
+    navigate("/product-manager/deliveries-page");
   };
-
-
 
   return (
     <div className="product-manager-container">
-      <h1>Product Manager Interface</h1>
+      <h1>Product Manager Dashboard</h1>
 
       <div className="sections">
-        <div className="section light-blue">
-          <h2>Product Management</h2>
+        <div className="section">
+          <h2>Products</h2>
           <button className="action-button" onClick={handleAddProduct}>
             Add Product
           </button>
-          <button className="action-button" onClick={handleDeleteProduct}>Remove Product</button>
+          <button className="action-button" onClick={handleDeleteProduct}>
+            Remove Product
+          </button>
         </div>
 
-        <div className="section light-green">
-          <h2>Category Management</h2>
-          <button className="action-button" onClick={handleCategory}>Manage Categories</button>
+        <div className="section">
+          <h2>Categories</h2>
+          <button className="action-button" onClick={handleCategory}>
+            Manage Categories
+          </button>
         </div>
 
-        <div className="section light-yellow">
-          <h2>Comment Management</h2>
-          <button className="action-button" onClick={handleComments}>Manage Comments</button>
+        <div className="section">
+          <h2>Comments</h2>
+          <button className="action-button" onClick={handleComments}>
+            Manage Comments
+          </button>
         </div>
 
-        <div className="section light-red">
-          <h2>Stock Management</h2>
-
-          <button className="action-button" onClick={handleStock}>Manage Stocks</button>
+        <div className="section">
+          <h2>Stocks</h2>
+          <button className="action-button" onClick={handleStock}>
+            Manage Stocks
+          </button>
         </div>
 
-        <div className="section light-purple">
+        <div className="section">
           <h2>Invoices</h2>
-          <button className="action-button" onClick={handleInvoices}>View Invoices</button>
+          <button className="action-button" onClick={handleInvoices}>
+            View Invoices
+          </button>
         </div>
 
-        <div className="section light-teal">
-          <h2>Delivery Management</h2>
-          <button className="action-button" onClick={handleDeliveries}>View Products to be Delivered</button>
+        <div className="section">
+          <h2>Deliveries</h2>
+          <button className="action-button" onClick={handleDeliveries}>
+            View Products to be Delivered
+          </button>
         </div>
       </div>
     </div>
