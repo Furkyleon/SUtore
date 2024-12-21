@@ -40,6 +40,12 @@ def store(request):
      context = {}
      return render(request, 'store.html', context)
 
+from django.contrib.auth.hashers import make_password
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.hashers import check_password
 @csrf_exempt  # Exempt from CSRF verification
 @api_view(['POST'])
 def register(request):
@@ -49,7 +55,7 @@ def register(request):
     address = request.data.get('address')
     password = request.data.get('password')
     tax_id = request.data.get('tax_id')  # New field
-    role = request.data.get('role', 'customer')  # New field with default role
+    role = request.data.get('role', 'customer')  # Default role is "customer"
 
     # Validate required fields
     if not username or not email or not password:
@@ -65,17 +71,20 @@ def register(request):
         return Response({'error': 'Email already exists.'}, 
                         status=status.HTTP_400_BAD_REQUEST)
 
+    # Hash the password before storing it
+    hashed_password = make_password(password)
+
     # Create the new CustomUser instance
-    user = CustomUser.objects.create_user(
+    user = CustomUser.objects.create(
         username=username,
         email=email,
-        password=password,
+        password=hashed_password,
         address=address,
         tax_id=tax_id,  # Include tax ID
         role=role  # Include role
     )
 
-    # Optionally, you can create a token for the user here if using token authentication
+    # Optionally, generate a token for the user here if using token authentication
     # from rest_framework.authtoken.models import Token
     # token, created = Token.objects.get_or_create(user=user)
 
@@ -86,46 +95,51 @@ def register(request):
             'username': user.username,
             'email': user.email,
             'address': user.address,
-            'tax_id': user.tax_id,  # Include tax ID in response
-            'role': user.role  # Include role in response
+            'tax_id': user.tax_id,
+            'role': user.role
         }
     }, status=status.HTTP_201_CREATED)
-    
+
+
 
 
 @api_view(['POST'])
 def login(request):
-    serializer = LoginSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    username = request.data.get('username')
+    password = request.data.get('password')
 
-    username = serializer.validated_data['username']
-    password = serializer.validated_data['password']
+    # Validate input
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, 
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    # Use the custom manager to retrieve the user by email
-    user = CustomUser.objects.get_user_by_username(username)
-
-    if user is None:
-        return Response({'error': 'Invalid username.'}, 
-                        status=status.HTTP_401_UNAUTHORIZED)
-        
-    if not user.check_password(password):
-        return Response({'error': 'Invalid password.'}, 
+    # Retrieve the user by username
+    try:
+        user = CustomUser.objects.get(username=username)
+    except CustomUser.DoesNotExist:
+        return Response({'error': 'Invalid username or password.'}, 
                         status=status.HTTP_401_UNAUTHORIZED)
 
-        # Send the user data in response
+    # Check if the provided password matches the stored hashed password
+    if not check_password(password, user.password):
+        return Response({'error': 'Invalid username or password.'}, 
+                        status=status.HTTP_401_UNAUTHORIZED)
+
+    # Optionally, generate a token for the authenticated user
+    # from rest_framework.authtoken.models import Token
+    # token, created = Token.objects.get_or_create(user=user)
+
     return Response({
         # 'token': token.key,  # Uncomment if using tokens
         'user': {
             'username': user.username,
             'email': user.email,
             'address': user.address,
-            'tax_id': user.tax_id,  # Include tax ID in response
-            'role': user.role  # Include role in response
+            'tax_id': user.tax_id,
+            'role': user.role
         }
-    }, status=status.HTTP_201_CREATED)
-    
+    }, status=status.HTTP_200_OK)
+ 
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Require user authentication
