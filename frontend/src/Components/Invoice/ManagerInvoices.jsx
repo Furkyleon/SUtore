@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./PMInvoicesPage.css";
+import { useNavigate } from "react-router-dom";
+import "./ManagerInvoices.css";
 
 const ProductManagerInvoicesPage = () => {
   const [startDate, setStartDate] = useState("");
@@ -7,13 +8,14 @@ const ProductManagerInvoicesPage = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [hasFetched, setHasFetched] = useState(false); // New state to track fetch attempts
+  const [hasFetched, setHasFetched] = useState(false); // Track fetch attempts
+  const navigate = useNavigate();
 
   const fetchInvoices = async () => {
     setError("");
     setInvoices([]);
     setLoading(true);
-    setHasFetched(true); // Set to true when user initiates fetch
+    setHasFetched(true);
 
     if (!startDate || !endDate) {
       setError("Both start date and end date are required to view invoices.");
@@ -53,8 +55,12 @@ const ProductManagerInvoicesPage = () => {
     }
   };
 
+  const handleViewInvoice = (orderId) => {
+    navigate(`/invoice/${orderId}`);
+  };
+
   return (
-    <div className="product-manager-invoices-wrapper">
+    <div className="manager-invoices-wrapper">
       <h1>View Invoices</h1>
 
       <div className="date-input-section">
@@ -97,6 +103,7 @@ const ProductManagerInvoicesPage = () => {
               <th>Date</th>
               <th>Total Amount (TL)</th>
               <th>Discounted Total (TL)</th>
+              <th>Invoice</th>
             </tr>
           </thead>
           <tbody>
@@ -107,6 +114,14 @@ const ProductManagerInvoicesPage = () => {
                 <td>{new Date(invoice.date).toLocaleString()}</td>
                 <td>{invoice.total_amount.toFixed(2)}</td>
                 <td>{invoice.discounted_total.toFixed(2)}</td>
+                <td>
+                  <button
+                    className="view-invoice-btn"
+                    onClick={() => handleViewInvoice(invoice.order_id)}
+                  >
+                    View Invoice
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

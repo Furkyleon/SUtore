@@ -156,7 +156,7 @@ const OrderHistory = () => {
                   Date: {new Date(order.date_ordered).toLocaleDateString()}
                 </span>
                 <span className="order-total">
-                  Order Total:{" "}
+                  Order Total: {" "}
                   {order.items
                     .reduce(
                       (total, item) => total + parseFloat(item.subtotal),
@@ -172,12 +172,14 @@ const OrderHistory = () => {
                   View Invoice
                 </button>
 
-                <button
-                  className="cancel-order-button"
-                  onClick={() => cancelOrder(order.order_id)}
-                >
-                  Cancel Order
-                </button>
+                {order.status === "Processing" && (
+                  <button
+                    className="cancel-order-button"
+                    onClick={() => cancelOrder(order.order_id)}
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
               <ul className="order-items">
                 {order.items.map((item) => (
