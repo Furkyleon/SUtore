@@ -28,7 +28,10 @@ from datetime import datetime, timedelta
 from django.utils.timezone import now
 import base64
 from django.http import JsonResponse
-
+from matplotlib.ticker import MaxNLocator  # For adjusting x-ticks
+import os
+from matplotlib.ticker import MaxNLocator  # For adjusting x-ticks
+import matplotlib.pyplot as plt
 
 # bu alttakilere bakılacak
 # @login_required
@@ -1127,25 +1130,28 @@ def update_product_stock(request):
 
 
 
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_invoices(request):
     """
-    API endpoint for sales managers to view all invoices within a given date range.
+    API endpoint for sales managers to view all invoices within a given date range,
+    calculate discounted revenue, and return a chart based on discounted revenue only.
     Only accessible by users with role 'sales_manager'.
     """
     user = request.user
 
-    # Ensure the user is a Sales Manager, Product Manager
-    if not hasattr(user, 'role') or user.role != 'sales_manager' or user.role != 'product_manager':
+    # Ensure the user is a Sales Manager
+    if user.role != 'sales_manager':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN
         )
 
     # Extract query parameters for date range
-    start_date = request.query_params.get('start_date')
-    end_date = request.query_params.get('end_date')
+    start_date = request.data.get('start_date')
+    end_date = request.data.get('end_date')
 
     # Validate presence of both parameters
     if not start_date or not end_date:
@@ -1183,24 +1189,87 @@ def view_invoices(request):
             status=status.HTTP_200_OK
         )
 
-    # Serialize the data
-    invoice_data = [
-        {
-            "order_id": invoice.order.id,
-            "customer_username": invoice.customer.username,
-            "date": invoice.date,
-            "total_amount": float(invoice.total_amount),
-            "discounted_total": float(invoice.discounted_total)
-        }
-        for invoice in invoices
-    ]
+    # Calculate total discounted revenue
+    total_discounted_revenue = invoices.aggregate(Sum('discounted_total'))['discounted_total__sum'] or 0
 
-    # Return the response
+    # Prepare data for chart (monthly breakdown of discounted revenue)
+    discounted_revenue_per_month = []
+    months = []
+
+    # Generate discounted revenue per month within the given date range
+    current_date = start_date
+    while current_date <= end_date:
+        # Define the start and end of the current month
+        month_start = datetime(current_date.year, current_date.month, 1)
+        month_end = datetime(current_date.year, current_date.month + 1, 1) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1)
+        
+        # Ensure the month_end doesn't exceed the given end_date
+        if month_end > end_date:
+            month_end = end_date
+
+        # Calculate the revenue for this month
+        monthly_discounted_revenue = Invoice.objects.filter(date__range=(month_start, month_end)).aggregate(Sum('discounted_total'))['discounted_total__sum'] or 0
+        
+        # Append the result
+        discounted_revenue_per_month.append(monthly_discounted_revenue)
+        months.append(month_start.strftime('%b %Y'))  # Format month as "Short Month Year" (e.g., "Jan 2024")
+        
+        # Move to the next month
+        if current_date.month == 12:
+            current_date = datetime(current_date.year + 1, 1, 1)
+        else:
+            current_date = datetime(current_date.year, current_date.month + 1, 1)
+
+    # Get the maximum revenue value to set as the max y-axis limit
+    max_revenue = max(discounted_revenue_per_month) if discounted_revenue_per_month else 0
+
+    # Generate a plot (chart) of discounted revenue (only one line for revenue)
+    fig, ax = plt.subplots()
+    ax.plot(months, discounted_revenue_per_month, label="Discounted Revenue", color='green')
+
+
+    ax.set_xlabel('Month', fontsize=10)  # Adjust font size of x-axis label
+    ax.set_ylabel('Discounted Revenue', fontsize=10)  # Adjust font size of y-axis label
+    ax.set_title(f'Monthly Discounted Revenue from {start_date.strftime("%B %d, %Y")} to {end_date.strftime("%B %d, %Y")}', fontsize=12)
+    ax.legend(fontsize=10)
+
+
+    # Set the y-axis limit: Min is 0, max is the max revenue value
+    ax.set_ylim(0, float(max_revenue) * 1.1)  # Giving a bit of space above max value
+
+    # Adjust x-tick labels to prevent overlap (rotate them)
+    plt.xticks(rotation=45, ha='right')  # Rotate the labels by 45 degrees and align them to the right
+
+    # Optionally, adjust x-ticks to a reasonable number
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Adjust to show all months without too much overlap
+
+    # Define the path where to save the image
+    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')  # Assuming you are using Django's MEDIA_ROOT
+    if not os.path.exists(chart_dir):
+        os.makedirs(chart_dir)
+
+    chart_filename = f"discounted_revenue_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.png"
+    chart_path = os.path.join(chart_dir, chart_filename)
+
+    # Save the plot to the file system
+     # Save the plot to the file system with bbox_inches='tight' to ensure everything is visible
+    plt.savefig(chart_path, format='png', bbox_inches='tight')
+    plt.close(fig)
+    # You can generate the chart URL for the frontend
+    chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
+
+    # Return the response with revenue data and chart URL
     return Response(
-        {"invoices": invoice_data},
+        {
+            "total_discounted_revenue": total_discounted_revenue,
+            "chart_url": chart_url,  # URL to the saved chart image
+            "monthly_data": {
+                "months": months,
+                "discounted_revenue": discounted_revenue_per_month
+            }
+        },
         status=status.HTTP_200_OK
     )
-    
     
     
 @api_view(['POST'])
