@@ -58,7 +58,7 @@ urlpatterns = [
     
     # Product Manager
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
-    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
+    path('reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
     path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     # disapprove api can be added ?
 

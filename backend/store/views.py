@@ -798,13 +798,14 @@ def checkout(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_review(request, product_id):
     product = Product.objects.get(id=product_id)
     rating = request.data.get('rating')
     comment = request.data.get('comment')
 
     # Check if the user has purchased this product in a completed order
-    purchased_items = OrderItem.objects.filter(order_customer=request.user, order_complete=True, product=product)
+    purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -876,8 +877,13 @@ def get_rating_by_product(request, product_id):
 
 
 @api_view(['POST'])
-def update_review_comment_status(request, review_id):
-    # Update the comment status of a specific review.
+def update_review_comment_status(request, review_id, new_status):
+    """
+    Update the comment status of a specific review to either 'Approved' or 'Rejected'.
+    """
+    
+    if new_status not in ['Approved', 'Rejected']:
+        return Response({"error": "Invalid status. Valid options are 'Approved' or 'Rejected'."}, status=status.HTTP_400_BAD_REQUEST)
     
     # Check if the review exists
     try:
@@ -885,13 +891,11 @@ def update_review_comment_status(request, review_id):
     except Review.DoesNotExist:
         return Response({"error": "Review not found."}, status=status.HTTP_404_NOT_FOUND)
     
-    # Update the comment status to "Approved"
-    review.comment_status = "Approved"
+    # Update the comment status
+    review.comment_status = new_status
     review.save()
 
-    return Response({"message": "Comment status updated successfully."}, status=status.HTTP_200_OK)
-
-
+    return Response({"message": f"Comment status updated to {new_status} successfully."}, status=status.HTTP_200_OK)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
