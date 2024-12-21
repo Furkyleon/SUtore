@@ -1356,7 +1356,7 @@ def cancel_order(request, order_id):
         )
 
 
-@api_view(['PATCH'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def manage_stock(request, product_id):
     """API for product managers to update product stock."""

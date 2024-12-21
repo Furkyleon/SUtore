@@ -1,86 +1,149 @@
 .stock-management-wrapper {
-    padding: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
-  
-  .stock-management-wrapper h1 {
-    margin-bottom: 20px;
-    font-size: 2rem;
-    color: #01236a;
-  }
-  
-  .stock-management-wrapper .error {
-    color: red;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .stock-management-wrapper .success-message {
-    color: green;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .stock-management-wrapper .products-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  
-  .stock-management-wrapper .product-card {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: left;
-  }
-  
-  .stock-management-wrapper .product-card h2 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .stock-management-wrapper .product-card p {
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-  
-  .stock-management-wrapper .stock-input {
-    display: flex;
+  width: 100%;
+  text-align: center;
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  margin-top: 60px;
+}
+
+.stock-management-wrapper h1 {
+  color: #01236a;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-decoration: none;
+}
+
+.stock-management-wrapper .product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+}
+
+.stock-management-wrapper .product-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: flex-end;
+  transition: transform 0.3s ease;
+}
+
+.stock-management-wrapper .product-card:hover {
+  transform: scale(1.05);
+}
+
+.stock-management-wrapper .product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.stock-management-wrapper .product-card h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #01236a;
+}
+
+.stock-management-wrapper .product-card .price {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-management-wrapper .product-card .price .original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.stock-management-wrapper .product-card .price .original-price2 {
+  color: #000000;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.stock-management-wrapper .product-card .price .discounted-price {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.stock-management-wrapper .stock-controls {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stock-management-wrapper .stock-controls .stock {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.stock-management-wrapper .stock-controls .stock label {
+  font-size: 1.05rem;
+  color: #666;
+  margin-right: 3px;
+  margin-top: 7px;
+}
+
+.stock-management-wrapper .stock-controls .stock input {
+  width: 35%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.stock-management-wrapper .stock-controls .apply-btn {
+  background-color: #005da9;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.stock-management-wrapper .stock-controls .apply-btn:hover {
+  background-color: #01236a;
+}
+
+.stock-management-wrapper .product-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.stock-management-wrapper .error {
+  color: #ff0000;
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .stock-management-wrapper .product-list {
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
   }
-  
-  .stock-management-wrapper .stock-input label {
-    font-size: 1rem;
-    font-weight: bold;
+
+  .stock-management-wrapper .product-card {
+    width: 90%;
   }
-  
-  .stock-management-wrapper .stock-input input {
-    padding: 8px;
-    width: 80px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .stock-management-wrapper .update-stock-btn {
-    padding: 8px 15px;
-    background-color: #005da9;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .stock-management-wrapper .update-stock-btn:hover {
-    background-color: #01236a;
-    transform: scale(1.05);
-  }
-  
+}
