@@ -1473,3 +1473,59 @@ def update_user_fields(request):
             
         }
     }, status=status.HTTP_200_OK)
+    
+    
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
+def update_delivery_status(request, delivery_id):
+    """
+    API endpoint to update the delivery status and address for a specific delivery.
+    Only accessible by product managers.
+    """
+    # Check if the user is a product manager
+    if request.user.role != 'product_manager':
+        return Response({"error": "You are not authorized to update this delivery status."}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if the delivery exists
+    try:
+        delivery = Delivery.objects.get(id=delivery_id)
+    except Delivery.DoesNotExist:
+        return Response({"error": "Delivery not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Get the status and delivery address from the request
+    new_status = request.data.get('status', None)
+    new_delivery_address = request.data.get('delivery_address', None)
+
+    # Update the delivery address if provided
+    if new_delivery_address:
+        delivery.delivery_address = new_delivery_address
+
+    # If a new status is provided, update the order status
+    if new_status:
+        if new_status not in ['Shipped', 'Delivered', 'Pending']:
+            return Response({"error": "Invalid status."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update the order status (you can customize this part depending on your logic)
+        delivery.order_item.order.status = new_status
+        delivery.order_item.order.save()
+
+    # Save the updated delivery object
+    delivery.updated_at = timezone.now()  # Update the timestamp for the modification
+    delivery.save()
+
+    # Return the updated delivery information
+    return Response({
+        "message": "Delivery updated successfully.",
+        "delivery": {
+            "id": delivery.id,
+            "order_item": delivery.order_item.id,
+            "customer": delivery.customer.username,
+            "delivery_address": delivery.delivery_address,
+            "total_price": str(delivery.total_price),
+            "status": delivery.status,
+            "created_at": delivery.created_at,
+            "updated_at": delivery.updated_at,
+        }
+    }, status=status.HTTP_200_OK)

@@ -58,9 +58,11 @@ urlpatterns = [
     # revenue calculation
     
     # Product Manager
+    path('product-manager/deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
-    path('reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
-    path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
+    path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
+    path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
+    path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
     # disapprove api can be added ?
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
@@ -74,6 +76,6 @@ urlpatterns = [
     path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
-    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
+    
 
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
