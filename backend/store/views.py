@@ -1435,3 +1435,41 @@ def calculate_revenue(request):
         },
         status=status.HTTP_200_OK
     )
+    
+    
+    
+@api_view(['POST'])
+def update_user_fields(request):
+    """
+    API endpoint to allow users to update their fields like email, username, address, tax_id, etc.
+    """
+
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Get the user object
+    user = request.user
+
+    address = request.data.get('address')
+    tax_id = request.data.get('tax_id')
+
+    if address is not None:  # Check for empty strings as valid value
+        user.address = address
+    
+    if tax_id is not None:  # Check for empty strings as valid value
+        user.tax_id = tax_id
+    
+
+    # Save the updated user object
+    user.save()
+
+    # Return response
+    return Response({
+        "message": "User details updated successfully.",
+        "user": {
+            "address": user.address,
+            "tax_id": user.tax_id,
+            
+        }
+    }, status=status.HTTP_200_OK)
