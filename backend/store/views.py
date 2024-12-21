@@ -26,6 +26,9 @@ from django.db import transaction
 from django.utils.dateparse import parse_datetime
 from datetime import datetime, timedelta
 from django.utils.timezone import now
+import base64
+from django.http import JsonResponse
+
 
 # bu alttakilere bakılacak
 # @login_required
@@ -708,8 +711,9 @@ def checkout(request):
     except Order.DoesNotExist:
         return Response({"error": "Processing order not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if (order.complete):
+    if order.complete:
         return Response({"error": "Order already checkouted."}, status=status.HTTP_404_NOT_FOUND)
+    
     # Mark the order as complete
     order.complete = True
     order.status = 'Processing'
@@ -720,20 +724,19 @@ def checkout(request):
     order_items = order.order_items.all()  # Get all OrderItems related to the Order
     for order_item in order_items:
         product = order_item.product
-        product.popularity = F('popularity') + order_item.quantity # Use F expressions to avoid race conditions
+        product.popularity = F('popularity') + order_item.quantity  # Use F expressions to avoid race conditions
         product.save()
 
     # Calculate the total amount for the order
     total_amount = 0.0
     discount_total_amount = 0.0
     for item in order.order_items.all():
-        total_amount = total_amount + float(item.subtotal)
-        discount_total_amount = discount_total_amount + float(item.discount_subtotal)
+        total_amount += float(item.subtotal)
+        discount_total_amount += float(item.discount_subtotal)
         # Decrease product stock based on quantity in the order
         product = item.product
         product.stock -= item.quantity
         product.save()
-
 
     # Create an invoice
     invoice = Invoice.objects.create(
@@ -747,8 +750,8 @@ def checkout(request):
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
     order_history.orders.add(order)
     order_history.update_date = datetime.now()
-    order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)  # Ensure total_amount is set
-    order_history.discount_total_amount = Decimal(order_history.discount_total_amount) + Decimal(discount_total_amount)  # Ensure total_amount is set
+    order_history.total_amount = Decimal(order_history.total_amount) + Decimal(total_amount)
+    order_history.discount_total_amount = Decimal(order_history.discount_total_amount) + Decimal(discount_total_amount)
     order_history.save()
 
     # Create delivery entries for each order item
@@ -784,17 +787,25 @@ def checkout(request):
 
     # Generate the PDF and save it to the file
     pdfkit.from_string(invoice_html_content, pdf_file_path)
-    # Open the generated PDF file and attach it
-    with open(pdf_file_path, 'rb') as f:
-        email.attach(f'Invoice_Order_{order.id}.pdf', f.read(), 'application/pdf')
 
-    # Send the email
+    # Open the generated PDF file and convert it to base64
+    with open(pdf_file_path, 'rb') as f:
+        pdf_data = f.read()
+        pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')  # Base64 encode and convert to string
+
+    # Send the email with the PDF attached (optional)
     try:
+        email.attach(f'Invoice_Order_{order.id}.pdf', pdf_data, 'application/pdf')
         email.send()
-        return Response({"message": "Order completed successfully, and invoice has been sent."}, status=status.HTTP_200_OK)
+
+        # Return a JSON response with the base64 encoded PDF
+        return JsonResponse({
+            "message": "Order completed successfully, and invoice has been sent.",
+            "invoice_pdf": pdf_base64  # Base64 encoded PDF in the response
+        }, status=status.HTTP_200_OK)
+
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
@@ -1025,20 +1036,46 @@ def apply_discount(request):
 
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
+    
+    if not wishlist_entries.exists():
+        return Response(
+            {"error": "No users found with this product in their wishlist."},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
     for entry in wishlist_entries:
         if entry.user.email:  # Ensure email exists before sending
             try:
-                send_mail(
+                # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
+                product_url = f'http://127.0.0.1:8000/product/{product.id}'
+
+                # Render the email content (HTML)
+                html_message = render_to_string('discount_notification.html', {
+                    'user': entry.user,
+                    'username': entry.user.username,
+                    'product': product,
+                    'discount_percentage': discount_percentage,
+                    'product_url': product_url,  # Add the product link to context
+                })
+                plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
+                
+                email = EmailMessage(
                     subject=f"Discount Alert for '{product.name}'!",
-                    message=f"Good news! '{product.name}' now has a discount of {discount_percentage}%.\n"
-                            f"Original price: ${original_price}, discounted price: ${discount_price}.",
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[entry.user.email],
-                    fail_silently=True,
+                    body=plain_text_content,  # Plain text version of the email
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[entry.user.email],
                 )
+                
+                # Attach HTML message for email clients that support HTML
+                email.content_subtype = "html"
+                email.body = html_message
+
+                # Send the email
+                email.send(fail_silently=False)
+
             except Exception as e:
                 print(f"Could not send email to {entry.user.email}: {e}")
+
 
     # Send success response
     return Response(
@@ -1051,8 +1088,8 @@ def apply_discount(request):
             "discount_percentage": discount_percentage,
         },
         status=status.HTTP_200_OK
-    
     )
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -1504,7 +1541,7 @@ def update_delivery_status(request, delivery_id):
 
     # If a new status is provided, update the order status
     if new_status:
-        if new_status not in ['Shipped', 'Delivered', 'Pending']:
+        if new_status not in ['In-transit', 'Delivered', 'Processing', 'Cancelled']:
             return Response({"error": "Invalid status."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Update the order status (you can customize this part depending on your logic)
