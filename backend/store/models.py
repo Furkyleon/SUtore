@@ -322,6 +322,7 @@ class Invoice(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='invoices')
     date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    url = models.URLField(max_length=255, blank=True, null=True)  # Field to store the invoice URL
     discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def str(self):

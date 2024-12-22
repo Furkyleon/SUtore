@@ -711,7 +711,6 @@ def order_history(request):
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
  
-
 @api_view(['POST'])
 def checkout(request):
     order_id = request.data.get('order_id')
@@ -755,13 +754,7 @@ def checkout(request):
         product.stock -= item.quantity
         product.save()
 
-    # Create an invoice
-    invoice = Invoice.objects.create(
-        order=order,
-        customer=request.user,
-        total_amount=total_amount,
-        discounted_total=discount_total_amount
-    )
+
 
     # Add it to the order history (if not already added)
     order_history, created = OrderHistory.objects.get_or_create(customer=request.user)
@@ -780,50 +773,62 @@ def checkout(request):
             total_price=item.discount_subtotal
         )
 
-    # Step 1: Render the email body template (order confirmation)
-    html_message = render_to_string('order_confirmation.html', {'order': order})
-    plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
-    
-    # Send the email
-    email = EmailMessage(
-        subject=f"Invoice for Order #{order.id}",
-        body=plain_text_content,  # Plain text version of the email
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[order.customer.email],
-    )
-    
-    # Attach the HTML message for email clients that support HTML
-    email.content_subtype = "html"
-    email.body = html_message
-    
+    # Generate the invoice PDF file path
+    pdf_file_name = f"invoice_order_{order.id}.pdf"
+    pdf_file_path = os.path.join(settings.MEDIA_ROOT, 'invoices', pdf_file_name)
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(pdf_file_path), exist_ok=True)
+
     # Step 2: Render the invoice template for the PDF
     invoice_html_content = render_to_string('invoice_template.html', {'order': order})
-    
-    # Path to save the generated PDF (you can adjust this path as needed)
-    pdf_file_path = f'invoice_order_{order.id}.pdf'
 
     # Generate the PDF and save it to the file
     pdfkit.from_string(invoice_html_content, pdf_file_path)
 
-    # Open the generated PDF file and convert it to base64
-    with open(pdf_file_path, 'rb') as f:
-        pdf_data = f.read()
-        pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')  # Base64 encode and convert to string
+    # Construct the public-facing URL
+    pdf_url = f"{settings.MEDIA_URL}invoices/{pdf_file_name}"
+
+    invoice = Invoice.objects.create(
+    order=order,
+    customer=request.user,
+    total_amount=total_amount,
+    discounted_total=discount_total_amount,
+    url=pdf_url  # Save the URL to the invoice
+    )
 
     # Send the email with the PDF attached (optional)
     try:
-        email.attach(f'Invoice_Order_{order.id}.pdf', pdf_data, 'application/pdf')
+        # Step 1: Render the email body template (order confirmation)
+        html_message = render_to_string('order_confirmation.html', {'order': order})
+        plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
+        
+        # Send the email
+        email = EmailMessage(
+            subject=f"Invoice for Order #{order.id}",
+            body=plain_text_content,  # Plain text version of the email
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[order.customer.email],
+        )
+        
+        # Attach the HTML message for email clients that support HTML
+        email.content_subtype = "html"
+        email.body = html_message
+
+        # Attach the PDF
+        with open(pdf_file_path, 'rb') as f:
+            email.attach(f'Invoice_Order_{order.id}.pdf', f.read(), 'application/pdf')
+
         email.send()
 
-        # Return a JSON response with the base64 encoded PDF
+        # Return a JSON response with the invoice URL
         return JsonResponse({
             "message": "Order completed successfully, and invoice has been sent.",
-            "invoice_pdf": pdf_base64  # Base64 encoded PDF in the response
+            "invoice_url": pdf_url  # URL to the saved PDF
         }, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1148,7 +1153,7 @@ def update_product_stock(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def view_invoices(request):
+def view_invoicess(request):
     """
     API endpoint for sales managers to view all invoices within a given date range,
     calculate discounted revenue, and return a chart based on discounted revenue only.
