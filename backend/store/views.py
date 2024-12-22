@@ -33,6 +33,17 @@ import os
 from matplotlib.ticker import MaxNLocator  # For adjusting x-ticks
 import matplotlib.pyplot as plt
 
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from weasyprint import HTML
+import os
+from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .models import Invoice
+from django.utils.dateparse import parse_datetime
 # bu alttakilere bakılacak
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
@@ -1150,10 +1161,85 @@ def update_product_stock(request):
 
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_invoices(request):
+    """
+    API endpoint for sales managers and product managers to view all invoices within a given date range.
+    Only accessible by users with role 'sales_manager' or 'product_manager'.
+    """
+    user = request.user
+
+    # Ensure the user has one of the required roles: 'sales_manager' or 'product_manager'
+    if not hasattr(user, 'role') or user.role not in ['sales_manager', 'product_manager']:
+        return Response(
+            {"error": "You do not have permission to view this data."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Extract query parameters for date range
+    start_date = request.data.get('start_date')
+    end_date = request.data.get('end_date')
+
+    # Validate presence of both parameters
+    if not start_date or not end_date:
+        return Response(
+            {"error": "Both 'start_date' and 'end_date' parameters are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Parse the dates safely
+    try:
+        start_date = parse_datetime(start_date)
+        end_date = parse_datetime(end_date)
+        
+        if not start_date or not end_date:
+            raise ValueError("Invalid date format provided.")
+
+        # Ensure that the date range is valid
+        if start_date > end_date:
+            return Response(
+                {"error": "'start_date' cannot be later than 'end_date'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    except ValueError as e:
+        return Response(
+            {"error": f"Invalid date format: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Fetch invoices in the date range
+    invoices = Invoice.objects.filter(date__range=(start_date, end_date))
+
+    if not invoices.exists():
+        return Response(
+            {"message": "No invoices found in the given date range."},
+            status=status.HTTP_200_OK
+        )
+
+    # Serialize the data
+    invoice_data = [
+        {
+            "order_id": invoice.order.id,
+            "customer_username": invoice.customer.username,
+            "date": invoice.date,
+            "total_amount": float(invoice.total_amount),
+            "discounted_total": float(invoice.discounted_total),
+            "pdf_url": invoice.url if invoice.url else "PDF not found"
+        }
+        for invoice in invoices
+    ]
+
+    # Return the response
+    return Response(
+        {"invoices": invoice_data},
+        status=status.HTTP_200_OK
+    )
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def view_invoicess(request):
+def view_invoices_chart(request):
     """
     API endpoint for sales managers to view all invoices within a given date range,
     calculate discounted revenue, and return a chart based on discounted revenue only.
@@ -1282,10 +1368,7 @@ def view_invoicess(request):
         {
             "total_discounted_revenue": total_discounted_revenue,
             "chart_url": chart_url,  # URL to the saved chart image
-            "monthly_data": {
-                "months": months,
-                "discounted_revenue": discounted_revenue_per_month
-            }
+
         },
         status=status.HTTP_200_OK
     )

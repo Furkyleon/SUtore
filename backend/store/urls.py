@@ -49,9 +49,10 @@ urlpatterns = [
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
 
-    # Sales Manager
+    # Sales Managerview_invoices_chart
     path('sales-manager/apply-discount/', views.apply_discount, name='apply_discount'),
     path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
+    path('sales-manager/view-invoices_chart/', views.view_invoices_chart, name="view-invoices_chart"),
     path('sales-manager/pending-refund-requests/', views.get_pending_refund_requests, name='pending-refund-requests'),
     path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
     path('sales-manager/revenue/', views.calculate_revenue, name="calculate_revenue"),
