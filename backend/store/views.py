@@ -1189,9 +1189,9 @@ def view_invoices(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # Extract query parameters for date range
-    start_date = request.data.get('start_date')
-    end_date = request.data.get('end_date')
+    # Extract query parameters for date range using GET
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
     # Validate presence of both parameters
     if not start_date or not end_date:
@@ -1237,7 +1237,8 @@ def view_invoices(request):
             "date": invoice.date,
             "total_amount": float(invoice.total_amount),
             "discounted_total": float(invoice.discounted_total),
-            "pdf_url": invoice.url if invoice.url else "PDF not found"
+            "pdf_url": request.build_absolute_uri(invoice.url) if invoice.url else "PDF not found"
+
         }
         for invoice in invoices
     ]
@@ -1247,6 +1248,7 @@ def view_invoices(request):
         {"invoices": invoice_data},
         status=status.HTTP_200_OK
     )
+
 
 
 @api_view(['GET'])
