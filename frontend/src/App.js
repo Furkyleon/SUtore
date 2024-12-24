@@ -15,7 +15,7 @@ import Wishlist from "./Components/Wishlist/Wishlist";
 import SalesManager from "./Components/SalesManager/SalesManager";
 import DiscountPage from "./Components/SalesManager/DiscountPage";
 import RefundPage from "./Components/SalesManager/RefundPage";
-import SMInvoicesPage from "./Components/SalesManager/SMInvoicesPage";
+import InvoicesPage from "./Components/Invoice/ManagerInvoices";
 import RevenueCalc from "./Components/SalesManager/RevenueCalc";
 import ProductManager from "./Components/ProductManager/ProductManager";
 import AddProduct from "./Components/ProductManager/AddProduct";
@@ -23,7 +23,6 @@ import DeleteProduct from "./Components/ProductManager/DeleteProduct";
 import CategoryManagement from "./Components/ProductManager/CategoryManagement";
 import CommentManagement from "./Components/ProductManager/CommentManagement";
 import StockManagement from "./Components/ProductManager/StockManagement";
-import PMInvoicesPage from "./Components/ProductManager/PMInvoicesPage";
 import DeliveryManagementPage from "./Components/ProductManager/DeliveryManagementPage";
 
 function App() {
@@ -42,6 +41,7 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="invoice/:orderId" element={<Invoice />} />
+          <Route path="manager/invoices" element={<InvoicesPage />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="sales-manager" element={<SalesManager />} />
           <Route
@@ -49,7 +49,7 @@ function App() {
             element={<DiscountPage />}
           />
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
-          <Route path="sales-manager/invoices" element={<SMInvoicesPage />} />
+          
           <Route
             path="sales-manager/calculate-revenue"
             element={<RevenueCalc />}
@@ -71,10 +71,6 @@ function App() {
           <Route
             path="product-manager/stock-management"
             element={<StockManagement />}
-          />
-          <Route
-            path="product-manager/invoice-page"
-            element={<PMInvoicesPage />}
           />
           <Route
             path="product-manager/deliveries-page"

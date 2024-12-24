@@ -1189,7 +1189,6 @@ def view_invoices(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-
     # Extract query parameters for date range
     start_date = request.data.get('start_date')
     end_date = request.data.get('end_date')

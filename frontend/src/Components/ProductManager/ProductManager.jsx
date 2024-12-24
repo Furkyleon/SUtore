@@ -26,7 +26,7 @@ const ProductManager = () => {
   };
 
   const handleInvoices = () => {
-    navigate("/product-manager/invoice-page");
+    navigate("/manager/invoices");
   };
 
   const handleDeliveries = () => {
