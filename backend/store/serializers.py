@@ -107,7 +107,16 @@ class OrderHistorySerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id', 'user', 'product', 'rating', 'comment', 'comment_status', 'date_added']
+        fields = [
+            'id',
+            'user',
+            'product',
+            'product_id',  # For writing the product relationship
+            'rating',
+            'comment',
+            'comment_status',
+            'date_added',
+        ]
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:

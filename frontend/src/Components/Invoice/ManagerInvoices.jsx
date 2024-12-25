@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import "./ManagerInvoices.css";
 
 const ProductManagerInvoicesPage = () => {
@@ -8,8 +7,29 @@ const ProductManagerInvoicesPage = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [hasFetched, setHasFetched] = useState(false); // Track fetch attempts
-  const navigate = useNavigate();
+  const [hasFetched, setHasFetched] = useState(false);
+
+  // Set default start and end dates when the component mounts
+  useEffect(() => {
+    const currentDate = new Date();
+
+    // Calculate the first day of the current month
+    const firstDayOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    // Calculate the last day of the current month
+    const lastDayOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
+    // Format dates as YYYY-MM-DD
+    setStartDate(firstDayOfMonth.toISOString().split("T")[0]);
+    setEndDate(lastDayOfMonth.toISOString().split("T")[0]);
+  }, []);
 
   const fetchInvoices = async () => {
     setError("");
@@ -23,13 +43,22 @@ const ProductManagerInvoicesPage = () => {
       return;
     }
 
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      setError("Start date cannot be later than end date.");
+      setLoading(false);
+      return;
+    }
+
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/sales-manager/view-invoices/?start_date=${startDate}&end_date=${endDate}`,
+        `http://127.0.0.1:8000/sales-manager/view-invoices/?start_date=${start.toISOString().split('T')[0]}&end_date=${end.toISOString().split('T')[0]}`,
         {
           method: "GET",
           headers: {
@@ -53,10 +82,6 @@ const ProductManagerInvoicesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleViewInvoice = (orderId) => {
-    navigate(`/invoice/${orderId}`);
   };
 
   return (
@@ -103,7 +128,7 @@ const ProductManagerInvoicesPage = () => {
               <th>Date</th>
               <th>Total Amount (TL)</th>
               <th>Discounted Total (TL)</th>
-              <th>Invoice</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -117,9 +142,10 @@ const ProductManagerInvoicesPage = () => {
                 <td>
                   <button
                     className="view-invoice-btn"
-                    onClick={() => handleViewInvoice(invoice.order_id)}
+                    onClick={() => window.open(invoice.pdf_url, "_blank")}
+                    disabled={!invoice.pdf_url || invoice.pdf_url === "PDF not found"}
                   >
-                    View Invoice
+                    View PDF
                   </button>
                 </td>
               </tr>

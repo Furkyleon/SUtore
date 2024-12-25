@@ -26,6 +26,7 @@ const Invoice = () => {
       })
       .then((data) => {
         // Find the order with the specified orderId
+        
         const foundOrder = data.find((order) => order.order_id === parseInt(orderId, 10));
         if (!foundOrder) {
           throw new Error("Order not found.");
@@ -34,6 +35,7 @@ const Invoice = () => {
         setLoading(false);
       })
       .catch((error) => {
+        
         console.error("Error fetching order details:", error);
         setError(error.message || "Failed to load order details. Please try again.");
         setLoading(false);

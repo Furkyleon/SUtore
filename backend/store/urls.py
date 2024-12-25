@@ -9,6 +9,7 @@ urlpatterns = [
     # Login and Register
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
+    path('update_user_fields/', views.update_user_fields, name='update_user_fields'),
 
     # Product and Category
     path('products/get_all/', views.get_all_products, name='get_all_products'),
@@ -43,23 +44,20 @@ urlpatterns = [
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
 
-    # Sales Manager
+    # Sales Managerview_invoices_chart
     path('sales-manager/apply-discount/', views.apply_discount, name='apply_discount'),
     path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
+    path('sales-manager/view-invoices_chart/', views.view_invoices_chart, name="view-invoices_chart"),
     path('sales-manager/pending-refund-requests/', views.get_pending_refund_requests, name='pending-refund-requests'),
     path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
     path('sales-manager/revenue/', views.calculate_revenue, name="calculate_revenue"),
     
     # Product Manager
-    path('products/add_product/', views.add_product, name='add_product'),
-    path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
-    path('categories/add/', views.add_category, name='add_category'),
-    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
+    path('product-manager/deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
-    path('products/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
-    path('deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
-    path('reviews/<int:review_id>/approve/', views.update_review_comment_status, name='approve-review'),
-    # disapprove api can be added ?
+    path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
+    path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
+    path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
     
     # Sort and Search
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
@@ -73,5 +71,5 @@ urlpatterns = [
     path('products/search_products/', views.search_products, name='search_products'),
     path('products/search/', views.get_products_by_name, name='get_products_by_name'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
-    
+
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

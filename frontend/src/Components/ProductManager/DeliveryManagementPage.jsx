@@ -5,6 +5,11 @@ const DeliveryManagementPage = () => {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedDelivery, setSelectedDelivery] = useState(null); // To track the delivery being updated
+  const [newStatus, setNewStatus] = useState(""); // New status for the delivery
+  const [newAddress, setNewAddress] = useState(""); // New address for the delivery
+  const [updateError, setUpdateError] = useState("");
+  const [updateMessage, setUpdateMessage] = useState("");
 
   useEffect(() => {
     const fetchDeliveries = async () => {
@@ -16,12 +21,15 @@ const DeliveryManagementPage = () => {
       const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/deliveries/", {
-          method: "GET",
-          headers: {
-            Authorization: authHeader,
-          },
-        });
+        const response = await fetch(
+          "http://127.0.0.1:8000/product-manager/deliveries/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: authHeader,
+            },
+          }
+        );
 
         if (!response.ok) {
           const data = await response.json();
@@ -30,11 +38,7 @@ const DeliveryManagementPage = () => {
         }
 
         const data = await response.json();
-        if (data.message === "No deliveries found.") {
-          setDeliveries([]);
-        } else {
-          setDeliveries(data);
-        }
+        setDeliveries(data);
       } catch (err) {
         setError("Failed to fetch deliveries. Please try again.");
       } finally {
@@ -44,6 +48,56 @@ const DeliveryManagementPage = () => {
 
     fetchDeliveries();
   }, []);
+
+  const handleUpdateDelivery = async (deliveryId) => {
+    setUpdateError("");
+    setUpdateMessage("");
+
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/product-manager/update_delivery_status/${deliveryId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authHeader,
+          },
+          body: JSON.stringify({
+            status: newStatus,
+            delivery_address: newAddress,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setUpdateError(data.error || "Failed to update delivery.");
+        return;
+      }
+
+      setUpdateMessage("Delivery updated successfully.");
+      // Update the delivery in the local state
+      setDeliveries((prev) =>
+        prev.map((delivery) =>
+          delivery.delivery_id === deliveryId
+            ? { ...delivery, status: newStatus || delivery.status, delivery_address: newAddress || delivery.delivery_address }
+            : delivery
+        )
+      );
+
+      // Clear the form
+      setSelectedDelivery(null);
+      setNewStatus("");
+      setNewAddress("");
+    } catch (err) {
+      setUpdateError("Failed to update delivery. Please try again.");
+    }
+  };
 
   return (
     <div className="delivery-management-wrapper">
@@ -67,8 +121,7 @@ const DeliveryManagementPage = () => {
               <th>Total Price (TL)</th>
               <th>Address</th>
               <th>Status</th>
-              <th>Created At</th>
-              <th>Updated At</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -81,12 +134,51 @@ const DeliveryManagementPage = () => {
                 <td>{delivery.total_price.toFixed(2)}</td>
                 <td>{delivery.delivery_address}</td>
                 <td>{delivery.status}</td>
-                <td>{new Date(delivery.created_at).toLocaleString()}</td>
-                <td>{new Date(delivery.updated_at).toLocaleString()}</td>
+                <td>
+                <button
+                    className="update-button"
+                    onClick={() => setSelectedDelivery(delivery)}
+                >
+                    Update
+                </button>
+
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {selectedDelivery && (
+        <div className="update-delivery-form">
+          <h2>Update Delivery</h2>
+          <p>Delivery ID: {selectedDelivery.delivery_id}</p>
+          <label>
+            New Status:
+            <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+              <option value="">Select Status</option>
+              <option value="Processing">Processing</option>
+              <option value="In-transit">In-transit</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </label>
+          <label>
+            New Address:
+            <input
+              type="text"
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+              placeholder="Enter new address"
+            />
+          </label>
+          <button onClick={() => handleUpdateDelivery(selectedDelivery.delivery_id)}>
+            Submit
+          </button>
+          <button onClick={() => setSelectedDelivery(null)}>Cancel</button>
+          {updateError && <p className="error-message">{updateError}</p>}
+          {updateMessage && <p className="success-message">{updateMessage}</p>}
+        </div>
       )}
     </div>
   );
