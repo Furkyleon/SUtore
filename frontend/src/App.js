@@ -24,6 +24,7 @@ import CategoryManagement from "./Components/ProductManager/CategoryManagement";
 import CommentManagement from "./Components/ProductManager/CommentManagement";
 import StockManagement from "./Components/ProductManager/StockManagement";
 import DeliveryManagementPage from "./Components/ProductManager/DeliveryManagementPage";
+import ProfilePage from "./Components/Profile/ProfilePage";
 
 function App() {
   return (
@@ -49,7 +50,6 @@ function App() {
             element={<DiscountPage />}
           />
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
-          
           <Route
             path="sales-manager/calculate-revenue"
             element={<RevenueCalc />}
@@ -76,6 +76,7 @@ function App() {
             path="product-manager/deliveries-page"
             element={<DeliveryManagementPage />}
           />
+          <Route path="profile" element={<ProfilePage />} /> {/* New ProfilePage route */}
         </Route>
       </Routes>
     </Router>

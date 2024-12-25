@@ -203,6 +203,9 @@ const Navbar = () => {
 
                 {localStorage.getItem("role") === "customer" && (
                   <li>
+                    <Link to="/profile" onClick={toggleSidebar2}>
+                      Profile
+                    </Link>
                     <Link to="/wishlist" onClick={toggleSidebar2}>
                       Wishlist
                     </Link>

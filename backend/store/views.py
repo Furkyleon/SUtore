@@ -1251,7 +1251,7 @@ def view_invoices(request):
 
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def view_invoices_chart(request):
     """

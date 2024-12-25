@@ -9,6 +9,7 @@ const RevenueCalculationPage = () => {
   const { start_date, end_date } = location.state || {};
 
   const [revenue, setRevenue] = useState(null);
+  const [chartUrl, setChartUrl] = useState(""); // State to store chart URL
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -18,14 +19,14 @@ const RevenueCalculationPage = () => {
       return;
     }
 
-    const fetchRevenue = async () => {
+    const fetchRevenueData = async () => {
       const username = localStorage.getItem("username");
       const password = localStorage.getItem("password");
       const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/sales-manager/revenue/",
+          "http://127.0.0.1:8000/sales-manager/view-invoices_chart/",
           {
             method: "POST",
             headers: {
@@ -42,20 +43,21 @@ const RevenueCalculationPage = () => {
         if (!response.ok) {
           const errorData = await response.json();
           setError(
-            errorData.error || "An error occurred while calculating revenue."
+            errorData.error || "An error occurred while fetching revenue data."
           );
           return;
         }
 
         const data = await response.json();
-        setRevenue(data.revenue);
+        setRevenue(data.total_discounted_revenue); // Set the total discounted revenue
+        setChartUrl(data.chart_url); // Set the chart URL for display
       } catch (err) {
-        console.error("Error calculating revenue:", err);
-        setError("Failed to calculate revenue. Please try again.");
+        console.error("Error fetching revenue data:", err);
+        setError("Failed to fetch revenue data. Please try again.");
       }
     };
 
-    fetchRevenue();
+    fetchRevenueData();
   }, [start_date, end_date]);
 
   const handleBack = () => {
@@ -70,10 +72,17 @@ const RevenueCalculationPage = () => {
       {revenue !== null && (
         <div className="revenue-result">
           <h3>
-            From {new Date(start_date).toLocaleString()} to{" "}
-            {new Date(end_date).toLocaleString()}:
+            From {new Date(start_date).toLocaleDateString()} to{" "}
+            {new Date(end_date).toLocaleDateString()}:
           </h3>
-          <h2>{revenue}</h2>
+          <h2>Total Discounted Revenue: ${revenue.toFixed(2)}</h2>
+        </div>
+      )}
+
+      {chartUrl && (
+        <div className="chart-container">
+          <h3>Discounted Revenue Chart</h3>
+          <img src={chartUrl} alt="Discounted Revenue Chart" className="chart" />
         </div>
       )}
 

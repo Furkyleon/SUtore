@@ -12,7 +12,11 @@ urlpatterns = [
     path('update_user_fields/', views.update_user_fields, name='update_user_fields'),
 
     # Product and Category
+    path('products/add_product/', views.add_product, name='add_product'),
+    path('products/delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('products/get_all/', views.get_all_products, name='get_all_products'),
+    path('categories/add/', views.add_category, name='add_category'),
+    path('categories/delete/<str:category_name>/', views.delete_category, name='delete_category'),
     path('categories/get_all/', views.get_categories, name='get_categories'),
     path('products/category/<str:category_name>/', views.get_products_by_category, name='get_products_by_category'),
 
@@ -44,7 +48,7 @@ urlpatterns = [
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
 
-    # Sales Managerview_invoices_chart
+    # Sales Manager
     path('sales-manager/apply-discount/', views.apply_discount, name='apply_discount'),
     path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
     path('sales-manager/view-invoices_chart/', views.view_invoices_chart, name="view-invoices_chart"),
