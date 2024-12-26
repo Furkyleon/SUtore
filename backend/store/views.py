@@ -912,6 +912,30 @@ def get_reviews_by_product(request, product_id):
 
 
 @api_view(['GET'])
+def get_comments_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Filter reviews by product
+    reviews = Review.objects.filter(product=product, comment_status= "Pending")
+    
+    # Serialize the reviews
+    serializer = ReviewSerializer(reviews, many=True)
+
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def get_rating_by_product(request, product_id):
     # Check if the product exists
     try:
@@ -958,6 +982,8 @@ def update_review_comment_status(request, review_id, new_status):
     review.save()
 
     return Response({"message": f"Comment status updated to {new_status} successfully."}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):

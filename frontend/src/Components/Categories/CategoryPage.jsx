@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import "./CategoryPage.css";
 
@@ -14,33 +14,36 @@ const CategoryPage = () => {
   const password = localStorage.getItem("password");
   const role = localStorage.getItem("role");
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/products/category/${categoryName}/`
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/products/category/${categoryName}/`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "An error occurred while fetching products."
         );
-
-        if (!response.ok) {
-          throw new Error(
-            (await response.json()).error ||
-              "An error occurred while fetching products."
-          );
-        }
-
-        const data = await response.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchProducts();
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [categoryName]);
 
-  const sortedProducts = [...products].sort((a, b) => {
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, categoryName]);
+
+  const sortedProducts = products.slice().sort((a, b) => {
     if (sortCriterion === "price") {
       return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
     } else if (sortCriterion === "name") {
@@ -55,21 +58,15 @@ const CategoryPage = () => {
     return 0;
   });
 
-  const handleSortChange = (event) => {
-    setSortOrder(event.target.value);
-  };
-
-  const handleCriterionChange = (event) => {
-    setSortCriterion(event.target.value);
-  };
+  const handleSortChange = (event) => setSortOrder(event.target.value);
+  const handleCriterionChange = (event) => setSortCriterion(event.target.value);
 
   const addToCart = async (serialNumber) => {
-    const authHeader =
-      username && password
-        ? { Authorization: `Basic ${btoa(`${username}:${password}`)}` }
-        : {};
-
     try {
+      const authHeader =
+        username && password
+          ? { Authorization: `Basic ${btoa(`${username}:${password}`)}` }
+          : {};
       const response = await fetch("http://127.0.0.1:8000/cart/add/", {
         method: "POST",
         headers: {

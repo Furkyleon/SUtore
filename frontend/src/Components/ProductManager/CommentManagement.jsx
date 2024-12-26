@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import "./CommentManagement.css";
 
 const ManageCommentsPage = () => {
@@ -41,7 +41,7 @@ const ManageCommentsPage = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/products/${selectedProductId}/get_reviews/`
+        `http://127.0.0.1:8000/product-manager/${selectedProductId}/get_comments/`
       );
 
       if (!response.ok) {
@@ -62,13 +62,13 @@ const ManageCommentsPage = () => {
     }
   };
 
-  const handleApproveReview = async (reviewId) => {
+  const handleUpdateReviewStatus = async (reviewId, newStatus) => {
     setError("");
     setSuccessMessage("");
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/reviews/${reviewId}/approve/`,
+        `http://127.0.0.1:8000/product-manager/reviews/${reviewId}/${newStatus}/`,
         {
           method: "POST",
         }
@@ -76,7 +76,9 @@ const ManageCommentsPage = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to approve review.");
+        setError(
+          data.error || `Failed to update review status to ${newStatus}.`
+        );
         return;
       }
 
@@ -84,13 +86,15 @@ const ManageCommentsPage = () => {
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review.id === reviewId
-            ? { ...review, comment_status: "Approved" }
+            ? { ...review, comment_status: newStatus }
             : review
         )
       );
-      setSuccessMessage("Review approved successfully!");
+      setSuccessMessage(`Review ${newStatus.toLowerCase()} successfully!`);
     } catch (err) {
-      setError("An error occurred while approving the review.");
+      setError(
+        `An error occurred while updating the review status to ${newStatus}.`
+      );
     }
   };
 
@@ -137,14 +141,27 @@ const ManageCommentsPage = () => {
               <p>
                 <strong>Status:</strong> {review.comment_status}
               </p>
-              {review.comment_status !== "Approved" && (
-                <button
-                  onClick={() => handleApproveReview(review.id)}
-                  className="approve-btn"
-                >
-                  <FaCheckCircle /> Approve
-                </button>
-              )}
+              {review.comment_status !== "Approved" &&
+                review.comment_status !== "Rejected" && (
+                  <>
+                    <button
+                      onClick={() =>
+                        handleUpdateReviewStatus(review.id, "Approved")
+                      }
+                      className="approve-btn"
+                    >
+                      <FaCheckCircle /> Approve
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleUpdateReviewStatus(review.id, "Rejected")
+                      }
+                      className="reject-btn"
+                    >
+                      <FaTimesCircle /> Reject
+                    </button>
+                  </>
+                )}
             </div>
           ))}
         </div>
