@@ -62,11 +62,11 @@ const CategoryPage = () => {
   const handleCriterionChange = (event) => setSortCriterion(event.target.value);
 
   const addToCart = async (serialNumber) => {
+    const authHeader = username && username !== "null" && password && password !== "null"
+      ? { Authorization: `Basic ${btoa(`${username}:${password}`)}` }
+      : {};
+
     try {
-      const authHeader =
-        username && password
-          ? { Authorization: `Basic ${btoa(`${username}:${password}`)}` }
-          : {};
       const response = await fetch("http://127.0.0.1:8000/cart/add/", {
         method: "POST",
         headers: {
