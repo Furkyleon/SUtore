@@ -50,7 +50,7 @@ const StockManagementPage = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/products/manage-stock/${productId}/`,
+        `http://127.0.0.1:8000/product-manager/manage-stock/${productId}/`,
         {
           method: "POST",
           headers: {
