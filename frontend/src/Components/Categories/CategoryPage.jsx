@@ -10,32 +10,43 @@ const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
+
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/products/category/${categoryName}/`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          setError(data.error || "An error occurred while fetching products.");
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/products/category/${categoryName}/`
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            (await response.json()).error ||
+              "An error occurred while fetching products."
+          );
         }
+
+        const data = await response.json();
+        setProducts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to fetch products. Please try again.");
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, [categoryName]);
 
-  const sortedProducts = products.sort((a, b) => {
+  const sortedProducts = [...products].sort((a, b) => {
     if (sortCriterion === "price") {
       return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
     } else if (sortCriterion === "name") {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
       return sortOrder === "asc"
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
     } else if (sortCriterion === "popularity") {
       return sortOrder === "asc"
         ? a.popularity - b.popularity
@@ -52,70 +63,36 @@ const CategoryPage = () => {
     setSortCriterion(event.target.value);
   };
 
-  // Add product to cart
-  const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
-    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+  const addToCart = async (serialNumber) => {
+    const authHeader =
+      username && password
+        ? { Authorization: `Basic ${btoa(`${username}:${password}`)}` }
+        : {};
 
-    if (username && username !== "null" && password && password !== "null") {
-      fetch("http://127.0.0.1:8000/cart/add/", {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/cart/add/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: authHeader,
+          ...authHeader,
         },
         body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to add item to cart!");
-          return response.json();
-        })
-        .then(() => alert("Product added to cart successfully!"))
-        .catch((error) => {
-          console.log("Username:", username, "Password:", password);
+      });
 
-          console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
-        });
-    } else {
-      let myorderID = localStorage.getItem("order_id"); // Define the variable
-
-      if (myorderID && myorderID === "null") {
-        myorderID = 0;
-        localStorage.setItem("order_id", 0);
+      if (!response.ok) {
+        throw new Error("Failed to add item to cart!");
       }
 
-      fetch("http://127.0.0.1:8000/cart/add/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const data = await response.json();
 
-        body: JSON.stringify({
-          serial_number: serialNumber,
-          quantity: 1,
-          order_id: myorderID,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to add item to cart!");
-          return response.json();
-        })
-        .then((data) => {
-          // Save the order_id to localStorage
-          if (data.order_id) {
-            localStorage.setItem("order_id", data.order_id);
-            console.log("Order ID saved locally.");
-          }
-          alert("Product added to cart successfully!");
-        })
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-          console.log(myorderID);
-          console.log("Username:");
-          alert("There was an error adding the product to the cart.");
-        });
+      if (data.order_id) {
+        localStorage.setItem("order_id", data.order_id);
+      }
+
+      alert("Product added to cart successfully!");
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      alert("There was an error adding the product to the cart.");
     }
   };
 
@@ -182,17 +159,15 @@ const CategoryPage = () => {
                       </span>
                     )}
                   </p>
-                  {product.stock > 0 ? (
-                    <button
-                      onClick={() => {
-                        addToCart(product.serial_number);
-                      }}
-                    >
-                      Add to Cart
-                    </button>
-                  ) : (
-                    <span className="out-of-stock-label">Out of Stock!</span>
-                  )}
+                  {role !== "product_manager" &&
+                    role !== "sales_manager" &&
+                    (product.stock > 0 ? (
+                      <button onClick={() => addToCart(product.serial_number)}>
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <span className="out-of-stock-label">Out of Stock!</span>
+                    ))}
                 </div>
               ))
             ) : (

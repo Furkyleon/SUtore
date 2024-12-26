@@ -242,21 +242,24 @@ def get_categories(request):
 @api_view(['GET'])
 def get_products_by_category(request, category_name):
     """Retrieve products by category name."""
-    # Check if the category exists in the Category model
-    if not Category.objects.filter(name=category_name).exists():
+    try:
+        # Fetch the Category object
+        category = Category.objects.get(name=category_name)
+
+        # Filter products by the category ID
+        products = Product.objects.filter(category=category)
+
+        if not products.exists():
+            return Response({'error': 'No products found in this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize and return the products
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Category.DoesNotExist:
         return Response({'error': 'Category does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-
-    # Filter products by category
-    products = Product.objects.filter(category=category_name)
-
-    if not products.exists():
-        # Return error if no products found in the category
-        return Response({'error': 'No products found in this category.'}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
-    
-    # Return serialized data
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -1085,45 +1088,39 @@ def apply_discount(request):
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
     
-    if not wishlist_entries.exists():
-        return Response(
-            {"error": "No users found with this product in their wishlist."},
-            status=status.HTTP_404_NOT_FOUND
-        )
+    if wishlist_entries.exists():
+        for entry in wishlist_entries:
+            if entry.user.email:  # Ensure email exists before sending
+                try:
+                    # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
+                    product_url = f'http://127.0.0.1:8000/product/{product.id}'
 
-    for entry in wishlist_entries:
-        if entry.user.email:  # Ensure email exists before sending
-            try:
-                # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
-                product_url = f'http://127.0.0.1:8000/product/{product.id}'
+                    # Render the email content (HTML)
+                    html_message = render_to_string('discount_notification.html', {
+                        'user': entry.user,
+                        'username': entry.user.username,
+                        'product': product,
+                        'discount_percentage': discount_percentage,
+                        'product_url': product_url,  # Add the product link to context
+                    })
+                    plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
+                    
+                    email = EmailMessage(
+                        subject=f"Discount Alert for '{product.name}'!",
+                        body=plain_text_content,  # Plain text version of the email
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=[entry.user.email],
+                    )
+                    
+                    # Attach HTML message for email clients that support HTML
+                    email.content_subtype = "html"
+                    email.body = html_message
 
-                # Render the email content (HTML)
-                html_message = render_to_string('discount_notification.html', {
-                    'user': entry.user,
-                    'username': entry.user.username,
-                    'product': product,
-                    'discount_percentage': discount_percentage,
-                    'product_url': product_url,  # Add the product link to context
-                })
-                plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
-                
-                email = EmailMessage(
-                    subject=f"Discount Alert for '{product.name}'!",
-                    body=plain_text_content,  # Plain text version of the email
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[entry.user.email],
-                )
-                
-                # Attach HTML message for email clients that support HTML
-                email.content_subtype = "html"
-                email.body = html_message
+                    # Send the email
+                    email.send(fail_silently=False)
 
-                # Send the email
-                email.send(fail_silently=False)
-
-            except Exception as e:
-                print(f"Could not send email to {entry.user.email}: {e}")
-
+                except Exception as e:
+                    print(f"Could not send email to {entry.user.email}: {e}")
 
     # Send success response
     return Response(

@@ -7,6 +7,10 @@ const StorePage = () => {
   const [sortCriterion, setSortCriterion] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
 
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000/products/get_all/")
       .then((response) => {
@@ -20,10 +24,7 @@ const StorePage = () => {
       .catch((error) => console.error("Fetch Error:", error));
   }, []);
 
-  // Add product to cart
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (username && username !== "null" && password && password !== "null") {
@@ -169,13 +170,15 @@ const StorePage = () => {
                 </span>
               )}
             </p>
-            {product.stock > 0 ? (
-              <button onClick={() => addToCart(product.serial_number)}>
-                Add to Cart
-              </button>
-            ) : (
-              <span className="out-of-stock-label">Out of Stock!</span>
-            )}
+            {role !== "product_manager" &&
+              role !== "sales_manager" &&
+              (product.stock > 0 ? (
+                <button onClick={() => addToCart(product.serial_number)}>
+                  Add to Cart
+                </button>
+              ) : (
+                <span className="out-of-stock-label">Out of Stock!</span>
+              ))}
           </div>
         ))}
       </div>

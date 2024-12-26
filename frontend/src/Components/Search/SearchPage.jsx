@@ -9,6 +9,10 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchTerm = queryParams.get("query")?.toLowerCase() || "";
@@ -65,10 +69,7 @@ const SearchPage = () => {
     return 0;
   });
 
-  // Add product to cart
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (username && username !== "null" && password && password !== "null") {
@@ -201,13 +202,15 @@ const SearchPage = () => {
                     </span>
                   )}
                 </p>
-                {product.stock > 0 ? (
-                  <button onClick={() => addToCart(product.serial_number)}>
-                    Add to Cart
-                  </button>
-                ) : (
-                  <span className="out-of-stock-label">Out of Stock!</span>
-                )}
+                {role !== "product_manager" &&
+                  role !== "sales_manager" &&
+                  (product.stock > 0 ? (
+                    <button onClick={() => addToCart(product.serial_number)}>
+                      Add to Cart
+                    </button>
+                  ) : (
+                    <span className="out-of-stock-label">Out of Stock!</span>
+                  ))}
               </div>
             ))}
           </div>

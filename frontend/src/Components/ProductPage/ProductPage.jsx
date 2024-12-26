@@ -21,6 +21,7 @@ const ProductPage = () => {
 
   const username = localStorage.getItem("username");
   const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
     const username = localStorage.getItem("username");
@@ -250,7 +251,6 @@ const ProductPage = () => {
             </span>
             <div className="rating-tooltip">Click to view comments</div>
           </div>
-
           <div className="price-section">
             {product.discount > 0 ? (
               <>
@@ -269,30 +269,32 @@ const ProductPage = () => {
               <span className="discounted-price">{product.price + " TL"}</span>
             )}
           </div>
-
           <p className="product-description">{product.description}</p>
-
           <div className="add-to-cart-wishlist-section">
-            <div className="button-stock-section">
-              {product.stock > 0 ? (
-                <button
-                  className="add-to-cart-button"
-                  onClick={() => addToCart(product.serial_number)}
-                >
-                  Add to Cart
-                </button>
-              ) : (
-                <span className="out-of-stock-label">Out of Stock!</span>
-              )}
-            </div>
+            {role !== "product_manager" && role !== "sales_manager" && (
+              <>
+                <div className="button-stock-section">
+                  {product.stock > 0 ? (
+                    <button
+                      className="add-to-cart-button"
+                      onClick={() => addToCart(product.serial_number)}
+                    >
+                      Add to Cart
+                    </button>
+                  ) : (
+                    <span className="out-of-stock-label">Out of Stock!</span>
+                  )}
+                </div>
 
-            <div className="wishlist-icon" onClick={toggleWishlist}>
-              {isInWishlist ? (
-                <FaHeart className="filled-heart" />
-              ) : (
-                <FaRegHeart className="empty-heart" />
-              )}
-            </div>
+                <div className="wishlist-icon" onClick={toggleWishlist}>
+                  {isInWishlist ? (
+                    <FaHeart className="filled-heart" />
+                  ) : (
+                    <FaRegHeart className="empty-heart" />
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="additional-info">
