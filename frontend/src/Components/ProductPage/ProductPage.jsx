@@ -18,6 +18,9 @@ const ProductPage = () => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlist, setWishlist] = useState([]);
 
+  // NEW: We store average rating in its own state to avoid race conditions.
+  const [averageRating, setAverageRating] = useState(0);
+
   const commentsRef = useRef(null);
 
   const username = localStorage.getItem("username");
@@ -35,6 +38,7 @@ const ProductPage = () => {
       const selectedProduct = allProducts.find(
         (item) => item.id === parseInt(productId)
       );
+
       setProduct(selectedProduct || null);
 
       // 2. Fetch the user’s wishlist to see if this product is already in it
@@ -81,15 +85,21 @@ const ProductPage = () => {
         throw new Error("Error fetching rating");
       }
       const data = await response.json();
+
+      // Keep the existing code so as not to remove anything:
       setProduct((prev) =>
         prev ? { ...prev, rating_average: data.average_rating || 0 } : null
       );
+
+      // NEW: Also store it in a separate state so it’s never lost.
+      setAverageRating(data.average_rating || 0);
     } catch (error) {
       console.error("Error fetching rating:", error);
     }
   };
 
   useEffect(() => {
+    // Fetch product details, reviews, and rating on mount or when productId changes
     fetchProductDetails();
     fetchReviews();
     fetchRating();
@@ -235,6 +245,7 @@ const ProductPage = () => {
           <h2 className="product-model">Product Model: {product.model}</h2>
           <p className="product-code">Serial Number: {product.serial_number}</p>
 
+          {/* RATING SECTION */}
           <div
             className="rating"
             onClick={scrollToComments}
@@ -242,11 +253,12 @@ const ProductPage = () => {
           >
             <span className="stars">
               {Array.from({ length: 5 }).map((_, index) => {
-                if (product.rating_average >= index + 1) {
+                // Display based on the separate 'averageRating' state
+                if (averageRating >= index + 1) {
                   return <FaStar key={index} />;
                 } else if (
-                  product.rating_average > index &&
-                  product.rating_average < index + 1
+                  averageRating > index &&
+                  averageRating < index + 1
                 ) {
                   return <FaStarHalfAlt key={index} />;
                 } else {
@@ -254,7 +266,8 @@ const ProductPage = () => {
                 }
               })}
             </span>
-            <span className="rating-average">({product.rating_average})</span>
+            {/* Always show this number */}
+            <span className="rating-average">({averageRating})</span>
             <span className="review-count">
               {commentsList.length} Reviews ▼
             </span>
