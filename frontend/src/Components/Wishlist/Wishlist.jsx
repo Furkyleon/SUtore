@@ -71,6 +71,35 @@ const Wishlist = () => {
     return product ? product.price : "Product image unavailable";
   };
 
+  const removeFromWishlist = async (productId) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/wishlist/remove/", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(
+            `${localStorage.getItem("username")}:${localStorage.getItem(
+              "password"
+            )}`
+          )}`,
+        },
+        body: JSON.stringify({ product_id: productId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove product from wishlist.");
+      }
+
+      alert("Product removed from wishlist.");
+      // Update the wishlist state
+      setWishlist((prevWishlist) =>
+        prevWishlist.filter((item) => item.product !== productId)
+      );
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   if (loading)
     return <div className="wishlist-loading">Loading your wishlist...</div>;
   if (error) return <div className="wishlist-error">{error}</div>;
@@ -101,13 +130,20 @@ const Wishlist = () => {
                 </div>
               </Link>
 
-              <div className="wishlist-product-name">
+              <div className="wishlist-product-price">
                 {getProductPriceById(item.product) + " TL"}
               </div>
 
               <div className="wishlist-added-date">
                 Added on: {new Date(item.added_date).toLocaleDateString()}
               </div>
+
+              <button
+                className="wishlist-remove-button"
+                onClick={() => removeFromWishlist(item.product)}
+              >
+                Remove
+              </button>
             </li>
           ))}
         </ul>
