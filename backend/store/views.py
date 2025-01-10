@@ -1273,7 +1273,6 @@ def view_invoices(request):
     )
 
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def view_invoices_chart(request):
@@ -1302,7 +1301,7 @@ def view_invoices_chart(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Parse the dates safely
+    # Parse and validate the dates
     try:
         start_date = parse_datetime(start_date)
         end_date = parse_datetime(end_date)
@@ -1316,6 +1315,10 @@ def view_invoices_chart(request):
                 {"error": "'start_date' cannot be later than 'end_date'."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        # Make dates timezone-aware if they are naive
+        start_date = timezone.make_aware(start_date) if timezone.is_naive(start_date) else start_date
+        end_date = timezone.make_aware(end_date) if timezone.is_naive(end_date) else end_date
     except ValueError as e:
         return Response(
             {"error": f"Invalid date format: {str(e)}"},
@@ -1342,8 +1345,8 @@ def view_invoices_chart(request):
     current_date = start_date
     while current_date <= end_date:
         # Define the start and end of the current month
-        month_start = datetime(current_date.year, current_date.month, 1)
-        month_end = datetime(current_date.year, current_date.month + 1, 1) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1)
+        month_start = datetime(current_date.year, current_date.month, 1, tzinfo=current_date.tzinfo)
+        month_end = datetime(current_date.year, current_date.month + 1, 1, tzinfo=current_date.tzinfo) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1, tzinfo=current_date.tzinfo)
         
         # Ensure the month_end doesn't exceed the given end_date
         if month_end > end_date:
@@ -1358,57 +1361,56 @@ def view_invoices_chart(request):
         
         # Move to the next month
         if current_date.month == 12:
-            current_date = datetime(current_date.year + 1, 1, 1)
+            current_date = datetime(current_date.year + 1, 1, 1, tzinfo=current_date.tzinfo)
         else:
-            current_date = datetime(current_date.year, current_date.month + 1, 1)
+            current_date = datetime(current_date.year, current_date.month + 1, 1, tzinfo=current_date.tzinfo)
 
-    # Get the maximum revenue value to set as the max y-axis limit
-    max_revenue = max(discounted_revenue_per_month) if discounted_revenue_per_month else 0
-
-    # Generate a plot (chart) of discounted revenue (only one line for revenue)
+    # Generate the chart
+    plt.switch_backend('Agg')  # Ensure no GUI is used
     fig, ax = plt.subplots()
     ax.plot(months, discounted_revenue_per_month, label="Discounted Revenue", color='green')
 
-
-    ax.set_xlabel('Month', fontsize=10)  # Adjust font size of x-axis label
-    ax.set_ylabel('Discounted Revenue', fontsize=10)  # Adjust font size of y-axis label
+    ax.set_xlabel('Month', fontsize=10)
+    ax.set_ylabel('Discounted Revenue', fontsize=10)
     ax.set_title(f'Monthly Discounted Revenue from {start_date.strftime("%B %d, %Y")} to {end_date.strftime("%B %d, %Y")}', fontsize=12)
     ax.legend(fontsize=10)
 
+    # Set y-axis limit
+    ax.set_ylim(0, float(max(discounted_revenue_per_month)) * 1.1 if discounted_revenue_per_month else 1)
 
-    # Set the y-axis limit: Min is 0, max is the max revenue value
-    ax.set_ylim(0, float(max_revenue) * 1.1)  # Giving a bit of space above max value
+    # Adjust x-ticks to prevent overlap
+    plt.xticks(rotation=45, ha='right')
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    # Adjust x-tick labels to prevent overlap (rotate them)
-    plt.xticks(rotation=45, ha='right')  # Rotate the labels by 45 degrees and align them to the right
-
-    # Optionally, adjust x-ticks to a reasonable number
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Adjust to show all months without too much overlap
-
-    # Define the path where to save the image
-    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')  # Assuming you are using Django's MEDIA_ROOT
+    # Save the chart
+    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')
     if not os.path.exists(chart_dir):
         os.makedirs(chart_dir)
 
     chart_filename = f"discounted_revenue_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.png"
     chart_path = os.path.join(chart_dir, chart_filename)
 
-    # Save the plot to the file system
-     # Save the plot to the file system with bbox_inches='tight' to ensure everything is visible
-    plt.savefig(chart_path, format='png', bbox_inches='tight')
-    plt.close(fig)
-    # You can generate the chart URL for the frontend
-    chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
+    try:
+        plt.savefig(chart_path, format='png', bbox_inches='tight')
+        plt.close(fig)
+        print(f"Chart successfully saved at: {chart_path}")
+    except Exception as e:
+        print(f"Error saving chart: {str(e)}")
+        return Response({"error": "Failed to generate chart."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # Return the response with revenue data and chart URL
+    # Construct the chart URL
+    chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
+    print(f"Chart URL sent to frontend: {chart_url}")
+
+    # Return the response
     return Response(
         {
             "total_discounted_revenue": total_discounted_revenue,
-            "chart_url": chart_url,  # URL to the saved chart image
-
+            "chart_url": chart_url,
         },
         status=status.HTTP_200_OK
     )
+
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
