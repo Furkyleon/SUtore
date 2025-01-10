@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Ensure this is the correct path
 import "./DeleteProduct.css";
 
 const DeleteProductPage = () => {
@@ -7,6 +8,11 @@ const DeleteProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -28,6 +34,14 @@ const DeleteProductPage = () => {
 
     fetchProducts();
   }, []);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   const handleDeleteProduct = async (productId) => {
     const username = localStorage.getItem("username");
@@ -51,10 +65,11 @@ const DeleteProductPage = () => {
         prevProducts.filter((product) => product.id !== productId)
       );
 
-      alert("Product deleted successfully!");
+      showNotification("Product deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting product:", error);
       setDeleteError("There was an error deleting the product.");
+      showNotification("Error deleting product!", "error");
     }
   };
 
@@ -115,6 +130,13 @@ const DeleteProductPage = () => {
           )}
         </div>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

@@ -66,3 +66,31 @@
   color: #777;
   margin-right: 30px;
 }
+
+.wishlist-remove-button {
+  background-color: #ff4d4d; /* Vibrant red for a clear action */
+  color: white; /* Contrast text color */
+  border: none; /* Remove default border */
+  padding: 10px 15px; /* Comfortable padding */
+  font-size: 14px; /* Readable font size */
+  font-weight: bold; /* Bold text for emphasis */
+  border-radius: 5px; /* Rounded corners for a soft look */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+.wishlist-remove-button:hover {
+  background-color: #e63939; /* Slightly darker red on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}
+
+.wishlist-remove-button:active {
+  background-color: #cc3333; /* Even darker red on click */
+  transform: scale(0.95); /* Shrink effect on click */
+}
+
+.wishlist-remove-button:focus {
+  outline: none; /* Remove outline on focus */
+  box-shadow: 0 0 0 2px #ff9999; /* Add a subtle focus ring */
+}
+

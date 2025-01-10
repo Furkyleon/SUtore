@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./DiscountPage.css";
 
 const DiscountPage = () => {
@@ -7,9 +8,22 @@ const DiscountPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [discountInputs, setDiscountInputs] = useState({});
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortCriterion, setSortCriterion] = useState("name");
+
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -91,15 +105,18 @@ const DiscountPage = () => {
         [serialNumber]: data.discount_percentage || 0,
       }));
 
-      alert(
-        `Discount applied successfully: ${
-          data.product_name
-        } - ${data.discounted_price.toFixed(2)} TL`
+      showNotification(
+        `Discount applied successfully: ${data.product_name} - ${data.discounted_price.toFixed(
+          2
+        )} TL`,
+        "success"
       );
-      window.location.reload();
     } catch (error) {
       console.error("Error applying discount:", error);
-      alert(error.message || "There was an error applying the discount.");
+      showNotification(
+        error.message || "There was an error applying the discount.",
+        "error"
+      );
     }
   };
 
@@ -191,6 +208,13 @@ const DiscountPage = () => {
           )}
         </div>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };
