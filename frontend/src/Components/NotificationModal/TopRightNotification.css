@@ -1,0 +1,122 @@
+/* Default Notification Styling */
+.top-right-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  color: #333;
+  padding: 15px 20px;
+  border-left: 5px solid;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  margin-top: 50px;
+}
+
+.top-right-notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.top-right-notification.success {
+  border-left-color: #4caf50; /* Green border for success */
+}
+
+.top-right-notification.error {
+  border-left-color: #f44336; /* Red border for error */
+}
+
+.top-right-notification.warning {
+  border-left-color: #ff9800; /* Orange border for warning */
+}
+
+/* Close Button Styling */
+.close-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+/* Custom Styling for LoginForm Page */
+.custom-login-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(90deg, #01236a, #01236a);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensure proper spacing between elements */
+  gap: 20px; /* Increase spacing between the message and the button */
+  z-index: 1000;
+  width: fit-content; /* Ensure the notification only takes as much width as needed */
+  max-width: 300px; /* Prevent it from being too wide */
+  word-wrap: break-word; /* Handle longer messages gracefully */
+}
+
+.custom-logout-notification {
+  position: fixed;
+  top: 20px;
+  left: 20px; /* Align to the left */
+  right: auto; /* Remove the right alignment */
+  background: linear-gradient(90deg, #01236a, #01236a);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  z-index: 1000;
+  width: fit-content;
+  max-width: 300px;
+  word-wrap: break-word;
+  margin-top: 50px;
+}
+
+
+.custom-refund-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  color: #333;
+  padding: 10px 15px; /* Reduced padding */
+  border-left: 4px solid; /* Adjusted border size */
+  border-radius: 4px; /* Slightly reduced border-radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  margin-top: 50px;
+
+  width: fit-content;
+  max-width: 400px;
+  max-height: 75px;
+  word-wrap: break-word;
+  font-size: 14px; /* Slightly reduced font size */
+  line-height: 1.4; /* Adjusted line height for better compactness */
+}
+

@@ -7,6 +7,7 @@ import {
   FaRegHeart,
 } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./ProductPage.css";
 
 const ProductPage = () => {
@@ -17,17 +18,28 @@ const ProductPage = () => {
   const [commentsList, setCommentsList] = useState([]);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlist, setWishlist] = useState([]);
-
-  // NEW: We store average rating in its own state to avoid race conditions.
   const [averageRating, setAverageRating] = useState(0);
-
   const commentsRef = useRef(null);
+
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
 
   const username = localStorage.getItem("username");
   const password = localStorage.getItem("password");
   const role = localStorage.getItem("role");
 
   const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   const fetchProductDetails = async () => {
     try {
@@ -41,14 +53,12 @@ const ProductPage = () => {
 
       setProduct(selectedProduct || null);
 
-      // 2. Fetch the user’s wishlist to see if this product is already in it
       const wishlistResponse = await fetch("http://127.0.0.1:8000/wishlist/", {
         headers: { Authorization: authHeader },
       });
       const wishlistData = await wishlistResponse.json();
       setWishlist(wishlistData);
 
-      // Check if the current product is already in the wishlist
       if (selectedProduct) {
         setIsInWishlist(
           wishlistData.some((item) => item.product === selectedProduct.id)
@@ -56,10 +66,10 @@ const ProductPage = () => {
       }
     } catch (error) {
       console.error("Error fetching product or wishlist data:", error);
+      //showNotification("Failed to fetch product or wishlist data.", "error");
     }
   };
 
-  // Fetch product reviews
   const fetchReviews = async () => {
     try {
       const response = await fetch(
@@ -72,10 +82,10 @@ const ProductPage = () => {
       setCommentsList(data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      showNotification("Failed to fetch reviews.", "error");
     }
   };
 
-  // Fetch average rating
   const fetchRating = async () => {
     try {
       const response = await fetch(
@@ -85,21 +95,14 @@ const ProductPage = () => {
         throw new Error("Error fetching rating");
       }
       const data = await response.json();
-
-      // Keep the existing code so as not to remove anything:
-      setProduct((prev) =>
-        prev ? { ...prev, rating_average: data.average_rating || 0 } : null
-      );
-
-      // NEW: Also store it in a separate state so it’s never lost.
       setAverageRating(data.average_rating || 0);
     } catch (error) {
       console.error("Error fetching rating:", error);
+      showNotification("Failed to fetch product rating.", "error");
     }
   };
 
   useEffect(() => {
-    // Fetch product details, reviews, and rating on mount or when productId changes
     fetchProductDetails();
     fetchReviews();
     fetchRating();
@@ -127,68 +130,43 @@ const ProductPage = () => {
         throw new Error("Failed to update wishlist");
       }
       setIsInWishlist(!isInWishlist);
+      showNotification(
+        isInWishlist
+          ? "Product removed from wishlist."
+          : "Product added to wishlist.",
+        "success"
+      );
     } catch (error) {
       console.error("Error toggling wishlist:", error);
+      showNotification("Failed to update wishlist.", "error");
     }
   };
 
   const addToCart = (serialNumber) => {
-    if (username && username !== "null" && password && password !== "null") {
-      fetch("http://127.0.0.1:8000/cart/add/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
-        body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
+    fetch("http://127.0.0.1:8000/cart/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to add item to cart!");
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to add item to cart!");
-          return response.json();
-        })
-        .then(() => alert("Product added to cart successfully!"))
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
-        });
-    } else {
-      let myorderID = localStorage.getItem("order_id");
-      if (!myorderID || myorderID === "null") {
-        myorderID = 0;
-        localStorage.setItem("order_id", 0);
-      }
-
-      fetch("http://127.0.0.1:8000/cart/add/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          serial_number: serialNumber,
-          quantity: 1,
-          order_id: myorderID,
-        }),
+      .then(() => {
+        showNotification("Product added to cart successfully!", "success");
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to add item to cart!");
-          return response.json();
-        })
-        .then((data) => {
-          if (data.order_id) {
-            localStorage.setItem("order_id", data.order_id);
-          }
-          alert("Product added to cart successfully!");
-        })
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
-        });
-    }
+      .catch((error) => {
+        console.error("Error adding to cart:", error);
+        showNotification("There was an error adding the product to the cart.", "error");
+      });
   };
 
   const handleCommentSubmit = () => {
     if (!rating) {
-      alert("Please provide a rating.");
+      showNotification("Please provide a rating.", "warning");
       return;
     }
 
@@ -209,7 +187,7 @@ const ProductPage = () => {
         );
       })
       .then(() => {
-        alert("Your review has been submitted successfully.");
+        showNotification("Your review has been submitted successfully.", "success");
         fetchReviews();
         fetchRating();
         setComment("");
@@ -217,11 +195,10 @@ const ProductPage = () => {
       })
       .catch((error) => {
         console.error("Error submitting review:", error);
-        alert(error.message);
+        showNotification(error.message, "error");
       });
   };
 
-  // Scroll to comments section
   const scrollToComments = () => {
     commentsRef.current.scrollIntoView({ behavior: "smooth" });
   };
@@ -245,7 +222,6 @@ const ProductPage = () => {
           <h2 className="product-model">Product Model: {product.model}</h2>
           <p className="product-code">Serial Number: {product.serial_number}</p>
 
-          {/* RATING SECTION */}
           <div
             className="rating"
             onClick={scrollToComments}
@@ -253,7 +229,6 @@ const ProductPage = () => {
           >
             <span className="stars">
               {Array.from({ length: 5 }).map((_, index) => {
-                // Display based on the separate 'averageRating' state
                 if (averageRating >= index + 1) {
                   return <FaStar key={index} />;
                 } else if (
@@ -266,7 +241,6 @@ const ProductPage = () => {
                 }
               })}
             </span>
-            {/* Always show this number */}
             <span className="rating-average">({averageRating})</span>
             <span className="review-count">
               {commentsList.length} Reviews ▼
@@ -371,6 +345,13 @@ const ProductPage = () => {
           <button onClick={handleCommentSubmit}>Submit Comment</button>
         </div>
       </div>
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

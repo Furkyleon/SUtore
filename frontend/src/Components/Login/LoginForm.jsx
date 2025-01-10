@@ -2,12 +2,28 @@ import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import "./LoginForm.css";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Import TopRightNotification
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Notification state
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
@@ -34,12 +50,17 @@ const LoginForm = () => {
 
         console.log(username, password, responseData.user.role);
 
-        alert(`Welcome, ${responseData.user.username || "user"}!`);
-        navigate("/");
+        // Show welcome notification instead of alert
+        showNotification(`Welcome, ${responseData.user.username || "user"}!`, "success");
 
-        // giriş yapılan kullanıcının sepeti doluysa ?
+        // Delay navigation by 2 seconds
+        setTimeout(() => {
+          navigate("/");
+        }, 1200);
+
+        // Assign the cart to the logged-in user
         try {
-          const response = await fetch(
+          const cartResponse = await fetch(
             "http://127.0.0.1:8000/cart/assign_to_user/",
             {
               method: "POST",
@@ -57,24 +78,24 @@ const LoginForm = () => {
             }
           );
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.log("Error1");
+          if (!cartResponse.ok) {
+            const cartErrorData = await cartResponse.json();
+            console.log("Error assigning cart to user:", cartErrorData.error);
             return;
           }
 
-          const data = await response.json();
-          console.log("Order assigned successfully:", data);
+          const cartData = await cartResponse.json();
+          console.log("Order assigned successfully:", cartData);
         } catch (error) {
-          console.log("Error2");
+          console.log("Error assigning cart to user:", error);
         }
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || "Login failed");
+        showNotification(errorData.error || "Login failed. Please try again.", "error");
       }
     } catch (error) {
       console.error("Error during login:", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      showNotification("An unexpected error occurred. Please try again.", "error");
     }
   };
 
@@ -89,7 +110,7 @@ const LoginForm = () => {
           <h1>Login</h1>
           <div className="input-box">
             <input
-              type="username"
+              type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -116,6 +137,16 @@ const LoginForm = () => {
           </div>
         </form>
       </div>
+
+      {/* Top-Right Notification */}
+      <TopRightNotification
+      isOpen={notification.isOpen}
+      message={notification.message}
+      type={notification.type}
+      onClose={closeNotification}
+      customClass="custom-login-notification" // Add custom class
+    />
+
     </div>
   );
 };

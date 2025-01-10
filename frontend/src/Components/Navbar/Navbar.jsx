@@ -2,13 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdSearch } from "react-icons/io";
 import "./Navbar.css";
+import TopRightNotification from "../NotificationModal/TopRightNotification";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [categories, setCategories] = useState([]); // State to hold categories
+  const [categories, setCategories] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success",
+  });
 
   const sidebarRef = useRef(null);
   const sidebarRef2 = useRef(null);
@@ -49,12 +55,23 @@ const Navbar = () => {
     localStorage.setItem("password", null);
     localStorage.setItem("order_id", null);
     localStorage.setItem("role", null);
-    alert("You have been logged out.");
-    navigate("/");
-    setIsSidebarOpen2(false);
+
+    setNotification({
+      isOpen: true,
+      message: "You have been logged out.",
+      type: "success",
+    });
+
+    setTimeout(() => {
+      navigate("/");
+      setIsSidebarOpen2(false);
+    }, 2000);
   };
 
-  // Fetch categories from the backend
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -224,6 +241,15 @@ const Navbar = () => {
             )}
         </ul>
       </div>
+
+      {/* TopRightNotification */}
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+        customClass="custom-logout-notification"
+      />
     </div>
   );
 };

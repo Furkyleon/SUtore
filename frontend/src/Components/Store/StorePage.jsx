@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./StorePage.css";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Import new component
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
   const [sortCriterion, setSortCriterion] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // 'success' | 'error' | 'warning'
+  });
 
   const username = localStorage.getItem("username");
   const password = localStorage.getItem("password");
@@ -24,6 +30,15 @@ const StorePage = () => {
       .catch((error) => console.error("Fetch Error:", error));
   }, []);
 
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+  
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+  
+  
   const addToCart = (serialNumber) => {
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
@@ -40,15 +55,12 @@ const StorePage = () => {
           if (!response.ok) throw new Error("Failed to add item to cart!");
           return response.json();
         })
-        .then(() => alert("Product added to cart successfully!"))
-        .catch((error) => {
-          console.log("Username:", username, "Password:", password);
-
-          console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
+        .then(() => showNotification("Product added to cart successfully!", "success"))
+        .catch(() => {
+          showNotification("There was an error adding the product to the cart.", "error");
         });
     } else {
-      let myorderID = localStorage.getItem("order_id"); // Define the variable
+      let myorderID = localStorage.getItem("order_id");
 
       if (myorderID && myorderID === "null") {
         myorderID = 0;
@@ -60,7 +72,6 @@ const StorePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           serial_number: serialNumber,
           quantity: 1,
@@ -72,18 +83,14 @@ const StorePage = () => {
           return response.json();
         })
         .then((data) => {
-          // Save the order_id to localStorage
           if (data.order_id) {
             localStorage.setItem("order_id", data.order_id);
             console.log("Order ID saved locally.");
           }
-          alert("Product added to cart successfully!");
+          showNotification("Product added to cart successfully!", "success");
         })
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-          console.log(myorderID);
-          console.log("Username:");
-          alert("There was an error adding the product to the cart.");
+        .catch(() => {
+          showNotification("There was an error adding the product to the cart.", "error");
         });
     }
   };
@@ -182,6 +189,15 @@ const StorePage = () => {
           </div>
         ))}
       </div>
+
+      {/* Top-Right Notification */}
+      <TopRightNotification
+      isOpen={notification.isOpen}
+      message={notification.message}
+      type={notification.type}
+      onClose={closeNotification}
+    />
+
     </div>
   );
 };
