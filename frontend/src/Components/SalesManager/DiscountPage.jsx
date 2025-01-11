@@ -93,7 +93,7 @@ const DiscountPage = () => {
           product.serial_number === serialNumber
             ? {
                 ...product,
-                price: data.discounted_price || product.price,
+                price: product.price,
                 discount: data.discount_percentage || product.discount,
               }
             : product
@@ -106,9 +106,9 @@ const DiscountPage = () => {
       }));
 
       showNotification(
-        `Discount applied successfully: ${data.product_name} - ${data.discounted_price.toFixed(
-          2
-        )} TL`,
+        `Discount applied successfully: ${
+          data.product_name
+        } - ${data.discounted_price.toFixed(2)} TL`,
         "success"
       );
     } catch (error) {

@@ -11,7 +11,6 @@
 }
 
 .order-history-container p {
-  margin-bottom: 50px;
   text-align: center;
   font-size: 1.2rem;
   color: #666;
@@ -20,9 +19,9 @@
 .order-history-container h2 {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 40px;
+  margin-bottom: 25px;
   padding-top: 10px;
-  color: #333;
+  color: #01236a;
 }
 
 .order-history-container .order-list {

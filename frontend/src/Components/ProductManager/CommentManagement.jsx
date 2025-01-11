@@ -125,7 +125,6 @@ const ManageCommentsPage = () => {
 
       {loading && <p>Loading reviews...</p>}
       {error && <p className="error">{error}</p>}
-      {successMessage && <p className="success-message">{successMessage}</p>}
 
       {reviews.length > 0 && (
         <div className="reviews-list">
@@ -166,6 +165,7 @@ const ManageCommentsPage = () => {
           ))}
         </div>
       )}
+      {successMessage && <p className="success-message">{successMessage}</p>}
     </div>
   );
 };

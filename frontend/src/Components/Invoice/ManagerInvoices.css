@@ -58,15 +58,17 @@
 
 .manager-invoices-wrapper .no-invoices-message {
   text-align: center;
-  font-size: 1.2rem;
-  color: #ff5f5f;
+  font-size: 1.1rem;
+  color: red;
   margin-top: 20px;
+  font-weight: bold;
 }
 
 .manager-invoices-wrapper .invoices-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background: #ffffff;
 }
 
 .manager-invoices-wrapper .invoices-table th,
@@ -87,7 +89,7 @@
 }
 
 .manager-invoices-wrapper .invoices-table tr:hover {
-  background-color: #f1f1f1;
+  background-color: #fcfcfc;
 }
 
 .manager-invoices-wrapper .view-invoice-btn {

@@ -206,7 +206,8 @@ const AddProductPage = () => {
         </div>
         <div className="form-group">
           <label htmlFor="distributor_info">Distributor Info</label>
-          <textarea
+          <input
+            type="text"
             id="distributor_info"
             name="distributor_info"
             value={formData.distributor_info}

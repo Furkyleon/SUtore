@@ -1,7 +1,7 @@
 .profile-page-container {
   max-width: 400px;
   margin: 30px auto;
-  padding: 40px;
+  padding: 50px;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -10,15 +10,17 @@
 
 .profile-page-title {
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.8rem;
+  margin-top: -20px;
+  margin-bottom: 30px;
+  font-size: 2rem;
   color: #01236a;
 }
 
 .profile-page-message {
-  color: green;
+  color: blue;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  font-weight: bold;
 }
 
 .profile-page-form {
@@ -27,7 +29,7 @@
 }
 
 .profile-page-form-group {
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .profile-page-label {
@@ -50,7 +52,7 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: -10px;
+  margin-bottom: -20px;
 }
 
 .profile-page-submit-button:hover {

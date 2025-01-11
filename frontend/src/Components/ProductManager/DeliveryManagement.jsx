@@ -33,7 +33,9 @@ const DeliveryManagementPage = () => {
 
         if (!response.ok) {
           const data = await response.json();
-          setError(data.error || "An error occurred while fetching deliveries.");
+          setError(
+            data.error || "An error occurred while fetching deliveries."
+          );
           return;
         }
 
@@ -85,7 +87,11 @@ const DeliveryManagementPage = () => {
       setDeliveries((prev) =>
         prev.map((delivery) =>
           delivery.delivery_id === deliveryId
-            ? { ...delivery, status: newStatus || delivery.status, delivery_address: newAddress || delivery.delivery_address }
+            ? {
+                ...delivery,
+                status: newStatus || delivery.status,
+                delivery_address: newAddress || delivery.delivery_address,
+              }
             : delivery
         )
       );
@@ -94,6 +100,7 @@ const DeliveryManagementPage = () => {
       setSelectedDelivery(null);
       setNewStatus("");
       setNewAddress("");
+      window.location.reload();
     } catch (err) {
       setUpdateError("Failed to update delivery. Please try again.");
     }
@@ -135,13 +142,12 @@ const DeliveryManagementPage = () => {
                 <td>{delivery.delivery_address}</td>
                 <td>{delivery.status}</td>
                 <td>
-                <button
+                  <button
                     className="update-button"
                     onClick={() => setSelectedDelivery(delivery)}
-                >
+                  >
                     Update
-                </button>
-
+                  </button>
                 </td>
               </tr>
             ))}
@@ -155,7 +161,10 @@ const DeliveryManagementPage = () => {
           <p>Delivery ID: {selectedDelivery.delivery_id}</p>
           <label>
             New Status:
-            <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+            <select
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+            >
               <option value="">Select Status</option>
               <option value="Processing">Processing</option>
               <option value="In-transit">In-transit</option>
@@ -172,7 +181,9 @@ const DeliveryManagementPage = () => {
               placeholder="Enter new address"
             />
           </label>
-          <button onClick={() => handleUpdateDelivery(selectedDelivery.delivery_id)}>
+          <button
+            onClick={() => handleUpdateDelivery(selectedDelivery.delivery_id)}
+          >
             Submit
           </button>
           <button onClick={() => setSelectedDelivery(null)}>Cancel</button>

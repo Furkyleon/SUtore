@@ -130,33 +130,37 @@ const OrderHistory = () => {
   // Handle refund submission
   const handleRefundSubmit = (reason) => {
     const { productId, orderId } = refundModal;
-  
+
     fetch(`http://127.0.0.1:8000/order/itemsforrefund/${orderId}/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${btoa(
-          `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
+          `${localStorage.getItem("username")}:${localStorage.getItem(
+            "password"
+          )}`
         )}`,
       },
     })
       .then((response) => response.json())
       .then((orderItems) => {
         const orderItem = orderItems.find((item) => item.product === productId);
-  
+
         if (!orderItem) {
           showNotification("Error: Order item not found.", "error");
           return;
         }
-  
+
         const orderItemId = orderItem.id;
-  
+
         fetch("http://127.0.0.1:8000/request-refund/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Basic ${btoa(
-              `${localStorage.getItem("username")}:${localStorage.getItem("password")}`
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
             )}`,
           },
           body: JSON.stringify({ order_item_id: orderItemId, reason }),
@@ -166,7 +170,10 @@ const OrderHistory = () => {
             if (data.error) {
               showNotification(`Error: ${data.error}`, "error");
             } else {
-              showNotification("Refund request submitted successfully.", "success");
+              showNotification(
+                "Refund request submitted successfully.",
+                "success"
+              );
             }
           })
           .catch((error) => {
@@ -178,10 +185,9 @@ const OrderHistory = () => {
         console.error("Error fetching order items:", error);
         showNotification("Failed to retrieve order items.", "error");
       });
-  
+
     closeRefundModal();
   };
-  
 
   return (
     <div className="order-history-container">
@@ -272,14 +278,12 @@ const OrderHistory = () => {
         onSubmit={handleRefundSubmit}
       />
 
-
       <TopRightNotification
         isOpen={notification.isOpen}
         message={notification.message}
         type={notification.type}
         onClose={closeNotification}
       />
-
     </div>
   );
 };
