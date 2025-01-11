@@ -348,7 +348,7 @@ class RefundRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     reason = models.TextField(blank=True, null=True)
 
-    def str(self):
+    def __str__(self):
         return f"Refund request {self.id} by {self.customer.username}"
 
 class Delivery(models.Model):
@@ -378,5 +378,5 @@ class Delivery(models.Model):
         self.total_price = Decimal(self.order_item.quantity) * Decimal(self.order_item.product.price)
         self.save()
 
-    def _str_(self):
+    def __str__(self):
         return f"Delivery {self.id} for {self.order_item.product.name} - {self.status}"
