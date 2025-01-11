@@ -268,6 +268,7 @@ class OrderItem(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    is_refunded = models.BooleanField(default=False, null=True)
 
     def str(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"

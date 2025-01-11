@@ -1115,6 +1115,17 @@ def apply_discount(request):
     product.discount_price = discount_price
     product.save()
 
+    # Update prices in incomplete orders (orders that are not marked as complete)
+    incomplete_orders = Order.objects.filter(complete=False)
+
+    for order in incomplete_orders:
+        order_items = OrderItem.objects.filter(order=order, product=product)
+        for order_item in order_items:
+            # Update the price in the order item
+            order_item.price_discount = discount_price
+            order_item.discount_subtotal = order_item.quantity * discount_price
+            order_item.save()
+
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
     
@@ -1520,6 +1531,8 @@ def review_refund_request(request):
 
             # Simulate refund logic here (e.g., refund the amount to customer's payment gateway)
             refund_amount = order_item.discount_subtotal
+            order_item.is_refunded = True
+            order_item.save()
             
             # Add logic to refund the amount to customer's payment system, if needed.
 
