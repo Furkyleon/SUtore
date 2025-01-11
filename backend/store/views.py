@@ -491,13 +491,15 @@ def add_to_cart(request):
         
         
         order_item.quantity += quantity
+        order_item.price_discount = discount_price if discount_price is not None else price
         order_item.subtotal = price * order_item.quantity
-        order_item.discount_subtotal = discount_price * order_item.quantity
+        order_item.discount_subtotal = order_item.price_discount * order_item.quantity
         order_item.save()
     else:
         # Set subtotal for a new item
+        order_item.price_discount = discount_price if discount_price is not None else price
         order_item.subtotal = price * order_item.quantity
-        order_item.discount_subtotal = discount_price * order_item.quantity
+        order_item.discount_subtotal = order_item.price_discount * order_item.quantity
         order_item.save()
 
     # Optionally return the order ID and order item details
@@ -542,7 +544,7 @@ def update_cart_item(request):
         # Update the quantity and subtotal
         order_item.quantity = new_quantity
         order_item.subtotal = new_quantity * product.price
-        order_item.discount_subtotal = new_quantity * product.discount_price
+        order_item.discount_subtotal = new_quantity * order_item.price_discount
         order_item.save()
 
         # Return the updated order item
@@ -726,6 +728,7 @@ def order_history(request):
                         "product": item.product.name,
                         "quantity": item.quantity,
                         "price": str(item.price),
+                        "price_discount": str(item.price_discount),
                         "subtotal": str(item.subtotal),
                         "discount_subtotal": str(item.discount_subtotal),
                         "date_added": item.date_added
@@ -1580,6 +1583,12 @@ def cancel_order(request, order_id):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
+        # Update product stock
+        for item in order.order_items.all():
+            if item.product:  # Ensure product exists (not null)
+                item.product.stock += item.quantity
+                item.product.save()
+                
         # Mark the order as cancelled
         order.status = 'Cancelled'
         order.save()
@@ -1787,3 +1796,35 @@ def update_delivery_status(request, delivery_id):
             "updated_at": delivery.updated_at,
         }
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_items(request, order_item_id):
+    """
+    Retrieve details of a specific OrderItem.
+    This endpoint does not require authentication.
+    """
+    try:
+        # Fetch the order item
+        order_item = OrderItem.objects.get(id=order_item_id)
+
+        # Serialize the order item details
+        order_item_data = {
+            "id": order_item.id,
+            "product_name": order_item.product.name if order_item.product else "Product Unavailable",
+            "quantity": order_item.quantity,
+            "price": str(order_item.price),
+            "price_discount": str(order_item.price_discount),
+            "subtotal": str(order_item.subtotal),
+            "discount_subtotal": str(order_item.discount_subtotal),
+            "date_added": order_item.date_added,
+            "order_status": order_item.order.status,
+        }
+
+        return Response(order_item_data, status=status.HTTP_200_OK)
+
+    except OrderItem.DoesNotExist:
+        return Response(
+            {"error": "Order item not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
