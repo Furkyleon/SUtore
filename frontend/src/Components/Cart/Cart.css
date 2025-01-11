@@ -36,7 +36,7 @@
 
 .cart-container-wrapper .cart-item {
   display: grid;
-  grid-template-columns: 2fr 1.4fr 2fr 2fr 0.5fr;
+  grid-template-columns: 1.5fr 2fr 1fr 1.5fr 1.5fr 0.6fr;
   align-items: center;
   padding: 10px 15px;
   border-bottom: 1px solid #ddd;
@@ -46,8 +46,28 @@
   transition: box-shadow 0.2s ease;
 }
 
+.cart-item .item-image {
+  grid-column: 1 / 2;
+}
+
+.cart-item .item-name {
+  grid-column: 2 / 3;
+}
+
+.cart-item .item-quantity {
+  grid-column: 3 / 4;
+}
+
 .cart-container-wrapper .cart-item:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Hover effect for items */
+}
+
+.cart-container-wrapper .cart-item .product-image {
+  margin-left: 20px;
+  width: 50%;
+  max-width: 200px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .cart-container-wrapper .cart-item .item-name {
@@ -97,27 +117,54 @@
   cursor: not-allowed;
 }
 
-.cart-container-wrapper .cart-item .item-price,
+.cart-container-wrapper .cart-item .item-price {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.cart-container-wrapper .cart-item .item-price .price-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-container-wrapper .cart-item .item-price .original-price {
+  margin-right: 5px;
+  text-decoration: line-through;
+  color: gray;
+}
+
+.cart-container-wrapper .cart-item .item-price .original-price2 {
+  color: black;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.cart-container-wrapper .cart-item .item-price .discounted-price {
+  margin-top: 5px;
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
 .cart-container-wrapper .cart-item .item-subtotal {
-  margin-left: -20px;
-  text-align: right;
   font-size: 1.1rem;
   color: #555;
 }
 
 .cart-container-wrapper .cart-item .delete-button {
-  margin-top: 5px;
+  margin-top: 2px;
   justify-self: center;
   background: none;
   border: none;
   cursor: pointer;
-  color: #ff9800;
-  font-size: 1.5rem;
+  color: #ff3700;
+  font-size: 1.7rem;
   transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .cart-container-wrapper .cart-item .delete-button:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
   color: #b06900;
 }
 

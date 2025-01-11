@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { FaTrash } from "react-icons/fa";
 import "./Wishlist.css";
 import TopRightNotification from "../NotificationModal/TopRightNotification";
 import ConfirmationModal from "../ConfirmationModal/ConfirmationModal";
@@ -116,6 +117,27 @@ const Wishlist = () => {
     return products.find((p) => p.id === productId) || {};
   };
 
+  const getProductPriceById = (productId) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return "Price unavailable";
+
+    const { price, discount } = product;
+    if (discount && discount > 0) {
+      const discountedPrice = (price * (1 - discount / 100)).toFixed(2);
+      return (
+        <div className="price-container">
+          <span className="original-price">{price.toFixed(2)} TL</span>
+          <span className="discounted-price">{discountedPrice} TL</span>
+        </div>
+      );
+    }
+    return (
+      <div className="price-container">
+        <span className="original-price2">{price.toFixed(2)} TL</span>
+      </div>
+    );
+  };
+
   if (loading) return <div className="wishlist-loading">Loading...</div>;
   if (error) return <div className="wishlist-error">{error}</div>;
 
@@ -148,7 +170,7 @@ const Wishlist = () => {
                 </Link>
 
                 <div className="wishlist-product-price">
-                  {product.price ? `${product.price} TL` : "Price unavailable"}
+                  {getProductPriceById(item.product)}
                 </div>
 
                 <div className="wishlist-added-date">
@@ -159,7 +181,7 @@ const Wishlist = () => {
                   className="wishlist-remove-button"
                   onClick={() => openConfirmationModal(item.product)}
                 >
-                  Remove
+                  <FaTrash />
                 </button>
               </li>
             );

@@ -727,6 +727,7 @@ def order_history(request):
                         "quantity": item.quantity,
                         "price": str(item.price),
                         "subtotal": str(item.subtotal),
+                        "discount_subtotal": str(item.discount_subtotal),
                         "date_added": item.date_added
                     }
                     for item in order.order_items.all()
@@ -1119,7 +1120,7 @@ def apply_discount(request):
             if entry.user.email:  # Ensure email exists before sending
                 try:
                     # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
-                    product_url = f'http://127.0.0.1:8000/product/{product.id}'
+                    product_url = f'http://localhost:3000/product/{product.id}'
 
                     # Render the email content (HTML)
                     html_message = render_to_string('discount_notification.html', {

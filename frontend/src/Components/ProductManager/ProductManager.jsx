@@ -79,7 +79,7 @@ const ProductManager = () => {
         <div className="section">
           <h2>Deliveries</h2>
           <button className="action-button" onClick={handleDeliveries}>
-            View Products to be Delivered
+            View Deliveries
           </button>
         </div>
       </div>

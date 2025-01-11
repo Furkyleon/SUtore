@@ -201,13 +201,17 @@ const OrderHistory = () => {
                 <span className="order-total">
                   Order Total:{" "}
                   {order.items
-                    .reduce(
-                      (total, item) => total + parseFloat(item.subtotal),
-                      0
-                    )
+                    .reduce((total, item) => {
+                      // Use discount_subtotal if available; otherwise, fallback to subtotal
+                      const itemTotal = parseFloat(
+                        item.discount_subtotal || item.subtotal
+                      );
+                      return total + itemTotal;
+                    }, 0)
                     .toFixed(2)}{" "}
                   TL
                 </span>
+
                 <button
                   className="view-invoice-button"
                   onClick={() => viewInvoice(order.order_id)}
@@ -231,7 +235,11 @@ const OrderHistory = () => {
                       Quantity: {item.quantity}
                     </span>
                     <span className="item-price">
-                      Total: {item.subtotal} TL
+                      Total:{" "}
+                      {parseFloat(
+                        item.discount_subtotal || item.subtotal
+                      ).toFixed(2)}{" "}
+                      TL
                     </span>
                     <button
                       className="refund-button"
