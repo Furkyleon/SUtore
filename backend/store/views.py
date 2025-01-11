@@ -113,7 +113,6 @@ def register(request):
 
 
 
-
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
@@ -172,6 +171,7 @@ def add_product(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_product(request, product_id):
@@ -215,6 +215,7 @@ def add_category(request):
         return Response(CategorySerializer(category).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_category(request, category_name):
@@ -229,6 +230,7 @@ def delete_category(request, category_name):
     except Category.DoesNotExist:
         return Response({"error": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 def get_categories(request):
     """Retrieve all categories."""
@@ -240,21 +242,24 @@ def get_categories(request):
 @api_view(['GET'])
 def get_products_by_category(request, category_name):
     """Retrieve products by category name."""
-    # Check if the category exists in the Category model
-    if not Category.objects.filter(name=category_name).exists():
+    try:
+        # Fetch the Category object
+        category = Category.objects.get(name=category_name)
+
+        # Filter products by the category ID
+        products = Product.objects.filter(category=category)
+
+        if not products.exists():
+            return Response({'error': 'No products found in this category.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize and return the products
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Category.DoesNotExist:
         return Response({'error': 'Category does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-
-    # Filter products by category
-    products = Product.objects.filter(category=category_name)
-
-    if not products.exists():
-        # Return error if no products found in the category
-        return Response({'error': 'No products found in this category.'}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ProductSerializer(products, many=True)  # Serialize the queryset
-    
-    # Return serialized data
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -486,13 +491,15 @@ def add_to_cart(request):
         
         
         order_item.quantity += quantity
+        order_item.price_discount = discount_price if discount_price is not None else price
         order_item.subtotal = price * order_item.quantity
-        order_item.discount_subtotal = discount_price * order_item.quantity
+        order_item.discount_subtotal = order_item.price_discount * order_item.quantity
         order_item.save()
     else:
         # Set subtotal for a new item
+        order_item.price_discount = discount_price if discount_price is not None else price
         order_item.subtotal = price * order_item.quantity
-        order_item.discount_subtotal = discount_price * order_item.quantity
+        order_item.discount_subtotal = order_item.price_discount * order_item.quantity
         order_item.save()
 
     # Optionally return the order ID and order item details
@@ -537,7 +544,7 @@ def update_cart_item(request):
         # Update the quantity and subtotal
         order_item.quantity = new_quantity
         order_item.subtotal = new_quantity * product.price
-        order_item.discount_subtotal = new_quantity * product.discount_price
+        order_item.discount_subtotal = new_quantity * order_item.price_discount
         order_item.save()
 
         # Return the updated order item
@@ -608,7 +615,6 @@ def assign_user_to_order(request):
 def get_order_items(request, order_id):
     if not request.user.is_authenticated:
         try:
-           
             order = Order.objects.get(id=order_id)
             order_items = order.order_items.all()
             serializer = OrderItemSerializer(order_items, many=True)
@@ -618,12 +624,24 @@ def get_order_items(request, order_id):
 
     # Retrieve the active order for the customer
     try:
-        order = Order.objects.get(customer=request.user)
+        order = Order.objects.get(customer=request.user, complete=False)
         order_items = order.order_items.all()
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_order_items_for_refund(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, customer=request.user)
+        order_items = order.order_items.all() 
+        serializer = OrderItemSerializer(order_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -684,6 +702,7 @@ def get_order(request):
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 def order_history(request):
     if not request.user.is_authenticated:
@@ -709,7 +728,9 @@ def order_history(request):
                         "product": item.product.name,
                         "quantity": item.quantity,
                         "price": str(item.price),
+                        "price_discount": str(item.price_discount),
                         "subtotal": str(item.subtotal),
+                        "discount_subtotal": str(item.discount_subtotal),
                         "date_added": item.date_added
                     }
                     for item in order.order_items.all()
@@ -841,6 +862,7 @@ def checkout(request):
     except Exception as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_review(request, product_id):
@@ -879,6 +901,30 @@ def get_reviews_by_product(request, product_id):
     
     # Filter reviews by product
     reviews = Review.objects.filter(product=product, comment_status= "Approved")
+    
+    # Serialize the reviews
+    serializer = ReviewSerializer(reviews, many=True)
+
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_comments_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Filter reviews by product
+    reviews = Review.objects.filter(product=product, comment_status= "Pending")
     
     # Serialize the reviews
     serializer = ReviewSerializer(reviews, many=True)
@@ -940,6 +986,8 @@ def update_review_comment_status(request, review_id, new_status):
     review.save()
 
     return Response({"message": f"Comment status updated to {new_status} successfully."}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_wishlist(request):
@@ -1067,48 +1115,53 @@ def apply_discount(request):
     product.discount_price = discount_price
     product.save()
 
+    # Update prices in incomplete orders (orders that are not marked as complete)
+    incomplete_orders = Order.objects.filter(complete=False)
+
+    for order in incomplete_orders:
+        order_items = OrderItem.objects.filter(order=order, product=product)
+        for order_item in order_items:
+            # Update the price in the order item
+            order_item.price_discount = discount_price
+            order_item.discount_subtotal = order_item.quantity * discount_price
+            order_item.save()
+
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
     
-    if not wishlist_entries.exists():
-        return Response(
-            {"error": "No users found with this product in their wishlist."},
-            status=status.HTTP_404_NOT_FOUND
-        )
+    if wishlist_entries.exists():
+        for entry in wishlist_entries:
+            if entry.user.email:  # Ensure email exists before sending
+                try:
+                    # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
+                    product_url = f'http://localhost:3000/product/{product.id}'
 
-    for entry in wishlist_entries:
-        if entry.user.email:  # Ensure email exists before sending
-            try:
-                # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
-                product_url = f'http://127.0.0.1:8000/product/{product.id}'
+                    # Render the email content (HTML)
+                    html_message = render_to_string('discount_notification.html', {
+                        'user': entry.user,
+                        'username': entry.user.username,
+                        'product': product,
+                        'discount_percentage': discount_percentage,
+                        'product_url': product_url,  # Add the product link to context
+                    })
+                    plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
+                    
+                    email = EmailMessage(
+                        subject=f"Discount Alert for '{product.name}'!",
+                        body=plain_text_content,  # Plain text version of the email
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=[entry.user.email],
+                    )
+                    
+                    # Attach HTML message for email clients that support HTML
+                    email.content_subtype = "html"
+                    email.body = html_message
 
-                # Render the email content (HTML)
-                html_message = render_to_string('discount_notification.html', {
-                    'user': entry.user,
-                    'username': entry.user.username,
-                    'product': product,
-                    'discount_percentage': discount_percentage,
-                    'product_url': product_url,  # Add the product link to context
-                })
-                plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
-                
-                email = EmailMessage(
-                    subject=f"Discount Alert for '{product.name}'!",
-                    body=plain_text_content,  # Plain text version of the email
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[entry.user.email],
-                )
-                
-                # Attach HTML message for email clients that support HTML
-                email.content_subtype = "html"
-                email.body = html_message
+                    # Send the email
+                    email.send(fail_silently=False)
 
-                # Send the email
-                email.send(fail_silently=False)
-
-            except Exception as e:
-                print(f"Could not send email to {entry.user.email}: {e}")
-
+                except Exception as e:
+                    print(f"Could not send email to {entry.user.email}: {e}")
 
     # Send success response
     return Response(
@@ -1158,9 +1211,6 @@ def update_product_stock(request):
         return Response({'error': 'Invalid stock value.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_invoices(request):
@@ -1177,9 +1227,9 @@ def view_invoices(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # Extract query parameters for date range
-    start_date = request.data.get('start_date')
-    end_date = request.data.get('end_date')
+    # Extract query parameters for date range using GET
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
     # Validate presence of both parameters
     if not start_date or not end_date:
@@ -1225,7 +1275,8 @@ def view_invoices(request):
             "date": invoice.date,
             "total_amount": float(invoice.total_amount),
             "discounted_total": float(invoice.discounted_total),
-            "pdf_url": invoice.url if invoice.url else "PDF not found"
+            "pdf_url": request.build_absolute_uri(invoice.url) if invoice.url else "PDF not found"
+
         }
         for invoice in invoices
     ]
@@ -1237,7 +1288,7 @@ def view_invoices(request):
     )
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def view_invoices_chart(request):
     """
@@ -1265,7 +1316,7 @@ def view_invoices_chart(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Parse the dates safely
+    # Parse and validate the dates
     try:
         start_date = parse_datetime(start_date)
         end_date = parse_datetime(end_date)
@@ -1279,6 +1330,10 @@ def view_invoices_chart(request):
                 {"error": "'start_date' cannot be later than 'end_date'."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        # Make dates timezone-aware if they are naive
+        start_date = timezone.make_aware(start_date) if timezone.is_naive(start_date) else start_date
+        end_date = timezone.make_aware(end_date) if timezone.is_naive(end_date) else end_date
     except ValueError as e:
         return Response(
             {"error": f"Invalid date format: {str(e)}"},
@@ -1305,8 +1360,8 @@ def view_invoices_chart(request):
     current_date = start_date
     while current_date <= end_date:
         # Define the start and end of the current month
-        month_start = datetime(current_date.year, current_date.month, 1)
-        month_end = datetime(current_date.year, current_date.month + 1, 1) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1)
+        month_start = datetime(current_date.year, current_date.month, 1, tzinfo=current_date.tzinfo)
+        month_end = datetime(current_date.year, current_date.month + 1, 1, tzinfo=current_date.tzinfo) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1, tzinfo=current_date.tzinfo)
         
         # Ensure the month_end doesn't exceed the given end_date
         if month_end > end_date:
@@ -1321,58 +1376,56 @@ def view_invoices_chart(request):
         
         # Move to the next month
         if current_date.month == 12:
-            current_date = datetime(current_date.year + 1, 1, 1)
+            current_date = datetime(current_date.year + 1, 1, 1, tzinfo=current_date.tzinfo)
         else:
-            current_date = datetime(current_date.year, current_date.month + 1, 1)
+            current_date = datetime(current_date.year, current_date.month + 1, 1, tzinfo=current_date.tzinfo)
 
-    # Get the maximum revenue value to set as the max y-axis limit
-    max_revenue = max(discounted_revenue_per_month) if discounted_revenue_per_month else 0
-
-    # Generate a plot (chart) of discounted revenue (only one line for revenue)
+    # Generate the chart
+    plt.switch_backend('Agg')  # Ensure no GUI is used
     fig, ax = plt.subplots()
     ax.plot(months, discounted_revenue_per_month, label="Discounted Revenue", color='green')
 
-
-    ax.set_xlabel('Month', fontsize=10)  # Adjust font size of x-axis label
-    ax.set_ylabel('Discounted Revenue', fontsize=10)  # Adjust font size of y-axis label
+    ax.set_xlabel('Month', fontsize=10)
+    ax.set_ylabel('Discounted Revenue', fontsize=10)
     ax.set_title(f'Monthly Discounted Revenue from {start_date.strftime("%B %d, %Y")} to {end_date.strftime("%B %d, %Y")}', fontsize=12)
     ax.legend(fontsize=10)
 
+    # Set y-axis limit
+    ax.set_ylim(0, float(max(discounted_revenue_per_month)) * 1.1 if discounted_revenue_per_month else 1)
 
-    # Set the y-axis limit: Min is 0, max is the max revenue value
-    ax.set_ylim(0, float(max_revenue) * 1.1)  # Giving a bit of space above max value
+    # Adjust x-ticks to prevent overlap
+    plt.xticks(rotation=45, ha='right')
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    # Adjust x-tick labels to prevent overlap (rotate them)
-    plt.xticks(rotation=45, ha='right')  # Rotate the labels by 45 degrees and align them to the right
-
-    # Optionally, adjust x-ticks to a reasonable number
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Adjust to show all months without too much overlap
-
-    # Define the path where to save the image
-    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')  # Assuming you are using Django's MEDIA_ROOT
+    # Save the chart
+    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')
     if not os.path.exists(chart_dir):
         os.makedirs(chart_dir)
 
     chart_filename = f"discounted_revenue_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.png"
     chart_path = os.path.join(chart_dir, chart_filename)
 
-    # Save the plot to the file system
-     # Save the plot to the file system with bbox_inches='tight' to ensure everything is visible
-    plt.savefig(chart_path, format='png', bbox_inches='tight')
-    plt.close(fig)
-    # You can generate the chart URL for the frontend
-    chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
+    try:
+        plt.savefig(chart_path, format='png', bbox_inches='tight')
+        plt.close(fig)
+        print(f"Chart successfully saved at: {chart_path}")
+    except Exception as e:
+        print(f"Error saving chart: {str(e)}")
+        return Response({"error": "Failed to generate chart."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # Return the response with revenue data and chart URL
+    # Construct the chart URL
+    chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
+    print(f"Chart URL sent to frontend: {chart_url}")
+
+    # Return the response
     return Response(
         {
             "total_discounted_revenue": total_discounted_revenue,
-            "chart_url": chart_url,  # URL to the saved chart image
-
+            "chart_url": chart_url,
         },
         status=status.HTTP_200_OK
     )
-    
+
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1381,14 +1434,17 @@ def request_refund(request):
     Customer can request a refund for a purchased product within 30 days.
     """
     user = request.user
+
+    """
     # Ensure the user is a Customer
     if user.role != 'customer':
         return Response(
             {"error": "You do not have permission to view this data."},
             status=status.HTTP_403_FORBIDDEN)
-    
-    
+    """
+
     order_item_id = request.data.get("order_item_id")
+    print(order_item_id)
     reason = request.data.get("reason", "")
     
     # Ensure order_item_id is provided
@@ -1399,6 +1455,8 @@ def request_refund(request):
         # Fetch the order item
     
         order_item = OrderItem.objects.get(id=order_item_id)
+        print(order_item)
+        print(order_item.order.status)
         
         # Check if the order status is 'Delivered'
         if order_item.order.status != 'Delivered':
@@ -1442,8 +1500,8 @@ def review_refund_request(request):
     Sales Manager can approve/reject refund requests.
     """
     user = request.user
-    if user.role != "sales_manager":
-        return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+    """if user.role != "sales_manager":
+        return Response({"error": "You don't have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)"""
 
     refund_request_id = request.data.get("refund_request_id")
     decision = request.data.get("decision")  # Accept/Reject
@@ -1473,6 +1531,8 @@ def review_refund_request(request):
 
             # Simulate refund logic here (e.g., refund the amount to customer's payment gateway)
             refund_amount = order_item.discount_subtotal
+            order_item.is_refunded = True
+            order_item.save()
             
             # Add logic to refund the amount to customer's payment system, if needed.
 
@@ -1491,17 +1551,21 @@ def review_refund_request(request):
     except RefundRequest.DoesNotExist:
         return Response({"error": "Refund request not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_pending_refund_requests(request):
     user = request.user
 
     # Ensure the user is a sales manager
-    if not user.role == 'sales_manager':
+    """ if not user.role == 'sales_manager':
         return Response(
             {"error": "You do not have permission to view refund requests."},
             status=status.HTTP_403_FORBIDDEN
         )
+    """
+
+    print(user.role)
     
     # Retrieve only pending refund requests
     pending_requests = RefundRequest.objects.filter(status='Pending')
@@ -1510,6 +1574,7 @@ def get_pending_refund_requests(request):
     serializer = RefundRequestSerializer(pending_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1527,10 +1592,16 @@ def cancel_order(request, order_id):
             ) 
             else:
                 return Response(
-                    {"error": "Completed orders cannot be cancelled."},
+                    {"error": "Orders that have been shipped or delivered cannot be cancelled."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
+        # Update product stock
+        for item in order.order_items.all():
+            if item.product:  # Ensure product exists (not null)
+                item.product.stock += item.quantity
+                item.product.save()
+                
         # Mark the order as cancelled
         order.status = 'Cancelled'
         order.save()
@@ -1545,7 +1616,8 @@ def cancel_order(request, order_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
-@api_view(['PATCH'])
+
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def manage_stock(request, product_id):
     """API for product managers to update product stock."""
@@ -1563,6 +1635,7 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -1598,6 +1671,7 @@ def get_all_deliveries(request):
 
     return Response(serialized_deliveries, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def calculate_revenue(request):
@@ -1616,8 +1690,6 @@ def calculate_revenue(request):
     try:
         start_date = parse_datetime(start_date)
         end_date = parse_datetime(end_date)
-
-
 
         if not start_date or not end_date:
             raise ValueError("Invalid date format.")
@@ -1737,3 +1809,35 @@ def update_delivery_status(request, delivery_id):
             "updated_at": delivery.updated_at,
         }
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_items(request, order_item_id):
+    """
+    Retrieve details of a specific OrderItem.
+    This endpoint does not require authentication.
+    """
+    try:
+        # Fetch the order item
+        order_item = OrderItem.objects.get(id=order_item_id)
+
+        # Serialize the order item details
+        order_item_data = {
+            "id": order_item.id,
+            "product_name": order_item.product.name if order_item.product else "Product Unavailable",
+            "quantity": order_item.quantity,
+            "price": str(order_item.price),
+            "price_discount": str(order_item.price_discount),
+            "subtotal": str(order_item.subtotal),
+            "discount_subtotal": str(order_item.discount_subtotal),
+            "date_added": order_item.date_added,
+            "order_status": order_item.order.status,
+        }
+
+        return Response(order_item_data, status=status.HTTP_200_OK)
+
+    except OrderItem.DoesNotExist:
+        return Response(
+            {"error": "Order item not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )

@@ -1,0 +1,109 @@
+.manager-invoices-wrapper {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  margin-top: 70px;
+}
+
+.manager-invoices-wrapper h1 {
+  text-align: center;
+  font-size: 2rem;
+  color: #01236a;
+  margin-bottom: 20px;
+}
+
+.manager-invoices-wrapper .date-input-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.manager-invoices-wrapper .date-input-section label {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 10px;
+  color: #333;
+}
+
+.manager-invoices-wrapper .date-input-section input {
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.manager-invoices-wrapper .fetch-invoices-btn {
+  padding: 10px 20px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.manager-invoices-wrapper .fetch-invoices-btn:hover {
+  background-color: #01236a;
+  transform: scale(1.05);
+}
+
+.manager-invoices-wrapper .error-message {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.manager-invoices-wrapper .no-invoices-message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: red;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.manager-invoices-wrapper .invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #ffffff;
+}
+
+.manager-invoices-wrapper .invoices-table th,
+.manager-invoices-wrapper .invoices-table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 8px;
+}
+
+.manager-invoices-wrapper .invoices-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #01236a;
+}
+
+.manager-invoices-wrapper .invoices-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.manager-invoices-wrapper .invoices-table tr:hover {
+  background-color: #fcfcfc;
+}
+
+.manager-invoices-wrapper .view-invoice-btn {
+  padding: 6px 12px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.manager-invoices-wrapper .view-invoice-btn:hover {
+  background-color: #01236a;
+  transform: scale(1.05);
+}

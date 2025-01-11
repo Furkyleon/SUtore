@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification";
+import ConfirmationModal from "../ConfirmationModal/ConfirmationModal";
+import RefundReasonModal from "./RefundReasonModal";
 import "./OrderHistory.css";
 
 const OrderHistory = () => {
@@ -7,6 +10,20 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success",
+  });
+  const [confirmation, setConfirmation] = useState({
+    isOpen: false,
+    productId: null,
+  });
+  const [refundModal, setRefundModal] = useState({
+    isOpen: false,
+    productId: null,
+    orderId: null,
+  });
 
   // Fetch order history when the component mounts
   useEffect(() => {
@@ -36,9 +53,40 @@ const OrderHistory = () => {
       });
   }, []);
 
-  // Cancel an order
+  // Show notification
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+
+  // Open and close confirmation modal
+  const openConfirmationModal = (productId) => {
+    setConfirmation({ isOpen: true, productId });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmation({ isOpen: false, productId: null });
+  };
+
+  // Open and close refund modal
+  const openRefundModal = (productId, orderId) => {
+    setRefundModal({ isOpen: true, productId, orderId });
+  };
+
+  const closeRefundModal = () => {
+    setRefundModal({ isOpen: false, productId: null, orderId: null });
+  };
+
+  // Handle order cancellation
   const cancelOrder = (orderId) => {
-    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    openConfirmationModal(orderId);
+  };
+
+  const handleConfirmCancel = () => {
+    const orderId = confirmation.productId;
 
     fetch(`http://127.0.0.1:8000/order/cancel/${orderId}/`, {
       method: "POST",
@@ -53,9 +101,9 @@ const OrderHistory = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert(`Error: ${data.error}`);
+          showNotification(`Error: ${data.error}`, "error");
         } else {
-          alert(data.message);
+          showNotification(data.message, "success");
           // Update the order status locally
           setOrders((prevOrders) =>
             prevOrders.map((order) =>
@@ -68,8 +116,10 @@ const OrderHistory = () => {
       })
       .catch((error) => {
         console.error("Error cancelling order:", error);
-        alert("Failed to cancel order.");
+        showNotification("Failed to cancel order.", "error");
       });
+
+    closeConfirmationModal();
   };
 
   // View invoice
@@ -77,13 +127,12 @@ const OrderHistory = () => {
     navigate(`/invoice/${orderId}`);
   };
 
-  // Request refund
-  const requestRefund = (orderItemId) => {
-    const reason = prompt("Please provide a reason for your refund request:");
-    if (!reason) return;
+  // Handle refund submission
+  const handleRefundSubmit = (reason) => {
+    const { productId, orderId } = refundModal;
 
-    fetch("http://127.0.0.1:8000/request-refund/", {
-      method: "POST",
+    fetch(`http://127.0.0.1:8000/order/itemsforrefund/${orderId}/`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${btoa(
@@ -92,20 +141,52 @@ const OrderHistory = () => {
           )}`
         )}`,
       },
-      body: JSON.stringify({ order_item_id: orderItemId, reason }),
     })
       .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          alert(`Error: ${data.error}`);
-        } else {
-          alert("Refund request submitted successfully.");
+      .then((orderItems) => {
+        const orderItem = orderItems.find((item) => item.product === productId);
+
+        if (!orderItem) {
+          showNotification("Error: Order item not found.", "error");
+          return;
         }
+
+        const orderItemId = orderItem.id;
+
+        fetch("http://127.0.0.1:8000/request-refund/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+          body: JSON.stringify({ order_item_id: orderItemId, reason }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              showNotification(`Error: ${data.error}`, "error");
+            } else {
+              showNotification(
+                "Refund request submitted successfully.",
+                "success"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error requesting refund:", error);
+            showNotification("Failed to submit refund request.", "error");
+          });
       })
       .catch((error) => {
-        console.error("Error requesting refund:", error);
-        alert("Failed to submit refund request.");
+        console.error("Error fetching order items:", error);
+        showNotification("Failed to retrieve order items.", "error");
       });
+
+    closeRefundModal();
   };
 
   return (
@@ -126,26 +207,31 @@ const OrderHistory = () => {
                 <span className="order-total">
                   Order Total:{" "}
                   {order.items
-                    .reduce(
-                      (total, item) => total + parseFloat(item.subtotal),
-                      0
-                    )
+                    .reduce((total, item) => {
+                      // Use discount_subtotal if available; otherwise, fallback to subtotal
+                      const itemTotal = parseFloat(
+                        item.discount_subtotal || item.subtotal
+                      );
+                      return total + itemTotal;
+                    }, 0)
                     .toFixed(2)}{" "}
                   TL
                 </span>
+
                 <button
                   className="view-invoice-button"
                   onClick={() => viewInvoice(order.order_id)}
                 >
                   View Invoice
                 </button>
-
-                <button
-                  className="cancel-order-button"
-                  onClick={() => cancelOrder(order.order_id)}
-                >
-                  Cancel Order
-                </button>
+                {order.status === "Processing" && (
+                  <button
+                    className="cancel-order-button"
+                    onClick={() => cancelOrder(order.order_id)}
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
               <ul className="order-items">
                 {order.items.map((item) => (
@@ -155,11 +241,15 @@ const OrderHistory = () => {
                       Quantity: {item.quantity}
                     </span>
                     <span className="item-price">
-                      Total: {item.subtotal} TL
+                      Total:{" "}
+                      {parseFloat(
+                        item.discount_subtotal || item.subtotal
+                      ).toFixed(2)}{" "}
+                      TL
                     </span>
                     <button
                       className="refund-button"
-                      onClick={() => requestRefund(item.id)}
+                      onClick={() => openRefundModal(item.id, order.order_id)}
                     >
                       Request Refund
                     </button>
@@ -174,6 +264,26 @@ const OrderHistory = () => {
           Start shopping now!
         </a>
       )}
+
+      <ConfirmationModal
+        isOpen={confirmation.isOpen}
+        message="Are you sure you want to cancel this order?"
+        onConfirm={handleConfirmCancel}
+        onCancel={closeConfirmationModal}
+      />
+
+      <RefundReasonModal
+        isOpen={refundModal.isOpen}
+        onClose={closeRefundModal}
+        onSubmit={handleRefundSubmit}
+      />
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

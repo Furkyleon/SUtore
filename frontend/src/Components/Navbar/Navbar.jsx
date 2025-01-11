@@ -2,10 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdSearch } from "react-icons/io";
 import "./Navbar.css";
+import TopRightNotification from "../NotificationModal/TopRightNotification";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success",
+  });
+
+  const sidebarRef = useRef(null);
+  const sidebarRef2 = useRef(null);
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -13,11 +25,6 @@ const Navbar = () => {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
   };
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarOpen2, setIsSidebarOpen2] = useState(false);
-  const sidebarRef = useRef(null);
-  const sidebarRef2 = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -47,10 +54,42 @@ const Navbar = () => {
     localStorage.setItem("username", null);
     localStorage.setItem("password", null);
     localStorage.setItem("order_id", null);
-    alert("You have been logged out.");
-    navigate("/");
-    setIsSidebarOpen2(false);
+    localStorage.setItem("role", null);
+
+    setNotification({
+      isOpen: true,
+      message: "You have been logged out.",
+      type: "success",
+    });
+
+    setTimeout(() => {
+      navigate("/");
+      setIsSidebarOpen2(false);
+    }, 2000);
   };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/categories/get_all/"
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories.");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -97,12 +136,14 @@ const Navbar = () => {
 
       <div className="nav-right">
         <p className="animation2" onClick={toggleSidebar2}>
-          <img src="/loginregister.png" alt="" className="logo" />
+          <img src="/userprofile.png" alt="" className="logo" />
         </p>
-
-        <a href="/cart" className="SUtore">
-          <img src="/navbarlogo.png" alt="" className="logo2" />
-        </a>
+        {localStorage.getItem("role") !== "sales_manager" &&
+          localStorage.getItem("role") !== "product_manager" && (
+            <a href="/cart" className="SUtore">
+              <img src="/navbarlogo.png" alt="" className="logo2" />
+            </a>
+          )}
       </div>
 
       <div
@@ -114,51 +155,16 @@ const Navbar = () => {
         </button>
         <h2>All categories:</h2>
         <ul className="sidebar-menu">
-          <li>
-            <Link to="/store" onClick={toggleSidebar}>
-              All products <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Telephone" onClick={toggleSidebar}>
-              Telephone <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Television" onClick={toggleSidebar}>
-              Television <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Laptop" onClick={toggleSidebar}>
-              Laptop <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/White Goods" onClick={toggleSidebar}>
-              White Goods <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Accessory" onClick={toggleSidebar}>
-              Accessory <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Console" onClick={toggleSidebar}>
-              Console <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Photography" onClick={toggleSidebar}>
-              Photography <span className="arrow">›</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/categories/Self Care" onClick={toggleSidebar}>
-              Self Care <span className="arrow">›</span>
-            </Link>
-          </li>
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link
+                to={`/categories/${encodeURIComponent(category.name)}`}
+                onClick={toggleSidebar}
+              >
+                {category.name} <span className="arrow">›</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -197,26 +203,34 @@ const Navbar = () => {
                 {localStorage.getItem("role") === "sales_manager" && (
                   <li className="sales-manager">
                     <p className="admin">Admin Interface:</p>
-
                     <Link to="/sales-manager" onClick={toggleSidebar2}>
                       Sales Manager Page
                     </Link>
-
-                    <p className="customer">Customer Operations:</p>
                   </li>
                 )}
 
-                <li>
-                  <Link to="/wishlist" onClick={toggleSidebar2}>
-                    Wishlist
-                  </Link>
-                </li>
+                {localStorage.getItem("role") === "product_manager" && (
+                  <li className="product-manager">
+                    <p className="admin">Admin Interface:</p>
+                    <Link to="/product-manager" onClick={toggleSidebar2}>
+                      Product Manager Page
+                    </Link>
+                  </li>
+                )}
 
-                <li>
-                  <Link to="/order-history" onClick={toggleSidebar2}>
-                    Order History
-                  </Link>
-                </li>
+                {localStorage.getItem("role") === "customer" && (
+                  <li>
+                    <Link to="/profile" onClick={toggleSidebar2}>
+                      Profile
+                    </Link>
+                    <Link to="/wishlist" onClick={toggleSidebar2}>
+                      Wishlist
+                    </Link>
+                    <Link to="/order-history" onClick={toggleSidebar2}>
+                      Order History
+                    </Link>
+                  </li>
+                )}
 
                 <li>
                   <button onClick={handleLogout} className="logout-button">
@@ -227,6 +241,15 @@ const Navbar = () => {
             )}
         </ul>
       </div>
+
+      {/* TopRightNotification */}
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+        customClass="custom-logout-notification"
+      />
     </div>
   );
 };

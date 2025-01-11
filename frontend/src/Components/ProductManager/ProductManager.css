@@ -1,0 +1,85 @@
+.product-manager-container {
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  width: 50%;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.product-manager-container h1 {
+  text-align: center;
+  color: #01236a;
+  font-size: 2rem;
+  font-weight: bold;
+  padding-top: 10px;
+  margin-bottom: 30px;
+}
+
+.product-manager-container .sections {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  justify-content: center;
+}
+
+.product-manager-container .section {
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-manager-container .section:nth-child(1) {
+  background-color: #e3f2fd; /* Light Blue for Product Management */
+}
+
+.product-manager-container .section:nth-child(2) {
+  background-color: #e8f5e9; /* Light Green for Category Management */
+}
+
+.product-manager-container .section:nth-child(3) {
+  background-color: #fff8e1; /* Light Yellow for Comment Management */
+}
+
+.product-manager-container .section:nth-child(4) {
+  background-color: #ffebee; /* Light Red for Stock Management */
+}
+
+.product-manager-container .section:nth-child(5) {
+  background-color: #ede7f6; /* Light Purple for Invoices */
+}
+
+.product-manager-container .section:nth-child(6) {
+  background-color: #e0f7fa; /* Light Teal for Delivery */
+}
+
+.product-manager-container .section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.product-manager-container .action-button {
+  padding: 10px 15px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.product-manager-container .action-button:hover {
+  background-color: #01236a;
+  transform: scale(1.1);
+}
+
+.product-manager-container .action-button:active {
+  background-color: #011b4d;
+}

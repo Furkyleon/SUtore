@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./CategoryPage.css";
 
 const CategoryPage = () => {
@@ -10,32 +11,60 @@ const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch(`http://127.0.0.1:8000/products/category/${categoryName}/`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          setError(data.error || "An error occurred while fetching products.");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to fetch products. Please try again.");
-        setLoading(false);
-      });
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
+
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/products/category/${categoryName}/`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "An error occurred while fetching products."
+        );
+      }
+
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [categoryName]);
 
-  const sortedProducts = products.sort((a, b) => {
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, categoryName]);
+
+  const sortedProducts = products.slice().sort((a, b) => {
     if (sortCriterion === "price") {
       return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
     } else if (sortCriterion === "name") {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
       return sortOrder === "asc"
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
     } else if (sortCriterion === "popularity") {
       return sortOrder === "asc"
         ? a.popularity - b.popularity
@@ -44,21 +73,14 @@ const CategoryPage = () => {
     return 0;
   });
 
-  const handleSortChange = (event) => {
-    setSortOrder(event.target.value);
-  };
+  const handleSortChange = (event) => setSortOrder(event.target.value);
+  const handleCriterionChange = (event) => setSortCriterion(event.target.value);
 
-  const handleCriterionChange = (event) => {
-    setSortCriterion(event.target.value);
-  };
-
-  // Add product to cart
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (username && username !== "null" && password && password !== "null") {
+      // Logged-in user logic
       fetch("http://127.0.0.1:8000/cart/add/", {
         method: "POST",
         headers: {
@@ -71,15 +93,19 @@ const CategoryPage = () => {
           if (!response.ok) throw new Error("Failed to add item to cart!");
           return response.json();
         })
-        .then(() => alert("Product added to cart successfully!"))
+        .then(() => {
+          showNotification("Product added to cart successfully!", "success");
+        })
         .catch((error) => {
-          console.log("Username:", username, "Password:", password);
-
           console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
         });
     } else {
-      let myorderID = localStorage.getItem("order_id"); // Define the variable
+      // Guest user logic
+      let myorderID = localStorage.getItem("order_id");
 
       if (myorderID && myorderID === "null") {
         myorderID = 0;
@@ -91,7 +117,6 @@ const CategoryPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           serial_number: serialNumber,
           quantity: 1,
@@ -103,18 +128,17 @@ const CategoryPage = () => {
           return response.json();
         })
         .then((data) => {
-          // Save the order_id to localStorage
           if (data.order_id) {
             localStorage.setItem("order_id", data.order_id);
-            console.log("Order ID saved locally.");
           }
-          alert("Product added to cart successfully!");
+          showNotification("Product added to cart successfully!", "success");
         })
         .catch((error) => {
           console.error("Error adding to cart:", error);
-          console.log(myorderID);
-          console.log("Username:");
-          alert("There was an error adding the product to the cart.");
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
         });
     }
   };
@@ -182,17 +206,15 @@ const CategoryPage = () => {
                       </span>
                     )}
                   </p>
-                  {product.stock > 0 ? (
-                    <button
-                      onClick={() => {
-                        addToCart(product.serial_number);
-                      }}
-                    >
-                      Add to Cart
-                    </button>
-                  ) : (
-                    <span className="out-of-stock-label">Out of Stock!</span>
-                  )}
+                  {role !== "product_manager" &&
+                    role !== "sales_manager" &&
+                    (product.stock > 0 ? (
+                      <button onClick={() => addToCart(product.serial_number)}>
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <span className="out-of-stock-label">Out of Stock!</span>
+                    ))}
                 </div>
               ))
             ) : (
@@ -201,6 +223,13 @@ const CategoryPage = () => {
           </div>
         </>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

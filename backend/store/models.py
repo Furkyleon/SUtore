@@ -264,15 +264,21 @@ class OrderItem(models.Model):
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name="order_items")
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    price_discount = models.DecimalField(max_digits=10, decimal_places=2, null=price)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    is_refunded = models.BooleanField(default=False, null=True)
 
     def str(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"
 
     def can_review(self):
         return self.order.complete  # Only allows reviews if the order is complete
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.price * self.quantity  # Calculate the subtotal during save
+        super().save(*args, **kwargs)
     
 class Review(models.Model):
     RATING_CHOICES = [(i, str(i)) for i in range(0, 6)]  # Allows ratings from 1 to 5
@@ -342,7 +348,7 @@ class RefundRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     reason = models.TextField(blank=True, null=True)
 
-    def str(self):
+    def __str__(self):
         return f"Refund request {self.id} by {self.customer.username}"
 
 class Delivery(models.Model):
@@ -372,5 +378,5 @@ class Delivery(models.Model):
         self.total_price = Decimal(self.order_item.quantity) * Decimal(self.order_item.product.price)
         self.save()
 
-    def _str_(self):
+    def __str__(self):
         return f"Delivery {self.id} for {self.order_item.product.name} - {self.status}"

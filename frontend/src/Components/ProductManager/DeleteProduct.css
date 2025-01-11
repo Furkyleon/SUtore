@@ -1,0 +1,114 @@
+.delete-product-page-wrapper {
+  width: 100%;
+  text-align: center;
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  margin-top: 60px;
+}
+
+.delete-product-page-wrapper h1 {
+  color: #01236a;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-decoration: none;
+}
+
+.delete-product-page-wrapper .product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+}
+
+.delete-product-page-wrapper .product-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: flex-end;
+  transition: transform 0.3s ease;
+}
+
+.delete-product-page-wrapper .product-card:hover {
+  transform: scale(1.05);
+}
+
+.delete-product-page-wrapper .product-card a {
+  text-decoration: none;
+}
+
+.delete-product-page-wrapper .product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.delete-product-page-wrapper .product-card h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #01236a;
+  text-decoration: none;
+}
+
+.delete-product-page-wrapper .product-card .price {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.delete-product-page-wrapper .product-card .price .original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.delete-product-page-wrapper .product-card .price .original-price2 {
+  color: #000000;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.delete-product-page-wrapper .product-card .price .discounted-price {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.delete-product-page-wrapper .delete-btn {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.delete-product-page-wrapper .delete-btn:hover {
+  background: #b22621;
+  transform: scale(1.05);
+}
+
+.delete-product-page-wrapper .delete-btn:active {
+  background: #6e0400;
+  transform: scale(1);
+}
+
+.delete-product-page-wrapper .error {
+  color: #ff0000;
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
