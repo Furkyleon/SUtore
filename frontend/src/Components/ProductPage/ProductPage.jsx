@@ -143,26 +143,78 @@ const ProductPage = () => {
   };
 
   const addToCart = (serialNumber) => {
-    fetch("http://127.0.0.1:8000/cart/add/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: authHeader,
-      },
-      body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to add item to cart!");
-        return response.json();
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    const authHeader = username && password ? `Basic ${btoa(`${username}:${password}`)}` : null;
+  
+    if (username && username !== "null" && password && password !== "null") {
+      // Logged-in user logic
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({ serial_number: serialNumber, quantity: 1 }),
       })
-      .then(() => {
-        showNotification("Product added to cart successfully!", "success");
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then((data) => {
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+          }
+          showNotification("Product added to cart successfully!", "success");
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
+        });
+    } else {
+      // Guest user logic
+      let myorderID = localStorage.getItem("order_id");
+  
+      if (!myorderID || myorderID === "null") {
+        myorderID = 0;
+        localStorage.setItem("order_id", 0);
+      }
+  
+      fetch("http://127.0.0.1:8000/cart/add/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          serial_number: serialNumber,
+          quantity: 1,
+          order_id: myorderID,
+        }),
       })
-      .catch((error) => {
-        console.error("Error adding to cart:", error);
-        showNotification("There was an error adding the product to the cart.", "error");
-      });
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to add item to cart!");
+          return response.json();
+        })
+        .then((data) => {
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+          }
+          showNotification("Product added to cart successfully!", "success");
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
+        });
+    }
   };
+  
+  
 
   const handleCommentSubmit = () => {
     if (!rating) {
