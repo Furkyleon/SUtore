@@ -1129,6 +1129,20 @@ def apply_discount(request):
     product.discount_price = discount_price
     product.save()
 
+    # Update prices in incomplete orders (orders that are not marked as complete)
+    incomplete_orders = Order.objects.filter(complete=False)
+
+    for order in incomplete_orders:
+        order_items = OrderItem.objects.filter(order=order, product=product)
+        for order_item in order_items:
+            # Update the price in the order item
+            order_item.price = original_price
+            order_item.price_discount = discount_price
+            order_item.subtotal = order_item.quantity * original_price
+            order_item.discount_subtotal = order_item.quantity * discount_price
+            print(order_item.discount_subtotal)
+            order_item.save()
+
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
     
@@ -1141,7 +1155,7 @@ def apply_discount(request):
     for entry in wishlist_entries:
         if entry.user.email:  # Ensure email exists before sending
             try:
-                # Manually construct the product URL (assuming the base URL is 'http://123234234/products/')
+                # Manually construct the product URL (assuming the base URL is 'http://127.0.0.1:8000/products/')
                 product_url = f'http://127.0.0.1:8000/product/{product.id}'
 
                 # Render the email content (HTML)
@@ -1170,7 +1184,6 @@ def apply_discount(request):
 
             except Exception as e:
                 print(f"Could not send email to {entry.user.email}: {e}")
-
 
     # Send success response
     return Response(
@@ -1934,8 +1947,27 @@ def adjust_product_price(request, product_id):
     # Update the product's price
     original_price = product.price
     product.price = round(new_price, 2)
-    product.discount_price = product.price * (1 - product.discount / 100)
+
+    # If the product has a discount, update the discounted price
+    if product.discount > 0:
+        product.discount_price = product.price * (1 - product.discount / 100)
+    else:
+        product.discount_price = product.price  # If no discount, regular price is the discount price
+    
     product.save()
+
+    # Update prices in incomplete orders (orders that are not marked as complete)
+    incomplete_orders = Order.objects.filter(complete=False)
+
+    for order in incomplete_orders:
+        order_items = OrderItem.objects.filter(order=order, product=product)
+        for order_item in order_items:
+            # Update the price in the order item
+            order_item.price = product.price
+            order_item.subtotal = order_item.quantity * product.price
+            order_item.price_discount = product.discount_price
+            order_item.discount_subtotal = order_item.quantity * product.discount_price
+            order_item.save()
 
     # Return a response with the updated product details
     serializer = ProductSerializer(product)
@@ -1975,7 +2007,7 @@ def update_order_date(request, order_id):
     """
     try:
         # Fetch the order
-        order = Order.objects.get(id=order_id)
+        Invoice = Invoice.objects.get(id=order_id)
 
 
         # Get the new date from the request data
@@ -1996,8 +2028,8 @@ def update_order_date(request, order_id):
             )
 
         # Update the order's date_ordered field
-        order.date_ordered = new_date
-        order.save()
+        Invoice.date = new_date
+        Invoice.save()
 
         return Response(
             {"message": f"Order {order_id}'s 'date_ordered' updated successfully.", "new_date_ordered": new_date},
@@ -2014,3 +2046,49 @@ def update_order_date(request, order_id):
             {"error": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_invoice_date(request, invoice_id):
+    user = request.user
+
+    # Check if the invoice exists
+    try:
+        invoice = Invoice.objects.get(id=invoice_id)
+    except Invoice.DoesNotExist:
+        return Response(
+            {"error": "Invoice not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+   
+    # Get the new date from the request
+    new_date = request.data.get('date')
+
+    if not new_date:
+        return Response(
+            {"error": "The 'date' field is required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # Parse the date and validate
+        new_date_parsed = parse_datetime(new_date)
+        if not new_date_parsed:
+            raise ValueError("Invalid date format")
+    except ValueError as e:
+        return Response(
+            {"error": "Invalid date format. Use ISO 8601 format (e.g., '2025-01-01T12:00:00Z')."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Update the invoice date
+    invoice.date = new_date_parsed
+    invoice.save()
+
+    return Response(
+        {"message": "Invoice date updated successfully.", "invoice_id": invoice.id, "new_date": invoice.date},
+        status=status.HTTP_200_OK
+    )

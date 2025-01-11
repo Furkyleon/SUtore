@@ -43,7 +43,8 @@ urlpatterns = [
     path('order/history/', views.order_history, name='order_history'),
     path('request-refund/', views.request_refund, name="request_refund"),
     path('order-item/<int:order_item_id>/', views.get_order_item, name='get_order_item'),
-    path('orders/<int:order_id>/', views.update_order_date, name='update_order_date'),
+    path('orders/update_date/<int:order_id>/', views.update_order_date, name='update_order_date'),
+    path('invoices/<int:invoice_id>/update-date/', views.update_invoice_date, name='update_invoice_date'),
     # order cancelling api needed
     path('product_manager/order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 

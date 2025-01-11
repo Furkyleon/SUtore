@@ -22,7 +22,6 @@
       {% endfor %}
     </ul>
 
-    <p><strong>Total: </strong> {{ order.get_total_cost|floatformat:2 }} TL</p>
-    <p><strong>Discounted Total: </strong> {{ order.get_discount_total_cost|floatformat:2 }} TL</p>
+    <p><strong>Total: </strong> {{ order.get_discount_total_cost|floatformat:2 }} TL</p>
   </body>
 </html>

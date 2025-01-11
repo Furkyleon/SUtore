@@ -101,8 +101,7 @@
       <p><strong>Delivery Address:</strong> {{ address }}</p> <!-- Display the address -->
 
       <p class="total-price">
-        <strong>Total Price:</strong> {{ order.get_total_cost|floatformat:2 }} TL
-        <strong>Discounted Total Price:</strong> {{ order.get_discount_total_cost|floatformat:2 }} TL
+        <strong>Total Price:</strong> {{ order.get_discount_total_cost|floatformat:2 }} TL
       </p>
 
       <div class="invoice-details">
