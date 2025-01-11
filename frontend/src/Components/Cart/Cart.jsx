@@ -165,7 +165,7 @@ const Cart = () => {
   const calculateTotal = () => {
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.price) || 0;
+        const price = parseFloat(getDiscountedPrice(item.product)) || 0;
         return total + price * item.quantity;
       }, 0)
       .toFixed(2);
