@@ -85,7 +85,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price', 'subtotal', 'date_added', 'discount_subtotal']
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'price_discount', 'subtotal', 'date_added', 'discount_subtotal']
         
     def validate(self, data):
         if data['quantity'] > data['product'].stock:

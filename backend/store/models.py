@@ -264,6 +264,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name="order_items")
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    price_discount = models.DecimalField(max_digits=10, decimal_places=2, null=price)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)

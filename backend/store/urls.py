@@ -43,6 +43,7 @@ urlpatterns = [
     path('request-refund/', views.request_refund, name="request_refund"),
     # order cancelling api needed
     path('product_manager/order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
+    path('order-item/<int:order_item_id>/', views.get_items, name='get_items'),
 
     # Reviews
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
