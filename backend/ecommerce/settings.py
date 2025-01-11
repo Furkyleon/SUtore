@@ -172,3 +172,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cs308team2@gmail.com'
 EMAIL_HOST_PASSWORD = 'dyol ylwd dggp hjjg'
 DEFAULT_FROM_EMAIL = 'cs308team2@gmail.com'
+
+
+# settings.py
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./DiscountPage.css";
 
 const DiscountPage = () => {
@@ -7,9 +8,22 @@ const DiscountPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [discountInputs, setDiscountInputs] = useState({});
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortCriterion, setSortCriterion] = useState("name");
+
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,7 +35,7 @@ const DiscountPage = () => {
           setProducts(data);
           setDiscountInputs(
             data.reduce((acc, product) => {
-              acc[product.id] = product.discount || 0;
+              acc[product.serial_number] = product.discount || 0;
               return acc;
             }, {})
           );
@@ -38,15 +52,15 @@ const DiscountPage = () => {
     fetchProducts();
   }, []);
 
-  const handleInputChange = (productId, value) => {
+  const handleInputChange = (serialNumber, value) => {
     setDiscountInputs((prevState) => ({
       ...prevState,
-      [productId]: value,
+      [serialNumber]: value,
     }));
   };
 
-  const applyDiscount = async (productId) => {
-    const discountPercentage = discountInputs[productId];
+  const applyDiscount = async (serialNumber) => {
+    const discountPercentage = discountInputs[serialNumber];
     const username = localStorage.getItem("username");
     const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
@@ -61,45 +75,48 @@ const DiscountPage = () => {
             Authorization: authHeader,
           },
           body: JSON.stringify({
-            serial_number: products.find((product) => product.id === productId)
-              .serial_number,
+            serial_number: serialNumber,
             discount_percentage: discountPercentage,
           }),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to apply discount!");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to apply discount!");
+      }
 
       const data = await response.json();
 
-      // Update products state
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === productId
+          product.serial_number === serialNumber
             ? {
                 ...product,
                 price: data.discounted_price || product.price,
-                originalPrice: data.original_price || product.originalPrice,
                 discount: data.discount_percentage || product.discount,
               }
             : product
         )
       );
 
-      // Update discountInputs state
       setDiscountInputs((prevInputs) => ({
         ...prevInputs,
-        [productId]: data.discount_percentage || 0,
+        [serialNumber]: data.discount_percentage || 0,
       }));
 
-      alert(
-        `Discount applied successfully: ${
-          data.product_name
-        } - ${data.discounted_price.toFixed(2)} TL`
+      showNotification(
+        `Discount applied successfully: ${data.product_name} - ${data.discounted_price.toFixed(
+          2
+        )} TL`,
+        "success"
       );
     } catch (error) {
       console.error("Error applying discount:", error);
-      alert("There was an error applying the discount.");
+      showNotification(
+        error.message || "There was an error applying the discount.",
+        "error"
+      );
     }
   };
 
@@ -125,7 +142,7 @@ const DiscountPage = () => {
         <div className="product-list">
           {sortedProducts.length > 0 ? (
             sortedProducts.map((product) => (
-              <div key={product.id} className="product-card">
+              <div key={product.serial_number} className="product-card">
                 <Link to={`/product/${product.id}`} className="product-link">
                   <img
                     src={`http://localhost:8000${
@@ -156,20 +173,21 @@ const DiscountPage = () => {
                     </span>
                   )}
                 </p>
+
                 <div className="discount-controls">
                   <div className="discount">
-                    <label htmlFor={`discount-${product.id}`}>
+                    <label htmlFor={`discount-${product.serial_number}`}>
                       Discount (%):
                     </label>
                     <input
                       type="number"
-                      id={`discount-${product.id}`}
+                      id={`discount-${product.serial_number}`}
                       min="0"
                       max="100"
-                      value={discountInputs[product.id] || "0"}
+                      value={discountInputs[product.serial_number] || "0"}
                       onChange={(e) =>
                         handleInputChange(
-                          product.id,
+                          product.serial_number,
                           parseFloat(e.target.value)
                         )
                       }
@@ -178,7 +196,7 @@ const DiscountPage = () => {
 
                   <button
                     className="apply-btn"
-                    onClick={() => applyDiscount(product.id)}
+                    onClick={() => applyDiscount(product.serial_number)}
                   >
                     Apply
                   </button>
@@ -190,6 +208,13 @@ const DiscountPage = () => {
           )}
         </div>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

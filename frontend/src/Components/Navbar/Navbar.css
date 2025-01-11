@@ -254,18 +254,14 @@
   justify-content: space-between;
 }
 
-.navbar .sidebar-menu2 li.sales-manager a {
+.navbar .sidebar-menu2 li.sales-manager a,
+.navbar .sidebar-menu2 li.product-manager a {
   color: white;
   background-color: #01236a;
 }
 
-.navbar .sidebar-menu2 li.sales-manager p.customer {
-  margin-top: 40px;
-  margin-bottom: 20px;
-  font-size: 20px;
-}
-
-.navbar .sidebar-menu2 li.sales-manager p.admin {
+.navbar .sidebar-menu2 li.sales-manager p.admin,
+.navbar .sidebar-menu2 li.product-manager p.admin {
   margin-bottom: 20px;
   font-size: 20px;
 }
@@ -294,7 +290,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px 15px;
+  padding: 15px 15px;
   border-radius: 6px;
   background-color: rgba(207, 207, 207, 0.616);
   transition: background-color 0.3s ease, transform 0.2s ease,
@@ -302,6 +298,7 @@
   border: none;
   width: 100%;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .navbar .sidebar-menu2 li a:hover,

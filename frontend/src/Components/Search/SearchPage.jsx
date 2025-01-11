@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./SearchPage.css";
 
 const SearchPage = () => {
@@ -8,6 +9,24 @@ const SearchPage = () => {
   const [sortCriterion, setSortCriterion] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
+
+  const username = localStorage.getItem("username");
+  const password = localStorage.getItem("password");
+  const role = localStorage.getItem("role");
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -65,10 +84,7 @@ const SearchPage = () => {
     return 0;
   });
 
-  // Add product to cart
   const addToCart = (serialNumber) => {
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
     const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
     if (username && username !== "null" && password && password !== "null") {
@@ -84,15 +100,18 @@ const SearchPage = () => {
           if (!response.ok) throw new Error("Failed to add item to cart!");
           return response.json();
         })
-        .then(() => alert("Product added to cart successfully!"))
+        .then(() => {
+          showNotification("Product added to cart successfully!", "success");
+        })
         .catch((error) => {
-          console.log("Username:", username, "Password:", password);
-
           console.error("Error adding to cart:", error);
-          alert("There was an error adding the product to the cart.");
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
         });
     } else {
-      let myorderID = localStorage.getItem("order_id"); // Define the variable
+      let myorderID = localStorage.getItem("order_id");
 
       if (myorderID && myorderID === "null") {
         myorderID = 0;
@@ -116,18 +135,17 @@ const SearchPage = () => {
           return response.json();
         })
         .then((data) => {
-          // Save the order_id to localStorage
           if (data.order_id) {
             localStorage.setItem("order_id", data.order_id);
-            console.log("Order ID saved locally.");
           }
-          alert("Product added to cart successfully!");
+          showNotification("Product added to cart successfully!", "success");
         })
         .catch((error) => {
           console.error("Error adding to cart:", error);
-          console.log(myorderID);
-          console.log("Username:");
-          alert("There was an error adding the product to the cart.");
+          showNotification(
+            "There was an error adding the product to the cart.",
+            "error"
+          );
         });
     }
   };
@@ -201,13 +219,15 @@ const SearchPage = () => {
                     </span>
                   )}
                 </p>
-                {product.stock > 0 ? (
-                  <button onClick={() => addToCart(product.serial_number)}>
-                    Add to Cart
-                  </button>
-                ) : (
-                  <span className="out-of-stock-label">Out of Stock!</span>
-                )}
+                {role !== "product_manager" &&
+                  role !== "sales_manager" &&
+                  (product.stock > 0 ? (
+                    <button onClick={() => addToCart(product.serial_number)}>
+                      Add to Cart
+                    </button>
+                  ) : (
+                    <span className="out-of-stock-label">Out of Stock!</span>
+                  ))}
               </div>
             ))}
           </div>
@@ -217,6 +237,13 @@ const SearchPage = () => {
           No products found for "{queryParams.get("query")}".
         </p>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

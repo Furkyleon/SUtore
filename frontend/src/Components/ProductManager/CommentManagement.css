@@ -1,0 +1,92 @@
+.manage-comments-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.manage-comments-wrapper h1 {
+  text-align: center;
+  color: #01236a;
+  margin-bottom: 20px;
+}
+
+.manage-comments-wrapper .product-select {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manage-comments-wrapper label {
+  font-weight: bold;
+  color: #333;
+}
+
+.manage-comments-wrapper select {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.manage-comments-wrapper .fetch-reviews-btn {
+  padding: 10px 20px;
+  background-color: #005da9;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.manage-comments-wrapper .fetch-reviews-btn:hover {
+  background-color: #01236a;
+}
+
+.manage-comments-wrapper .error {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.manage-comments-wrapper .success-message {
+  color: green;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.manage-comments-wrapper .reviews-list {
+  margin-top: 20px;
+}
+
+.manage-comments-wrapper .review-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.manage-comments-wrapper .approve-btn {
+  margin-top: 10px;
+  padding: 8px 15px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.manage-comments-wrapper .approve-btn:hover {
+  background-color: #218838;
+}

@@ -101,7 +101,7 @@ const PaymentPage = () => {
         setPaymentSuccess(true); // Show payment success message
         setTimeout(() => {
           navigate(`/invoice/${orderId}`);
-        }, 5000);
+        }, 3000);
 
         // Reset form
         setForm({

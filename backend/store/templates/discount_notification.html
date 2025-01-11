@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discount Alert</title>
+</head>
+<body>
+    <h3>Good news! There's a discount on a product in your wishlist!</h3>
+    <p>Dear {{ username }},</p>
+    <p>We are excited to inform you that the product <strong>{{ product.name }}</strong> in your wishlist is now on sale.</p>
+    <p>Discount: <strong>{{ discount_percentage }}%</strong></p>
+    <p>Original Price: {{ product.price }} TL</p>
+    <p>Product Link: <a href="{{ product_url }}">{{ product.name }}</a></p>
+    <p>Discounted Price: {{ product.discount_price }} TL</p>
+</body>
+</html>

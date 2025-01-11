@@ -85,7 +85,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price', 'subtotal', 'date_added', 'discount_subtotal']
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'price_discount', 'subtotal', 'date_added', 'discount_subtotal']
         
     def validate(self, data):
         if data['quantity'] > data['product'].stock:
@@ -107,7 +107,16 @@ class OrderHistorySerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id', 'user', 'product', 'rating', 'comment', 'comment_status', 'date_added']
+        fields = [
+            'id',
+            'user',
+            'product',
+            'product_id',  # For writing the product relationship
+            'rating',
+            'comment',
+            'comment_status',
+            'date_added',
+        ]
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:

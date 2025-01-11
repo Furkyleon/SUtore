@@ -264,9 +264,11 @@ class OrderItem(models.Model):
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name="order_items")
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    price_discount = models.DecimalField(max_digits=10, decimal_places=2, null=price)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    is_refunded = models.BooleanField(default=False, null=True)
 
     def str(self):
         return f"{self.quantity} of {self.product.name} for Order {self.order.id}"
@@ -322,6 +324,7 @@ class Invoice(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='invoices')
     date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    url = models.URLField(max_length=255, blank=True, null=True)  # Field to store the invoice URL
     discounted_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def str(self):
@@ -356,7 +359,7 @@ class Delivery(models.Model):
         related_name='deliveries',
         limit_choices_to={'role': 'customer'}
     )
-    delivery_address = models.CharField(max_length=255)
+    delivery_address = models.CharField(max_length=255, null= True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
