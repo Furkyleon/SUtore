@@ -275,6 +275,10 @@ class OrderItem(models.Model):
 
     def can_review(self):
         return self.order.complete  # Only allows reviews if the order is complete
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.price * self.quantity  # Calculate the subtotal during save
+        super().save(*args, **kwargs)
     
 class Review(models.Model):
     RATING_CHOICES = [(i, str(i)) for i in range(0, 6)]  # Allows ratings from 1 to 5
