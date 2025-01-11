@@ -157,6 +157,7 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             'id',
             'customer',
             'order_item',
+            'refund_amount',
             'request_date',
             'status',
             'reason',

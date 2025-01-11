@@ -44,7 +44,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Invoice
 from django.utils.dateparse import parse_datetime
-# bu alttakilere bakılacak
+    
+from django.core.mail import send_mail
+from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import RefundRequest
+
+
+
 # @login_required
 # @permission_required('accounts.add_product', raise_exception=True)
 def store(request):
@@ -692,6 +702,8 @@ def get_order(request):
     except Order.DoesNotExist:
         return Response({"error": "No active order found."}, status=status.HTTP_404_NOT_FOUND)
 
+
+
 @api_view(['GET'])
 def order_history(request):
     if not request.user.is_authenticated:
@@ -702,7 +714,7 @@ def order_history(request):
         order_history = OrderHistory.objects.get(customer=request.user)
         orders = order_history.orders.filter(complete=True)
 
-        # Structure each order to show only item IDs within the order
+        # Structure each order to show only item IDs within the order and refund status
         data = []
         for order in orders:
             order_data = {
@@ -714,26 +726,41 @@ def order_history(request):
                 "status": order.status,
                 "items": [{
                         "id": item.product.id,
+                        "order_id": item.id,
                         "product": item.product.name,
                         "quantity": item.quantity,
                         "price": str(item.price),
                         "price_discount": str(item.price_discount),
                         "subtotal": str(item.subtotal),
-                        "date_added": item.date_added
+                        "discount_subtotal": str(item.discount_subtotal),
+                        "date_added": item.date_added,
+                        # Default to "None" for refund status
+                        "refund_status": "Noneasda"
                     }
                     for item in order.order_items.all()
                 ]
             }
+            # Add refund status for each item, filtered by the customer
+            for item_data in order_data["items"]:
+                # Fetch the refund request for this order item and the logged-in customer
+                refund_request = RefundRequest.objects.filter(order_item=item_data["order_id"], customer=request.user).first()
+                if refund_request:
+                    item_data["refund_status"] = refund_request.status
+                else:
+                    item_data["refund_status"] = "None"  # Explicitly set to "None" if no refund request exists
+
             data.append(order_data)
 
         return Response(data, status=status.HTTP_200_OK)
     except OrderHistory.DoesNotExist:
         return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
 
- 
+
+
 @api_view(['POST'])
 def checkout(request):
     order_id = request.data.get('order_id')
+    address = request.data.get('address')
 
     if not request.user.is_authenticated:
         return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -789,7 +816,7 @@ def checkout(request):
         Delivery.objects.create(
             order_item=item,
             customer=request.user,
-            delivery_address=request.user.address,
+            delivery_address= address,
             total_price=item.discount_subtotal
         )
 
@@ -801,7 +828,8 @@ def checkout(request):
     os.makedirs(os.path.dirname(pdf_file_path), exist_ok=True)
 
     # Step 2: Render the invoice template for the PDF
-    invoice_html_content = render_to_string('invoice_template.html', {'order': order})
+    invoice_html_content = render_to_string('invoice_template.html', {'order': order, 'address': address})
+
 
     # Generate the PDF and save it to the file
     pdfkit.from_string(invoice_html_content, pdf_file_path)
@@ -820,7 +848,8 @@ def checkout(request):
     # Send the email with the PDF attached (optional)
     try:
         # Step 1: Render the email body template (order confirmation)
-        html_message = render_to_string('order_confirmation.html', {'order': order})
+        html_message = render_to_string('order_confirmation.html', {'order': order, 'address': address})
+
         plain_text_content = strip_tags(html_message)  # Generate plain text from HTML
         
         # Send the email
@@ -1270,12 +1299,16 @@ def view_invoices(request):
     )
 
 
+import matplotlib
+matplotlib.use('Agg')
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_invoices_chart(request):
     """
     API endpoint for sales managers to view all invoices within a given date range,
-    calculate discounted revenue, and return a chart based on discounted revenue only.
+    calculate discounted revenue, and return a chart based on discounted revenue and profit.
     Only accessible by users with role 'sales_manager'.
     """
     user = request.user
@@ -1330,26 +1363,46 @@ def view_invoices_chart(request):
     # Calculate total discounted revenue
     total_discounted_revenue = invoices.aggregate(Sum('discounted_total'))['discounted_total__sum'] or 0
 
-    # Prepare data for chart (monthly breakdown of discounted revenue)
+    # Fetch refund amounts within the date range
+    refunds = RefundRequest.objects.filter(request_date__range=(start_date, end_date), status='Approved')
+    total_refunds = refunds.aggregate(Sum('refund_amount'))['refund_amount__sum'] or 0
+
+    # Subtract refunds from discounted revenue
+    adjusted_discounted_revenue = total_discounted_revenue - total_refunds
+
+    # Prepare data for chart (monthly breakdown of discounted revenue and profit)
     discounted_revenue_per_month = []
+    profit_per_month = []
     months = []
 
-    # Generate discounted revenue per month within the given date range
+    # Generate monthly data within the given date range
     current_date = start_date
     while current_date <= end_date:
         # Define the start and end of the current month
         month_start = datetime(current_date.year, current_date.month, 1)
-        month_end = datetime(current_date.year, current_date.month + 1, 1) if current_date.month < 12 else datetime(current_date.year + 1, 1, 1)
+        month_end = (datetime(current_date.year, current_date.month + 1, 1) if current_date.month < 12 
+                     else datetime(current_date.year + 1, 1, 1)) - timedelta(seconds=1)
         
         # Ensure the month_end doesn't exceed the given end_date
         if month_end > end_date:
             month_end = end_date
 
-        # Calculate the revenue for this month
-        monthly_discounted_revenue = Invoice.objects.filter(date__range=(month_start, month_end)).aggregate(Sum('discounted_total'))['discounted_total__sum'] or 0
-        
-        # Append the result
+        # Calculate revenue and profit for this month
+        monthly_invoices = Invoice.objects.filter(date__range=(month_start, month_end))
+        monthly_discounted_revenue = monthly_invoices.aggregate(Sum('discounted_total'))['discounted_total__sum'] or 0
+        monthly_total_amount = monthly_invoices.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        monthly_cost = monthly_total_amount / 2  # Assuming cost is half of the total_amount
+        monthly_profit = monthly_discounted_revenue - monthly_cost
+
+        # Subtract refunds for this month
+        monthly_refunds = RefundRequest.objects.filter(request_date__range=(month_start, month_end), status='Approved')
+        monthly_refund_total = monthly_refunds.aggregate(Sum('refund_amount'))['refund_amount__sum'] or 0
+        monthly_discounted_revenue -= monthly_refund_total
+        monthly_profit -= monthly_refund_total  # Adjust profit by refund amount
+
+        # Append data
         discounted_revenue_per_month.append(monthly_discounted_revenue)
+        profit_per_month.append(monthly_profit)
         months.append(month_start.strftime('%b %Y'))  # Format month as "Short Month Year" (e.g., "Jan 2024")
         
         # Move to the next month
@@ -1358,54 +1411,53 @@ def view_invoices_chart(request):
         else:
             current_date = datetime(current_date.year, current_date.month + 1, 1)
 
-    # Get the maximum revenue value to set as the max y-axis limit
-    max_revenue = max(discounted_revenue_per_month) if discounted_revenue_per_month else 0
+    # Debugging: Print the data
+    print("Months:", months)
+    print("Discounted Revenue per Month:", discounted_revenue_per_month)
+    print("Profit per Month:", profit_per_month)
 
-    # Generate a plot (chart) of discounted revenue (only one line for revenue)
+    # Generate a plot (chart) of revenue and profit
     fig, ax = plt.subplots()
-    ax.plot(months, discounted_revenue_per_month, label="Discounted Revenue", color='green')
+    ax.plot(months, discounted_revenue_per_month, label="Discounted Revenue", color='green', marker='o')
+    ax.plot(months, profit_per_month, label="Profit", color='orange', linestyle='-.', marker='^')
 
-
-    ax.set_xlabel('Month', fontsize=10)  # Adjust font size of x-axis label
-    ax.set_ylabel('Discounted Revenue', fontsize=10)  # Adjust font size of y-axis label
-    ax.set_title(f'Monthly Discounted Revenue from {start_date.strftime("%B %d, %Y")} to {end_date.strftime("%B %d, %Y")}', fontsize=12)
+    # Set labels and title
+    ax.set_xlabel('Month', fontsize=10)
+    ax.set_ylabel('Amount', fontsize=10)
+    ax.set_title(f'Monthly Revenue and Profit from {start_date.strftime("%B %d, %Y")} to {end_date.strftime("%B %d, %Y")}', fontsize=12)
     ax.legend(fontsize=10)
 
+    # Set y-axis limits
+    max_value = max(discounted_revenue_per_month + profit_per_month) if discounted_revenue_per_month else 0
+    ax.set_ylim(0, float(max_value) * 1.1 if max_value > 0 else 10)
 
-    # Set the y-axis limit: Min is 0, max is the max revenue value
-    ax.set_ylim(0, float(max_revenue) * 1.1)  # Giving a bit of space above max value
+    # Customize x-axis ticks
+    plt.xticks(rotation=45, ha='right')
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    # Adjust x-tick labels to prevent overlap (rotate them)
-    plt.xticks(rotation=45, ha='right')  # Rotate the labels by 45 degrees and align them to the right
-
-    # Optionally, adjust x-ticks to a reasonable number
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Adjust to show all months without too much overlap
-
-    # Define the path where to save the image
-    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')  # Assuming you are using Django's MEDIA_ROOT
+    # Save the chart
+    chart_dir = os.path.join(settings.MEDIA_ROOT, 'charts')
     if not os.path.exists(chart_dir):
         os.makedirs(chart_dir)
 
-    chart_filename = f"discounted_revenue_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.png"
+    chart_filename = f"revenue_profit_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.png"
     chart_path = os.path.join(chart_dir, chart_filename)
-
-    # Save the plot to the file system
-     # Save the plot to the file system with bbox_inches='tight' to ensure everything is visible
     plt.savefig(chart_path, format='png', bbox_inches='tight')
     plt.close(fig)
-    # You can generate the chart URL for the frontend
+
+    # Generate URL for the frontend
     chart_url = f"{settings.MEDIA_URL}charts/{chart_filename}"
 
     # Return the response with revenue data and chart URL
     return Response(
         {
-            "total_discounted_revenue": total_discounted_revenue,
+            "total_discounted_revenue": adjusted_discounted_revenue,
             "chart_url": chart_url,  # URL to the saved chart image
-
         },
         status=status.HTTP_200_OK
     )
-    
+
+
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1467,14 +1519,7 @@ def request_refund(request):
     except OrderItem.DoesNotExist:
         return Response({"error": "Order item not found or you don't have permission to refund this product."}, status=status.HTTP_404_NOT_FOUND)
     
-    
-from django.core.mail import send_mail
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from .models import RefundRequest
+
 
 
 @api_view(['POST'])
@@ -1502,7 +1547,7 @@ def review_refund_request(request):
 
         # Update the status
         refund_request.status = decision
-        refund_request.save()
+
 
         customer_email = refund_request.customer.email  # Assuming the RefundRequest has a related customer object
 
@@ -1510,14 +1555,15 @@ def review_refund_request(request):
             # Refund logic
             order_item = refund_request.order_item
             product = order_item.product
-
+            
             # Adjust product stock
             product.stock += order_item.quantity
             product.save()
 
             # Simulate refund logic here (e.g., refund the amount to customer's payment gateway)
             refund_amount = order_item.discount_subtotal
-
+            refund_request.refund_amount = refund_amount
+            refund_request.save()
             # Send an email to the customer that the refund has been approved
             send_mail(
                 'Refund Request Approved',
@@ -1541,7 +1587,7 @@ def review_refund_request(request):
             # Send an email to the customer that the refund has been rejected
             order_item = refund_request.order_item  # Access the order item related to the refund request
             product_name = order_item.product.name  # Access the product name from the order item
-
+            refund_request.save()
             send_mail(
                 'Refund Request Rejected',
                 f'Your refund request for the product "{product_name}" has been rejected.',
@@ -1576,6 +1622,8 @@ def get_pending_refund_requests(request):
     serializer = RefundRequestSerializer(pending_requests, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1635,6 +1683,7 @@ def manage_stock(request, product_id):
         return Response({"message": f"Stock updated for product '{product.name}'. New stock: {product.stock}"}, status=status.HTTP_200_OK)
     except Product.DoesNotExist:
         return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -1914,3 +1963,54 @@ def get_user_info(request):
     }
     
     return Response(user_info, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['POST'])
+def update_order_date(request, order_id):
+    """
+    API endpoint to update the 'date_ordered' field of an order.
+    Only accessible by authenticated users.
+    """
+    try:
+        # Fetch the order
+        order = Order.objects.get(id=order_id)
+
+
+        # Get the new date from the request data
+        new_date = request.data.get('date_ordered')
+        if not new_date:
+            return Response(
+                {"error": "'date_ordered' is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Parse the date safely
+        try:
+            new_date = datetime.strptime(new_date, '%Y-%m-%d %H:%M:%S')  # Example format: "2025-01-11 14:30:00"
+        except ValueError:
+            return Response(
+                {"error": "Invalid date format. Use 'YYYY-MM-DD HH:MM:SS'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update the order's date_ordered field
+        order.date_ordered = new_date
+        order.save()
+
+        return Response(
+            {"message": f"Order {order_id}'s 'date_ordered' updated successfully.", "new_date_ordered": new_date},
+            status=status.HTTP_200_OK
+        )
+
+    except Order.DoesNotExist:
+        return Response(
+            {"error": f"Order with id {order_id} does not exist."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

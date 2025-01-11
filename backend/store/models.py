@@ -342,7 +342,7 @@ class RefundRequest(models.Model):
     request_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     reason = models.TextField(blank=True, null=True)
-
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     def str(self):
         return f"Refund request {self.id} by {self.customer.username}"
 
