@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Ensure the path is correct
 import "./StockManagement.css";
 
 const StockManagementPage = () => {
@@ -7,6 +8,11 @@ const StockManagementPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [stockInputs, setStockInputs] = useState({});
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // Can be 'success' or 'error'
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +40,14 @@ const StockManagementPage = () => {
 
     fetchProducts();
   }, []);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   const handleInputChange = (productId, value) => {
     setStockInputs((prevState) => ({
@@ -79,10 +93,13 @@ const StockManagementPage = () => {
         )
       );
 
-      alert(`Stock updated successfully for "Product ID: ${productId}"`);
+      showNotification(
+        `Stock updated successfully for "Product ID: ${productId}"`,
+        "success"
+      );
     } catch (error) {
       console.error("Error updating stock:", error);
-      alert("There was an error updating the stock.");
+      showNotification("There was an error updating the stock.", "error");
     }
   };
 
@@ -160,6 +177,13 @@ const StockManagementPage = () => {
           )}
         </div>
       )}
+
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

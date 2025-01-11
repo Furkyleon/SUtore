@@ -2,62 +2,47 @@
   padding: 40px;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-  width: 50%;
-  margin-top: 80px;
-  margin-bottom: 20px;
+  width: 60%;
+  margin: 80px auto 20px;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 12px #0000001a;
 }
 
 .sales-manager-container h1 {
-  text-align: center;
   color: #01236a;
   font-size: 2rem;
   font-weight: bold;
-  padding-top: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 40px;
 }
 
-.sales-manager-container .discount-refund {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.sales-manager-container .dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 30px;
 }
 
-.sales-manager-container .discount-refund h2 {
-  font-size: 1.3rem;
-}
-
-.sales-manager-container .discount-refund .section {
-  border-radius: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 0px;
-  flex: 1;
-}
-
 .sales-manager-container .section {
-  margin-top: 30px;
   padding: 20px;
   border-radius: 25px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .sales-manager-container .section:nth-child(1) {
-  background-color: #e3f2fd; /* Light Blue for Discounts */
+  background-color: #e3f2fd; /* Light Blue */
 }
 
 .sales-manager-container .section:nth-child(2) {
-  background-color: #e8f5e9; /* Light Green for Invoices */
+  background-color: #e8f5e9; /* Light Green */
 }
 
 .sales-manager-container .section:nth-child(3) {
-  background-color: #fff8e1; /* Light Yellow for Revenue */
+  background-color: #fff8e1; /* Light Yellow */
 }
 
 .sales-manager-container .section:nth-child(4) {
-  background-color: #ffebee; /* Light Red for Refunds */
+  background-color: #ffebee; /* Light Red */
 }
 
 .sales-manager-container h2 {
@@ -67,29 +52,6 @@
   color: #333;
 }
 
-.sales-manager-container label {
-  display: block;
-  font-size: 17px;
-  font-weight: bold;
-}
-
-.sales-manager-container .date-input {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 30px;
-  margin-bottom: 20px;
-}
-
-.sales-manager-container input[type="date"] {
-  margin-right: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
 .sales-manager-container .action-button {
   padding: 10px 15px;
   background-color: #005da9;
@@ -97,30 +59,11 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 10px;
   font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .sales-manager-container .action-button:hover {
   background-color: #01236a;
-  transition: background-color 0.3s ease, transform 0.3s ease;
   transform: scale(1.1);
-}
-
-.sales-manager-container .invoice-list,
-.sales-manager-container .chart-placeholder {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 14px;
-  color: #555;
-  border: 1px dashed #ddd;
-}
-
-.sales-manager-container .error-message {
-  color: red;
-  font-weight: bold;
-  margin-bottom: 5px;
 }
