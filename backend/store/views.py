@@ -150,11 +150,9 @@ def login(request):
     # from rest_framework.authtoken.models import Token
     # token, created = Token.objects.get_or_create(user=user)
 
-        # Retrieve incomplete order IDs for the user
     incomplete_order = Order.objects.filter(complete=False, customer=user).first()
     order_id = incomplete_order.id if incomplete_order else None
 
-    
     return Response({
         # 'token': token.key,  # Uncomment if using tokens
         'user': {
@@ -892,51 +890,28 @@ def checkout(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_review(request, product_id):
-    try:
-        # Retrieve the product by its ID
-        product = Product.objects.get(id=product_id)
-    except Product.DoesNotExist:
-        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
-    # Get the rating and comment from the request data
+    product = Product.objects.get(id=product_id)
     rating = request.data.get('rating')
     comment = request.data.get('comment')
-
-    # Ensure rating is an integer, and validate that it is between 1 and 5
-    try:
-        rating = int(rating)  # Convert the rating to an integer
-    except (ValueError, TypeError):
-        return Response({"error": "Rating should be an integer between 1 and 5."}, status=status.HTTP_400_BAD_REQUEST)
-
-    if rating < 1 or rating > 5:
-        return Response({"error": "Rating should be between 1 and 5."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if the user has purchased this product in a completed order
     purchased_items = OrderItem.objects.filter(order__customer=request.user, order__complete=True, product=product)
     if not purchased_items.exists():
         return Response({"error": "You can only review products you've purchased."}, status=status.HTTP_403_FORBIDDEN)
-
+    
     # Check if the user has already reviewed this product
     existing_review = Review.objects.filter(user=request.user, product=product).first()
     if existing_review:
         return Response({"error": "You can only leave one review per product."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Check if the order containing the product has been delivered
-    order_item = purchased_items.first()
-    if not order_item.order.complete or order_item.order.status != 'Delivered':
-        return Response({"error": "You can only leave a review after your order has been delivered."}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Create the review only if the order status is 'Delivered'
-    review = Review.objects.create(
-        user=request.user,
-        product=product,
-        rating=rating,
-        comment=comment,
-        comment_status="Pending"  # Set the review status to Pending for moderation
-    )
-
-    # Serialize and return the review data
+    if comment == "":
+        review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment,comment_status="Approved")
+    # Save the review
+    else:
+        review = Review.objects.create(user=request.user, product=product, rating=rating, comment=comment)
+    
     serializer = ReviewSerializer(review)
+   
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -963,6 +938,29 @@ def get_reviews_by_product(request, product_id):
     
     return Response(response_data, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+def get_comments_by_product(request, product_id):
+    # Check if the product exists
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Filter reviews by product
+    reviews = Review.objects.filter(product=product, comment_status= "Pending")
+    
+    # Serialize the reviews
+    serializer = ReviewSerializer(reviews, many=True)
+
+    # Add username to each review in the response data
+    response_data = []
+    for review in serializer.data:
+        user = CustomUser.objects.get(id=review['user'])  # Get the user instance by ID
+        review['username'] = user.username  # Add the username to the serialized data
+        response_data.append(review)
+    
+    return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_rating_by_product(request, product_id):
@@ -1261,9 +1259,9 @@ def view_invoices(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # Extract query parameters for date range
-    start_date = request.data.get('start_date')
-    end_date = request.data.get('end_date')
+    # Extract query parameters for date range using GET
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
     # Validate presence of both parameters
     if not start_date or not end_date:
@@ -1309,7 +1307,8 @@ def view_invoices(request):
             "date": invoice.date,
             "total_amount": float(invoice.total_amount),
             "discounted_total": float(invoice.discounted_total),
-            "pdf_url": invoice.url if invoice.url else "PDF not found"
+            "pdf_url": request.build_absolute_uri(invoice.url) if invoice.url else "PDF not found"
+
         }
         for invoice in invoices
     ]

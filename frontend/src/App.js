@@ -25,6 +25,7 @@ import CommentManagement from "./Components/ProductManager/CommentManagement";
 import StockManagement from "./Components/ProductManager/StockManagement";
 import DeliveryManagement from "./Components/ProductManager/DeliveryManagement";
 import ProfilePage from "./Components/Profile/ProfilePage";
+import UpdatePricesPage from "./Components/SalesManager/UpdatePricesPage";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
           <Route path="sales-manager/discount-page" element={<DiscountPage />} />
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
           <Route path="sales-manager/calculate-revenue" element={<RevenueCalc />} />
+          <Route path="sales-manager/update-prices-page" element={<UpdatePricesPage />} />
           <Route path="manager/invoices" element={<InvoicesPage />} />
           <Route path="product-manager" element={<ProductManager />} />
           <Route path="product-manager/add-product" element={<AddProduct />} />

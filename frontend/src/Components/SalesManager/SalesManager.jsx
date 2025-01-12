@@ -21,6 +21,10 @@ const SalesManagerPage = () => {
     navigate("/manager/invoices");
   };
 
+  const handleNavigateToUpdatePricesPage = () => {
+    navigate("/sales-manager/update-prices-page");
+  };
+
   return (
     <div className="sales-manager-container">
       <h1>Sales Manager Dashboard</h1>
@@ -32,6 +36,15 @@ const SalesManagerPage = () => {
             onClick={handleNavigateToDiscountPage}
           >
             Go to Discount Page
+          </button>
+        </div>
+        <div className="section">
+          <h2>Update Product Prices</h2>
+          <button
+            className="action-button"
+            onClick={handleNavigateToUpdatePricesPage}
+          >
+            Go to Update Prices
           </button>
         </div>
         <div className="section">

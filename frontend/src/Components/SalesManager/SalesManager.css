@@ -45,6 +45,10 @@
   background-color: #ffebee; /* Light Red */
 }
 
+.sales-manager-container .section:nth-child(5) {
+  background-color: #feebff; /* Light Red */
+}
+
 .sales-manager-container h2 {
   margin-bottom: 15px;
   font-size: 1.5rem;

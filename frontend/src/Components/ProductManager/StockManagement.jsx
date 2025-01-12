@@ -66,7 +66,7 @@ const StockManagementPage = () => {
       const response = await fetch(
         `http://127.0.0.1:8000/product-manager/manage-stock/${productId}/`,
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: authHeader,

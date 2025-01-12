@@ -13,15 +13,16 @@ const PaymentPage = () => {
   const [errors, setErrors] = useState({});
   const [orderId, setOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false); // New state for loading during submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false); // State for payment success
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOrderId = async () => {
+    const fetchOrderAndUserInfo = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/order/", {
+        // Fetch order ID
+        const orderResponse = await fetch("http://127.0.0.1:8000/order/", {
           headers: {
             Authorization: `Basic ${btoa(
               `${localStorage.getItem("username")}:${localStorage.getItem(
@@ -31,21 +32,42 @@ const PaymentPage = () => {
           },
         });
 
-        if (!response.ok) {
+        if (!orderResponse.ok) {
           throw new Error("Failed to fetch the order ID.");
         }
 
-        const orderData = await response.json();
-        setOrderId(orderData.id); // Assuming the order ID is in the response
+        const orderData = await orderResponse.json();
+        setOrderId(orderData.id);
+
+        // Fetch user info
+        const userResponse = await fetch("http://127.0.0.1:8000/user/info/", {
+          headers: {
+            Authorization: `Basic ${btoa(
+              `${localStorage.getItem("username")}:${localStorage.getItem(
+                "password"
+              )}`
+            )}`,
+          },
+        });
+
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch user info.");
+        }
+
+        const userInfo = await userResponse.json();
+        setForm((prevForm) => ({
+          ...prevForm,
+          billingAddress: userInfo.address || "", // Set the user's address as the default
+        }));
       } catch (error) {
-        console.error("Error fetching order ID:", error);
-        setErrorMessage("Failed to fetch the order. Please try again.");
+        console.error("Error:", error);
+        setErrorMessage("Failed to load page data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrderId();
+    fetchOrderAndUserInfo();
   }, []);
 
   const handleChange = (e) => {
@@ -76,7 +98,7 @@ const PaymentPage = () => {
     }
 
     if (validateForm()) {
-      setIsSubmitting(true); // Set loading state to true
+      setIsSubmitting(true);
       try {
         const response = await fetch("http://127.0.0.1:8000/checkout/", {
           method: "POST",
@@ -97,14 +119,12 @@ const PaymentPage = () => {
           alert(errorData.error || "Payment failed. Please try again.");
           return;
         }
-
         localStorage.setItem("order_id", 0);
-        setPaymentSuccess(true); // Show payment success message
+        setPaymentSuccess(true);
         setTimeout(() => {
           navigate(`/invoice/${orderId}`);
         }, 3000);
 
-        // Reset form
         setForm({
           name: "",
           cardNumber: "",
@@ -116,13 +136,13 @@ const PaymentPage = () => {
         console.error("Error during checkout:", error);
         alert("An unexpected error occurred. Please try again.");
       } finally {
-        setIsSubmitting(false); // Reset loading state
+        setIsSubmitting(false);
       }
     }
   };
 
   if (loading) {
-    return <div className="loading-message">Loading order details...</div>;
+    return <div className="loading-message">Loading order and user details...</div>;
   }
 
   if (errorMessage) {
@@ -216,7 +236,7 @@ const PaymentPage = () => {
             name="billingAddress"
             value={form.billingAddress}
             onChange={handleChange}
-            placeholder=""
+            placeholder="Enter your billing address"
           ></textarea>
           {errors.billingAddress && (
             <span className="error-text">{errors.billingAddress}</span>
@@ -235,3 +255,4 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+

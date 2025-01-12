@@ -64,6 +64,7 @@ urlpatterns = [
     # Product Manager
     path('product-manager/deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
+    path('product-manager/<int:product_id>/get_comments/', views.get_comments_by_product, name='get_comments_by_product'),
     path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
     path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
