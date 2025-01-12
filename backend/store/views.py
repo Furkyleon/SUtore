@@ -150,6 +150,11 @@ def login(request):
     # from rest_framework.authtoken.models import Token
     # token, created = Token.objects.get_or_create(user=user)
 
+        # Retrieve incomplete order IDs for the user
+    incomplete_order = Order.objects.filter(complete=False, customer=user).first()
+    order_id = incomplete_order.id if incomplete_order else None
+
+    
     return Response({
         # 'token': token.key,  # Uncomment if using tokens
         'user': {
@@ -157,7 +162,8 @@ def login(request):
             'email': user.email,
             'address': user.address,
             'tax_id': user.tax_id,
-            'role': user.role
+            'role': user.role,
+            'order_id': order_id
         }
     }, status=status.HTTP_200_OK)
  
@@ -1821,56 +1827,65 @@ def update_user_fields(request):
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Ensure the user is authenticated
-def update_delivery_status(request, delivery_id):
+def update_delivery_status(request, order_id):
     """
-    API endpoint to update the delivery status and address for a specific delivery.
+    API endpoint to update the order status and delivery address for a specific order.
     Only accessible by product managers.
     """
     # Check if the user is a product manager
     if request.user.role != 'product_manager':
-        return Response({"error": "You are not authorized to update this delivery status."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "You are not authorized to update this order."}, status=status.HTTP_403_FORBIDDEN)
     
-    # Check if the delivery exists
+    # Check if the order exists
     try:
-        delivery = Delivery.objects.get(id=delivery_id)
-    except Delivery.DoesNotExist:
-        return Response({"error": "Delivery not found."}, status=status.HTTP_404_NOT_FOUND)
+        order = Order.objects.get(id=order_id)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
     # Get the status and delivery address from the request
     new_status = request.data.get('status', None)
     new_delivery_address = request.data.get('delivery_address', None)
 
-    # Update the delivery address if provided
-    if new_delivery_address:
-        delivery.delivery_address = new_delivery_address
-
-    # If a new status is provided, update the order status
+    # Update the status for the order
     if new_status:
         if new_status not in ['In-transit', 'Delivered', 'Processing', 'Cancelled']:
             return Response({"error": "Invalid status."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Update the order status (you can customize this part depending on your logic)
-        delivery.order_item.order.status = new_status
-        delivery.order_item.order.save()
+        # Update the order status
+        order.status = new_status
+        order.save()
 
-    # Save the updated delivery object
-    delivery.updated_at = timezone.now()  # Update the timestamp for the modification
-    delivery.save()
+    # Update the delivery address if provided
+    if new_delivery_address:
+        # Update the delivery address for each order item
+        for order_item in order.order_items.all():
+            try:
+                # Get the associated delivery for this order item
+                delivery = order_item.delivery
+                if delivery:
+                    delivery.delivery_address = new_delivery_address
+                    delivery.save()  # Save the updated delivery address
+            except Delivery.DoesNotExist:
+                return Response({"error": f"No delivery found for order item {order_item.id}"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Return the updated delivery information
+    # Save the updated order object
+    order.updated_at = timezone.now()  # Update the timestamp for the modification
+    order.save()
+
+    # Return the updated order information
     return Response({
-        "message": "Delivery updated successfully.",
-        "delivery": {
-            "id": delivery.id,
-            "order_item": delivery.order_item.id,
-            "customer": delivery.customer.username,
-            "delivery_address": delivery.delivery_address,
-            "total_price": str(delivery.total_price),
-            "status": delivery.status,
-            "created_at": delivery.created_at,
-            "updated_at": delivery.updated_at,
+        "message": "Order updated successfully.",
+        "order": {
+            "id": order.id,
+            "customer": order.customer.username,
+            "status": order.status,
+            "total_price": str(order.get_total_cost),
+            "created_at": order.date_ordered,
+            "updated_at": order.updated_at,
+            "delivery_address": new_delivery_address or "No new address provided",
         }
     }, status=status.HTTP_200_OK)
+
     
     
 @api_view(['GET'])

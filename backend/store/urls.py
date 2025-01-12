@@ -66,7 +66,7 @@ urlpatterns = [
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
     path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
     path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
-    path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
+    path('product-manager/update_delivery_status/<int:order_id>/', views.update_delivery_status, name='update_delivery_status'),
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
