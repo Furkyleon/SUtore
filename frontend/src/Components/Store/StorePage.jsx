@@ -55,7 +55,13 @@ const StorePage = () => {
           if (!response.ok) throw new Error("Failed to add item to cart!");
           return response.json();
         })
-        .then(() => showNotification("Product added to cart successfully!", "success"))
+        .then((data) => {
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+            console.log("Order ID saved locally.");
+          }
+          showNotification("Product added to cart successfully!", "success");
+        })
         .catch(() => {
           showNotification("There was an error adding the product to the cart.", "error");
         });

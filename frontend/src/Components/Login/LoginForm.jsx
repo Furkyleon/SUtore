@@ -47,6 +47,7 @@ const LoginForm = () => {
         localStorage.setItem("username", username);
         localStorage.setItem("password", password);
         localStorage.setItem("role", responseData.user.role);
+        localStorage.setItem("order_id", responseData.user.order_id);
 
         console.log(username, password, responseData.user.role);
 
