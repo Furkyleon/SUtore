@@ -1580,7 +1580,7 @@ def review_refund_request(request):
             # Send an email to the customer that the refund has been approved
             send_mail(
                 'Refund Request Approved',
-                f'Your refund request for the product "{product.name}" has been approved. The amount of ${refund_amount} has been refunded to your card.',
+                f'Your refund request for the product "{product.name}" has been approved. The amount of {refund_amount} TL has been refunded to your card.',
                 settings.EMAIL_HOST_USER,
                 [customer_email],
                 fail_silently=False,

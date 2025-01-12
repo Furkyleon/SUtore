@@ -45,15 +45,14 @@ urlpatterns = [
     path('order-item/<int:order_item_id>/', views.get_order_item, name='get_order_item'),
     path('orders/update_date/<int:order_id>/', views.update_order_date, name='update_order_date'),
     path('invoices/<int:invoice_id>/update-date/', views.update_invoice_date, name='update_invoice_date'),
-    # order cancelling api needed
-    path('product_manager/order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
+    path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 
     # Reviews
     path('products/<int:product_id>/add_review/', views.add_review, name='add_review'),
     path('products/<int:product_id>/get_reviews/', views.get_reviews_by_product, name='get_reviews_by_product'),
     path('products/<int:product_id>/get_rating/', views.get_rating_by_product, name='get_rating_by_product'),
 
-    # Sales Managerview_invoices_chart
+    # Sales Manager
     path('sales-manager/apply-discount/', views.apply_discount, name='apply_discount'),
     path('sales-manager/view-invoices/', views.view_invoices, name="view-invoices"),
     path('sales-manager/view-invoices_chart/', views.view_invoices_chart, name="view-invoices_chart"),
@@ -61,7 +60,6 @@ urlpatterns = [
     path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
     path('sales-manager/revenue/', views.calculate_revenue, name="calculate_revenue"),
     path('sales-manager/adjust_product_price/<int:product_id>/', views.adjust_product_price, name='adjust_product_price'),
-    # revenue calculation
     
     # Product Manager
     path('product-manager/deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
@@ -69,7 +67,6 @@ urlpatterns = [
     path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
     path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
-    # disapprove api can be added ?
 
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
@@ -83,5 +80,4 @@ urlpatterns = [
     path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
     path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
     
-
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
