@@ -260,8 +260,11 @@ def get_products_by_category(request, category_name):
     if not Category.objects.filter(name=category_name).exists():
         return Response({'error': 'Category does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
+    # Find category object by category name
+    category = Category.objects.get(name=category_name)
+
     # Filter products by category
-    products = Product.objects.filter(category=category_name)
+    products = Product.objects.filter(category=category)
 
     if not products.exists():
         # Return error if no products found in the category
@@ -1316,7 +1319,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def view_invoices_chart(request):
     """
