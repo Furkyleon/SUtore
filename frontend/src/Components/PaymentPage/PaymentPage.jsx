@@ -110,7 +110,10 @@ const PaymentPage = () => {
               )}`
             )}`,
           },
-          body: JSON.stringify({ order_id: orderId }),
+          body: JSON.stringify({
+            order_id: orderId,
+            address: form.billingAddress,
+          }),
         });
 
         if (!response.ok) {
@@ -142,7 +145,9 @@ const PaymentPage = () => {
   };
 
   if (loading) {
-    return <div className="loading-message">Loading order and user details...</div>;
+    return (
+      <div className="loading-message">Loading order and user details...</div>
+    );
   }
 
   if (errorMessage) {
@@ -255,4 +260,3 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
-

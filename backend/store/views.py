@@ -724,26 +724,33 @@ def get_order(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Ensure the user is logged in
 def order_history(request):
-    if not request.user.is_authenticated:
-        return Response({"error": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
-
+    """
+    Retrieve order history for all users if the logged-in user is a manager.
+    Otherwise, retrieve only the logged-in user's order history.
+    """
     try:
-        # Retrieve order history for the user
-        order_history = OrderHistory.objects.get(customer=request.user)
-        orders = order_history.orders.filter(complete=True)
+        if request.user.role == 'product_manager':  # Replace 'manager' with your manager role identifier
+            # Retrieve all orders
+            orders = Order.objects.filter(complete=True)
+        else:
+            # Retrieve only the logged-in user's orders
+            orders = Order.objects.filter(customer=request.user, complete=True)
 
-        # Structure each order to show only item IDs within the order and refund status
+        # Serialize the orders
         data = []
         for order in orders:
             order_data = {
                 "order_id": order.id,
                 "customer": order.customer.id,
+                "customer_username": order.customer.username,
                 "date_ordered": order.date_ordered,
                 "complete": order.complete,
                 "transaction_id": order.transaction_id,
                 "status": order.status,
-                "items": [{
+                "items": [
+                    {
                         "id": item.product.id,
                         "order_id": item.id,
                         "product": item.product.name,
@@ -753,26 +760,28 @@ def order_history(request):
                         "subtotal": str(item.subtotal),
                         "discount_subtotal": str(item.discount_subtotal),
                         "date_added": item.date_added,
-                        # Default to "None" for refund status
-                        "refund_status": None
+                        "refund_status": None,  # Default to "None"
                     }
                     for item in order.order_items.all()
-                ]
+                ],
             }
-            # Add refund status for each item, filtered by the customer
+
+            # Add refund status for each item
             for item_data in order_data["items"]:
-                # Fetch the refund request for this order item and the logged-in customer
-                refund_request = RefundRequest.objects.filter(order_item=item_data["order_id"], customer=request.user).first()
+                refund_request = RefundRequest.objects.filter(
+                    order_item=item_data["order_id"], customer=order.customer
+                ).first()
                 if refund_request:
                     item_data["refund_status"] = refund_request.status
                 else:
-                    item_data["refund_status"] = "None"  # Explicitly set to "None" if no refund request exists
+                    item_data["refund_status"] = "None"
 
             data.append(order_data)
 
         return Response(data, status=status.HTTP_200_OK)
-    except OrderHistory.DoesNotExist:
-        return Response({"error": "No order history found."}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -2009,11 +2018,13 @@ def get_user_info(request):
     
     # Prepare the user information to be returned in the response
     user_info = {
+        'id': user.id,
         'username': user.username,
         'email': user.email,
         'address': user.address,
         'tax_id': user.tax_id,
         'role': user.role,
+        'password': user.password,
     }
     
     return Response(user_info, status=status.HTTP_200_OK)

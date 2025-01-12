@@ -8,7 +8,9 @@ const ProfilePage = () => {
   const [role, setRole] = useState("");
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
-  
+  const [id, setId] = useState(null);
+  const [pass, setPassword] = useState("");
+
   const authUsername = localStorage.getItem("username");
   const password = localStorage.getItem("password");
 
@@ -26,11 +28,13 @@ const ProfilePage = () => {
 
         if (response.ok) {
           const data = await response.json();
+          setId(data.id);
           setUsername(data.username);
           setEmail(data.email);
           setAddress(data.address);
           setTaxId(data.tax_id);
           setRole(data.role);
+          setPassword(data.password);
         } else {
           setMessage("Failed to load user information.");
         }
@@ -79,6 +83,18 @@ const ProfilePage = () => {
       <h2 className="profile-page-title">Profile</h2>
       <form onSubmit={handleSubmit} className="profile-page-form">
         <div className="profile-page-form-group">
+          <label htmlFor="id" className="profile-page-label">
+            User ID:
+          </label>
+          <input
+            type="text"
+            id="id"
+            value={id}
+            disabled
+            className="profile-page-input"
+          />
+        </div>
+        <div className="profile-page-form-group">
           <label htmlFor="username" className="profile-page-label">
             Username:
           </label>
@@ -110,6 +126,18 @@ const ProfilePage = () => {
             type="text"
             id="role"
             value={role}
+            disabled
+            className="profile-page-input"
+          />
+        </div>
+        <div className="profile-page-form-group">
+          <label htmlFor="password" className="profile-page-label">
+            Password:
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
             disabled
             className="profile-page-input"
           />
