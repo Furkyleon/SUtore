@@ -147,9 +147,13 @@ class RefundRequestSerializer(serializers.ModelSerializer):
     Serializer for RefundRequest model.
     """
 
-    # Make customer and order_item read-only fields
+    # Read-only fields for customer and order item
     customer = serializers.StringRelatedField(read_only=True)
     order_item = serializers.StringRelatedField(read_only=True)
+
+    # Custom fields for product name and quantity
+    product_name = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = RefundRequest
@@ -157,12 +161,26 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             'id',
             'customer',
             'order_item',
+            'product_name',
+            'quantity',
             'refund_amount',
             'request_date',
             'status',
             'reason',
         ]
         read_only_fields = ['id', 'customer', 'order_item', 'request_date']
+
+    def get_product_name(self, obj):
+        """
+        Get the product name associated with the order item.
+        """
+        return obj.order_item.product.name if obj.order_item and obj.order_item.product else None
+
+    def get_quantity(self, obj):
+        """
+        Get the quantity of the product in the order item.
+        """
+        return obj.order_item.quantity if obj.order_item else None
 
     def validate(self, data):
         """
@@ -180,6 +198,7 @@ class RefundRequestSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": "Refunds can only be requested within 30 days of purchase."})
 
         return data
+
 
 class DeliverySerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='order_item.product.name', read_only=True)
