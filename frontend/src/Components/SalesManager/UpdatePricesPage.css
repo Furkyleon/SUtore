@@ -1,0 +1,130 @@
+.update-prices-page-wrapper {
+    width: 100%;
+    text-align: center;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+    margin-top: 60px;
+  }
+  
+  .update-prices-page-wrapper h1 {
+    color: #01236a;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    text-decoration: none;
+  }
+  
+  .update-prices-page-wrapper .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 50px;
+  }
+  
+  .update-prices-page-wrapper .product-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: flex-end;
+    transition: transform 0.3s ease;
+  }
+  
+  .update-prices-page-wrapper .product-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .update-prices-page-wrapper .product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 20px;
+  }
+  
+  .update-prices-page-wrapper .product-card h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #01236a;
+  }
+  
+  .update-prices-page-wrapper .product-card .current-price {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .update-prices-page-wrapper .price-controls {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .update-prices-page-wrapper .price-controls label {
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .update-prices-page-wrapper .price-controls input {
+    width: 60%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .update-prices-page-wrapper .price-controls .update-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .update-prices-page-wrapper .price-controls .update-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .update-prices-page-wrapper .error {
+    color: #ff0000;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+
+  .update-prices-page-wrapper .product-card .current-price {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .update-prices-page-wrapper .product-card .discounted-price {
+    font-size: 0.8rem;
+    color: #ff9800;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .update-prices-page-wrapper .product-list {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .update-prices-page-wrapper .product-card {
+      width: 90%;
+    }
+  }
+  
