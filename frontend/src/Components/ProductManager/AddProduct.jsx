@@ -135,9 +135,6 @@ const AddProductPage = () => {
             onChange={handleChange}
           />
         </div>
-      </div>
-
-      <div className="form-row">
         <div className="form-group">
           <label htmlFor="stock">Stock</label>
           <input
@@ -149,6 +146,9 @@ const AddProductPage = () => {
             required
           />
         </div>
+      </div>
+
+      <div className="form-row">
         <div className="form-group">
           <label htmlFor="serial_number">Serial Number</label>
           <input
@@ -160,9 +160,6 @@ const AddProductPage = () => {
             required
           />
         </div>
-      </div>
-
-      <div className="form-row">
         <div className="form-group">
           <label htmlFor="price">Price</label>
           <input
@@ -187,44 +184,12 @@ const AddProductPage = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="category">Category</label>
-        <select
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          required
-        >
-          <option value="" disabled>
-            Select a category
-          </option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
         <label htmlFor="image">Image</label>
         <input
           type="file"
           id="image"
           name="image"
           onChange={handleFileChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="description">Description</label>
-        <textarea
-          className="description-textarea"
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          required
         />
       </div>
 
@@ -241,13 +206,45 @@ const AddProductPage = () => {
         </div>
         <div className="form-group">
           <label htmlFor="distributor_info">Distributor Info</label>
-          <textarea
+          <input
+            type="text"
             id="distributor_info"
             name="distributor_info"
             value={formData.distributor_info}
             onChange={handleChange}
           />
         </div>
+        <div className="form-group">
+          <label htmlFor="category">Category</label>
+          <select
+            id="category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="description">Description</label>
+        <textarea
+          className="description-textarea"
+          id="description"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          required
+        />
       </div>
 
       {error && <p className="error-message">{error}</p>}

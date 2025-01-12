@@ -26,8 +26,10 @@ const Invoice = () => {
       })
       .then((data) => {
         // Find the order with the specified orderId
-        
-        const foundOrder = data.find((order) => order.order_id === parseInt(orderId, 10));
+
+        const foundOrder = data.find(
+          (order) => order.order_id === parseInt(orderId, 10)
+        );
         if (!foundOrder) {
           throw new Error("Order not found.");
         }
@@ -35,9 +37,10 @@ const Invoice = () => {
         setLoading(false);
       })
       .catch((error) => {
-        
         console.error("Error fetching order details:", error);
-        setError(error.message || "Failed to load order details. Please try again.");
+        setError(
+          error.message || "Failed to load order details. Please try again."
+        );
         setLoading(false);
       });
   }, [orderId]);
@@ -48,18 +51,8 @@ const Invoice = () => {
   return (
     <div className="invoice-container">
       <h1>Invoice for Order #{order.order_id}</h1>
-      <p>
-        <strong>Customer ID:</strong> {order.customer}
-      </p>
-      <p className="total-price">
-        <strong>Total Price: </strong> 
-        {order.items
-          .reduce((total, item) => total + parseFloat(item.subtotal), 0)
-          .toFixed(2)} TL
-      </p>
-
       <div className="invoice-details">
-        <h3>Ordered Products:</h3>
+        <h4>Ordered Products:</h4>
         <ul>
           {order.items.map((item) => (
             <li key={item.id}>
@@ -67,13 +60,21 @@ const Invoice = () => {
               <br />
               Quantity: {item.quantity}
               <br />
-              Price per unit: {parseFloat(item.price).toFixed(2)} TL
-              <br />
-              Total: {parseFloat(item.subtotal).toFixed(2)} TL
+              Total: {parseFloat(item.discount_subtotal).toFixed(2)} TL
             </li>
           ))}
         </ul>
       </div>
+      <p className="total-price">
+        <strong>Total Price: </strong>
+        {order.items
+          .reduce(
+            (total, item) => total + parseFloat(item.discount_subtotal),
+            0
+          )
+          .toFixed(2)}{" "}
+        TL
+      </p>
     </div>
   );
 };

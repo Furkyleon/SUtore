@@ -25,6 +25,12 @@
   color: #01236a;
 }
 
+.manage-categories-container p {
+  text-align: center;
+  margin-top: 30px;
+  color: #01236a;
+}
+
 .manage-categories-container .error {
   color: red;
   margin-top: 5px;
@@ -83,7 +89,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 
 .manage-categories-container .category-input {

@@ -1,3 +1,4 @@
+# accounts/urls.py
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -10,6 +11,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('update_user_fields/', views.update_user_fields, name='update_user_fields'),
+    path('user/info/', views.get_user_info, name='get_user_info'),  
 
     # Product and Category
     path('products/add_product/', views.add_product, name='add_product'),
@@ -37,10 +39,12 @@ urlpatterns = [
     # Payment and Order History
     path('checkout/', views.checkout, name='checkout'),
     path('order/items/<int:order_id>/', views.get_order_items, name='get_order_items'),
-    path('order/itemsforrefund/<int:order_id>/', views.get_order_items_for_refund, name='get_order_items_for_refund'),
     path('order/', views.get_order, name='get_order'),
     path('order/history/', views.order_history, name='order_history'),
     path('request-refund/', views.request_refund, name="request_refund"),
+    path('order-item/<int:order_item_id>/', views.get_order_item, name='get_order_item'),
+    path('orders/update_date/<int:order_id>/', views.update_order_date, name='update_order_date'),
+    path('invoices/<int:invoice_id>/update-date/', views.update_invoice_date, name='update_invoice_date'),
     path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 
     # Reviews
@@ -55,26 +59,25 @@ urlpatterns = [
     path('sales-manager/pending-refund-requests/', views.get_pending_refund_requests, name='pending-refund-requests'),
     path('sales-manager/review-refund-request/', views.review_refund_request, name="review_refund_request"),
     path('sales-manager/revenue/', views.calculate_revenue, name="calculate_revenue"),
+    path('sales-manager/adjust_product_price/<int:product_id>/', views.adjust_product_price, name='adjust_product_price'),
     
     # Product Manager
     path('product-manager/deliveries/', views.get_all_deliveries, name='get_all_deliveries'),
     path('product-manager/update-product-stock/', views.update_product_stock, name='update_product_stock'),
-    path('product-manager/<int:product_id>/get_comments/', views.get_comments_by_product, name='get_comments_by_product'),
     path('product-manager/reviews/<int:review_id>/<str:new_status>/', views.update_review_comment_status, name='approve-review'),
     path('product-manager/manage-stock/<int:product_id>/', views.manage_stock, name='manage_stock'),
     path('product-manager/update_delivery_status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
-    
-    # Sort and Search
+
     path('products/sort/price/asc/', views.get_products_sorted_by_price_asc, name='products_sorted_by_price_asc'),
     path('products/sort/price/desc/', views.get_products_sorted_by_price_desc, name='products_sorted_by_price_desc'),
-    path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
-    path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
-    path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
-    path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
-    path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
-    path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
     path('products/search_products/', views.search_products, name='search_products'),
     path('products/search/', views.get_products_by_name, name='get_products_by_name'),
     path('products/price-interval/', views.get_products_by_price_interval, name='products_by_price_interval'),
-
+    path('products/category/<str:category_name>/sort/price/asc/', views.get_products_by_category_sorted_by_price_asc, name='products_by_category_sorted_by_price_asc'),
+    path('products/category/<str:category_name>/sort/price/desc/', views.get_products_by_category_sorted_by_price_desc, name='products_by_category_sorted_by_price_desc'),
+    path('products/sort/popularity/asc/', views.get_products_sorted_by_popularity_asc, name='get_products_sorted_by_popularity_asc'),
+    path('products/sort/popularity/desc/', views.get_products_sorted_by_popularity_desc, name='get_products_sorted_by_popularity_desc'),
+    path('products/category/<str:category_name>/sort/popularity/asc/', views.get_products_by_category_sorted_by_popularity_asc, name='get_products_by_category_sorted_by_popularity_asc'),
+    path('products/category/<str:category_name>/sort/popularity/desc/', views.get_products_by_category_sorted_by_popularity_desc, name='get_products_by_category_sorted_by_popularity_desc'),
+    
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

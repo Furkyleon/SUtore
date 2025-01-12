@@ -59,11 +59,18 @@
 .manage-comments-wrapper .success-message {
   color: green;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-top: 20px;
+  text-align: center;
 }
 
 .manage-comments-wrapper .reviews-list {
   margin-top: 20px;
+}
+
+.manage-comments-wrapper .reviews-list h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 .manage-comments-wrapper .review-item {
@@ -84,9 +91,27 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }
 
 .manage-comments-wrapper .approve-btn:hover {
   background-color: #218838;
+}
+
+.manage-comments-wrapper .reject-btn {
+  margin-top: 10px;
+  padding: 8px 15px;
+  background-color: #c51f1f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  margin-left: 10px;
+}
+
+.manage-comments-wrapper .reject-btn:hover {
+  background-color: #a90000;
 }

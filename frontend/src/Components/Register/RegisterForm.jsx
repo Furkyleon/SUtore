@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import "./RegisterForm.css";
+import TopRightNotification from "../NotificationModal/TopRightNotification"; // Import TopRightNotification
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -9,6 +10,21 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Notification state
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // 'success', 'error', or 'warning'
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
@@ -26,15 +42,24 @@ const RegisterForm = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        alert(`Welcome, ${responseData.user.username || "user"}!`);
-        navigate("/login");
+
+        // Show welcome notification instead of alert
+        showNotification(
+          `Welcome, ${responseData.user.username || "user"}!`,
+          "success"
+        );
+
+        // Delay navigation by 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 1200);
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || "Register failed");
+        showNotification(errorData.error || "Register failed", "error");
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      console.error("Error during registration:", error);
+      showNotification("An unexpected error occurred. Please try again.", "error");
     }
   };
 
@@ -85,6 +110,15 @@ const RegisterForm = () => {
           </div>
         </form>
       </div>
+
+      {/* Top-Right Notification */}
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+        customClass="custom-register-notification" // Add custom class
+      />
     </div>
   );
 };

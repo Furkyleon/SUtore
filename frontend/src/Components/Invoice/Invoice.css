@@ -22,10 +22,10 @@
   border-bottom: 2px solid #2980b9;
 }
 
-.invoice-container h3 {
+.invoice-container h4 {
   color: #2980b9;
   font-size: 1.6em;
-  margin-top: 20px;
+  margin-top: 30px;
   margin-bottom: 20px;
 }
 
@@ -36,10 +36,9 @@
 }
 
 .invoice-container .total-price {
-  font-size: 1.5em;
-  font-weight: bold;
+  font-size: 1.3em;
   color: #27ae60;
-  margin: 20px 0;
+  margin-top: 20px;
 }
 
 .invoice-container .invoice-details ul {

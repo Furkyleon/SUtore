@@ -23,7 +23,7 @@ import DeleteProduct from "./Components/ProductManager/DeleteProduct";
 import CategoryManagement from "./Components/ProductManager/CategoryManagement";
 import CommentManagement from "./Components/ProductManager/CommentManagement";
 import StockManagement from "./Components/ProductManager/StockManagement";
-import DeliveryManagementPage from "./Components/ProductManager/DeliveryManagementPage";
+import DeliveryManagement from "./Components/ProductManager/DeliveryManagement";
 import ProfilePage from "./Components/Profile/ProfilePage";
 
 function App() {
@@ -35,6 +35,8 @@ function App() {
           <Route path="store" element={<StorePage />} />
           <Route path="login" element={<LoginForm />} />
           <Route path="register" element={<RegisterForm />} />
+          <Route path="profile" element={<ProfilePage />} />
+          
           <Route path="payment" element={<PaymentPage />} />
           <Route path="order-history" element={<OrderHistory />} />
           <Route path="categories/:categoryName" element={<CategoryPage />} />
@@ -42,41 +44,20 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="invoice/:orderId" element={<Invoice />} />
-          <Route path="manager/invoices" element={<InvoicesPage />} />
           <Route path="wishlist" element={<Wishlist />} />
+
           <Route path="sales-manager" element={<SalesManager />} />
-          <Route
-            path="sales-manager/discount-page"
-            element={<DiscountPage />}
-          />
+          <Route path="sales-manager/discount-page" element={<DiscountPage />} />
           <Route path="sales-manager/refund-page" element={<RefundPage />} />
-          <Route
-            path="sales-manager/calculate-revenue"
-            element={<RevenueCalc />}
-          />
+          <Route path="sales-manager/calculate-revenue" element={<RevenueCalc />} />
+          <Route path="manager/invoices" element={<InvoicesPage />} />
           <Route path="product-manager" element={<ProductManager />} />
           <Route path="product-manager/add-product" element={<AddProduct />} />
-          <Route
-            path="product-manager/delete-product"
-            element={<DeleteProduct />}
-          />
-          <Route
-            path="product-manager/category-management"
-            element={<CategoryManagement />}
-          />
-          <Route
-            path="product-manager/comment-management"
-            element={<CommentManagement />}
-          />
-          <Route
-            path="product-manager/stock-management"
-            element={<StockManagement />}
-          />
-          <Route
-            path="product-manager/deliveries-page"
-            element={<DeliveryManagementPage />}
-          />
-          <Route path="profile" element={<ProfilePage />} /> {/* New ProfilePage route */}
+          <Route path="product-manager/delete-product" element={<DeleteProduct />} />
+          <Route path="product-manager/category-management" element={<CategoryManagement />} />
+          <Route path="product-manager/comment-management" element={<CommentManagement />} />
+          <Route path="product-manager/stock-management" element={<StockManagement />} />
+          <Route path="product-manager/deliveries-page" element={<DeliveryManagement />} />
         </Route>
       </Routes>
     </Router>

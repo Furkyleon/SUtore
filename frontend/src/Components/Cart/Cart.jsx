@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import "./Cart.css";
 
@@ -61,15 +62,18 @@ const Cart = () => {
     };
 
     const fetchProductDetails = async () => {
-      let myorderID = localStorage.getItem("order_id");
-      console.log("My order ID: ", myorderID);
       try {
         const response = await fetch("http://127.0.0.1:8000/products/get_all/");
         if (!response.ok) throw new Error("Failed to fetch product details");
         const productData = await response.json();
         const productMap = {};
         productData.forEach((product) => {
-          productMap[product.id] = product.name;
+          productMap[product.id] = {
+            name: product.name,
+            price: product.price,
+            discount: product.discount || 0,
+            image: product.image,
+          };
         });
         setProducts(productMap);
       } catch (err) {
@@ -147,10 +151,21 @@ const Cart = () => {
     }
   };
 
+  const getDiscountedPrice = (productId) => {
+    const product = products[productId];
+    if (!product) return null;
+
+    const { price, discount } = product;
+    if (discount && discount > 0) {
+      return (price * (1 - discount / 100)).toFixed(2);
+    }
+    return price.toFixed(2);
+  };
+
   const calculateTotal = () => {
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.price) || 0;
+        const price = parseFloat(getDiscountedPrice(item.product)) || 0;
         return total + price * item.quantity;
       }, 0)
       .toFixed(2);
@@ -167,7 +182,22 @@ const Cart = () => {
           <ul className="cart-items">
             {cartItems.map((item) => (
               <li key={item.id} className="cart-item">
-                <span className="item-name">{products[item.product]}</span>
+                <div className="item-image">
+                  <Link to={`/product/${item.product}`}>
+                    <img
+                      src={`http://127.0.0.1:8000${
+                        products[item.product]?.image
+                      }`}
+                      alt={products[item.product]?.name}
+                      className="product-image"
+                    />
+                  </Link>
+                </div>
+                <Link to={`/product/${item.product}`}>
+                  <span className="item-name">
+                    {products[item.product]?.name}
+                  </span>
+                </Link>
                 <span className="item-quantity">
                   <strong>Quantity:</strong> <span>{item.quantity}</span>
                   <button
@@ -184,11 +214,28 @@ const Cart = () => {
                   </button>
                 </span>
                 <span className="item-price">
-                  Price per Unit: {parseFloat(item.price).toFixed(2)} TL
+                  {products[item.product]?.discount > 0 ? (
+                    <div className="price-wrapper">
+                      <span className="original-price">
+                        {parseFloat(products[item.product]?.price).toFixed(2)}{" "}
+                        TL
+                      </span>
+                      <span className="discounted-price">
+                        {getDiscountedPrice(item.product)} TL
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="original-price2">
+                      {parseFloat(products[item.product]?.price).toFixed(2)} TL
+                    </span>
+                  )}
                 </span>
                 <span className="item-subtotal">
                   Subtotal:{" "}
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} TL
+                  {(
+                    parseFloat(getDiscountedPrice(item.product)) * item.quantity
+                  ).toFixed(2)}{" "}
+                  TL
                 </span>
                 <button
                   className="delete-button"

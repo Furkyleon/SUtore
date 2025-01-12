@@ -150,15 +150,13 @@ const RevenueCalculationPage = () => {
       {chartUrl && (
         <div className="chart-container">
           <h3>Discounted Revenue Chart</h3>
-          <img src={chartUrl} alt="Discounted Revenue Chart" className="chart" />
+          <img
+            src={chartUrl}
+            alt="Discounted Revenue Chart"
+            className="chart"
+          />
         </div>
       )}
-
-      <div className="center-button">
-        <button className="action-button" onClick={handleBack}>
-          Back to Dashboard
-        </button>
-      </div>
     </div>
   );
 };
