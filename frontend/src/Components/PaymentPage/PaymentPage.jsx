@@ -98,6 +98,7 @@ const PaymentPage = () => {
           return;
         }
 
+        localStorage.setItem("order_id", 0);
         setPaymentSuccess(true); // Show payment success message
         setTimeout(() => {
           navigate(`/invoice/${orderId}`);

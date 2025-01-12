@@ -16,16 +16,13 @@ const Cart = () => {
       const username = localStorage.getItem("username");
       const password = localStorage.getItem("password");
 
-      if (username && username !== "null" && password && password !== "null") {
+      if (!(username && username !== "null" && password && password !== "null")) {
         // Authenticated user
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/order/items/${0}/`,
+            `http://127.0.0.1:8000/order/items/${myorderID}/`,
             {
               method: "GET",
-              headers: {
-                Authorization: `Basic ${btoa(`${username}:${password}`)}`,
-              },
             }
           );
           if (!response.ok) throw new Error("Failed to fetch cart items");

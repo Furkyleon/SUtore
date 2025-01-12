@@ -150,6 +150,11 @@ def login(request):
     # from rest_framework.authtoken.models import Token
     # token, created = Token.objects.get_or_create(user=user)
 
+        # Retrieve incomplete order IDs for the user
+    incomplete_order = Order.objects.filter(complete=False, customer=user).first()
+    order_id = incomplete_order.id if incomplete_order else None
+
+    
     return Response({
         # 'token': token.key,  # Uncomment if using tokens
         'user': {
@@ -157,7 +162,8 @@ def login(request):
             'email': user.email,
             'address': user.address,
             'tax_id': user.tax_id,
-            'role': user.role
+            'role': user.role,
+            'order_id': order_id
         }
     }, status=status.HTTP_200_OK)
  
