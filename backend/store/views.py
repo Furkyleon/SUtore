@@ -1750,6 +1750,7 @@ def get_all_deliveries(request):
     serialized_deliveries = []
     for delivery in deliveries:
         serialized_deliveries.append({
+            "order_id": delivery.order_item.order.id,
             "delivery_id": delivery.id,
             "customer_id": delivery.customer.id,
             "customer_username": delivery.customer.username,
@@ -1761,6 +1762,41 @@ def get_all_deliveries(request):
             "status": delivery.status,
             "created_at": delivery.created_at,
             "updated_at": delivery.updated_at,
+        })
+
+    return Response(serialized_deliveries, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_deliveries_by_order(request, order_id):
+    """
+    Retrieve all deliveries related to a specific order. Only accessible by Product Managers.
+    """
+    if request.user.role != 'product_manager':
+        return Response({"error": "Only product managers can access delivery data."}, status=status.HTTP_403_FORBIDDEN)
+
+    # Fetch all deliveries related to the given order_id
+    deliveries = Delivery.objects.filter(order_item__order_id=order_id)
+
+    if not deliveries.exists():
+        return Response({"message": "No deliveries found for this order."}, status=status.HTTP_200_OK)
+
+    # Serialize the deliveries
+    serialized_deliveries = []
+    for delivery in deliveries:
+        serialized_deliveries.append({
+            "delivery_id": delivery.id,
+            "customer_id": delivery.customer.id,
+            "customer_username": delivery.customer.username,
+            "product_id": delivery.order_item.product.id,
+            "product_name": delivery.order_item.product.name,
+            "quantity": delivery.order_item.quantity,
+            "total_price": float(delivery.total_price),
+            "delivery_address": delivery.delivery_address,
+            "status": delivery.status,
+            "created_at": delivery.created_at,
+            "updated_at": delivery.updated_at,
+            "order_id": delivery.order_item.order.id
         })
 
     return Response(serialized_deliveries, status=status.HTTP_200_OK)

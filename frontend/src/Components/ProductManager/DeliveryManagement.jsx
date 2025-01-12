@@ -1,198 +1,180 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import TopRightNotification from "../NotificationModal/TopRightNotification";
 import "./DeliveryManagement.css";
 
-const DeliveryManagementPage = () => {
+const DeliveryManagement = () => {
+  const [orders, setOrders] = useState([]);
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedDelivery, setSelectedDelivery] = useState(null); // To track the delivery being updated
-  const [newStatus, setNewStatus] = useState(""); // New status for the delivery
-  const [newAddress, setNewAddress] = useState(""); // New address for the delivery
-  const [updateError, setUpdateError] = useState("");
-  const [updateMessage, setUpdateMessage] = useState("");
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    message: "",
+    type: "success",
+  });
 
+  // Fetch orders and deliveries when the component mounts
   useEffect(() => {
-    const fetchDeliveries = async () => {
-      setError("");
-      setLoading(true);
-
-      const username = localStorage.getItem("username");
-      const password = localStorage.getItem("password");
-      const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
-
+    const fetchOrdersAndDeliveries = async () => {
       try {
-        const response = await fetch(
-          "http://127.0.0.1:8000/product-manager/deliveries/",
-          {
-            method: "GET",
+        const [ordersResponse, deliveriesResponse] = await Promise.all([
+          fetch("http://127.0.0.1:8000/order/history/", {
             headers: {
-              Authorization: authHeader,
+              Authorization: `Basic ${btoa(
+                `${localStorage.getItem("username")}:${localStorage.getItem(
+                  "password"
+                )}`
+              )}`,
             },
-          }
-        );
+          }),
+          fetch("http://127.0.0.1:8000/product-manager/deliveries/", {
+            headers: {
+              Authorization: `Basic ${btoa(
+                `${localStorage.getItem("username")}:${localStorage.getItem(
+                  "password"
+                )}`
+              )}`,
+            },
+          }),
+        ]);
 
-        if (!response.ok) {
-          const data = await response.json();
-          setError(
-            data.error || "An error occurred while fetching deliveries."
-          );
-          return;
+        if (!ordersResponse.ok || !deliveriesResponse.ok) {
+          throw new Error("Failed to fetch data.");
         }
 
-        const data = await response.json();
-        setDeliveries(data);
-      } catch (err) {
-        setError("Failed to fetch deliveries. Please try again.");
-      } finally {
+        const ordersData = await ordersResponse.json();
+        const deliveriesData = await deliveriesResponse.json();
+
+        setOrders(ordersData);
+        setDeliveries(deliveriesData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to load orders and deliveries.");
         setLoading(false);
       }
     };
 
-    fetchDeliveries();
+    fetchOrdersAndDeliveries();
   }, []);
 
-  const handleUpdateDelivery = async (deliveryId) => {
-    setUpdateError("");
-    setUpdateMessage("");
+  // Show notification
+  const showNotification = (message, type = "success") => {
+    setNotification({ isOpen: true, message, type });
+  };
 
-    const username = localStorage.getItem("username");
-    const password = localStorage.getItem("password");
-    const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
+  const closeNotification = () => {
+    setNotification({ isOpen: false, message: "", type: "success" });
+  };
 
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/product-manager/update_delivery_status/${deliveryId}/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader,
-          },
-          body: JSON.stringify({
-            status: newStatus,
-            delivery_address: newAddress,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setUpdateError(data.error || "Failed to update delivery.");
-        return;
+  // Handle order status update
+  const updateOrderStatus = (orderId, newStatus) => {
+    fetch(
+      `http://127.0.0.1:8000/product-manager/update_delivery_status/${orderId}/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(
+            `${localStorage.getItem("username")}:${localStorage.getItem(
+              "password"
+            )}`
+          )}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
       }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          showNotification(`Error: ${data.error}`, "error");
+        } else {
+          showNotification("Order status updated successfully.", "success");
+          // Refresh orders list
+          setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order.order_id === orderId
+                ? { ...order, status: newStatus }
+                : order
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating order status:", error);
+        showNotification("Failed to update order status.", "error");
+      });
+  };
 
-      setUpdateMessage("Delivery updated successfully.");
-      // Update the delivery in the local state
-      setDeliveries((prev) =>
-        prev.map((delivery) =>
-          delivery.delivery_id === deliveryId
-            ? {
-                ...delivery,
-                status: newStatus || delivery.status,
-                delivery_address: newAddress || delivery.delivery_address,
-              }
-            : delivery
-        )
-      );
-
-      // Clear the form
-      setSelectedDelivery(null);
-      setNewStatus("");
-      setNewAddress("");
-      window.location.reload();
-    } catch (err) {
-      setUpdateError("Failed to update delivery. Please try again.");
-    }
+  // Get deliveries for a specific order
+  const getOrderDeliveries = (orderId) => {
+    return deliveries.filter((delivery) => delivery.order_id === orderId);
   };
 
   return (
-    <div className="delivery-management-wrapper">
-      <h1>Delivery Management</h1>
-
-      {loading && <p>Loading deliveries...</p>}
+    <div className="delivery-management-container">
+      <h2>Delivery Management</h2>
+      {loading && <p>Loading orders and deliveries...</p>}
       {error && <p className="error-message">{error}</p>}
-
-      {deliveries.length === 0 && !loading && !error && (
-        <p className="no-deliveries-message">No deliveries found.</p>
+      {!loading && !error && orders.length > 0 ? (
+        <ul className="order-list">
+          {orders.map((order) => (
+            <li key={order.order_id} className="order-item">
+              <div className="order-header">
+                <span className="order-id">Order ID: {order.order_id}</span>
+                <span className="order-status">Status: {order.status}</span>
+                <span className="order-total">
+                  Total Price:{" "}
+                  {order.items
+                    .reduce(
+                      (total, item) => total + parseFloat(item.subtotal || 0),
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  TL
+                </span>
+                <select
+                  className="status-dropdown"
+                  onChange={(e) =>
+                    updateOrderStatus(order.order_id, e.target.value)
+                  }
+                  value={order.status}
+                >
+                  <option value="Processing">Processing</option>
+                  <option value="In-transit">In-transit</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <ul className="delivery-items">
+                {getOrderDeliveries(order.order_id).map((delivery) => (
+                  <li key={delivery.delivery_id} className="delivery-item">
+                    <span>Delivery ID: {delivery.delivery_id}</span>
+                    <span>Customer ID: {delivery.customer_id}</span>
+                    <span>Product ID: {delivery.product_id}</span>
+                    <span>Quantity: {delivery.quantity}</span>
+                    <span>
+                      Total Price: {delivery.total_price.toFixed(2)} TL
+                    </span>
+                    <span>Delivery Address: {delivery.delivery_address}</span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No orders found.</p>
       )}
 
-      {deliveries.length > 0 && (
-        <table className="deliveries-table">
-          <thead>
-            <tr>
-              <th>Delivery ID</th>
-              <th>Customer</th>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Total Price (TL)</th>
-              <th>Address</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {deliveries.map((delivery) => (
-              <tr key={delivery.delivery_id}>
-                <td>{delivery.delivery_id}</td>
-                <td>{delivery.customer_username}</td>
-                <td>{delivery.product_name}</td>
-                <td>{delivery.quantity}</td>
-                <td>{delivery.total_price.toFixed(2)}</td>
-                <td>{delivery.delivery_address}</td>
-                <td>{delivery.status}</td>
-                <td>
-                  <button
-                    className="update-button"
-                    onClick={() => setSelectedDelivery(delivery)}
-                  >
-                    Update
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {selectedDelivery && (
-        <div className="update-delivery-form">
-          <h2>Update Delivery</h2>
-          <p>Delivery ID: {selectedDelivery.delivery_id}</p>
-          <label>
-            New Status:
-            <select
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-            >
-              <option value="">Select Status</option>
-              <option value="Processing">Processing</option>
-              <option value="In-transit">In-transit</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
-          </label>
-          <label>
-            New Address:
-            <input
-              type="text"
-              value={newAddress}
-              onChange={(e) => setNewAddress(e.target.value)}
-              placeholder="Enter new address"
-            />
-          </label>
-          <button
-            onClick={() => handleUpdateDelivery(selectedDelivery.delivery_id)}
-          >
-            Submit
-          </button>
-          <button onClick={() => setSelectedDelivery(null)}>Cancel</button>
-          {updateError && <p className="error-message">{updateError}</p>}
-          {updateMessage && <p className="success-message">{updateMessage}</p>}
-        </div>
-      )}
+      <TopRightNotification
+        isOpen={notification.isOpen}
+        message={notification.message}
+        type={notification.type}
+        onClose={closeNotification}
+      />
     </div>
   );
 };
 
-export default DeliveryManagementPage;
+export default DeliveryManagement;
