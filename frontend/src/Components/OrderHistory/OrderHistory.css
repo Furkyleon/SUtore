@@ -83,7 +83,8 @@
 }
 
 .order-item-detail .item-quantity,
-.order-item-detail .item-price {
+.order-item-detail .item-price,
+.order-item-detail .refund-status {
   font-size: 1rem;
   color: #555;
 }

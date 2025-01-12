@@ -39,6 +39,7 @@ urlpatterns = [
     # Payment and Order History
     path('checkout/', views.checkout, name='checkout'),
     path('order/items/<int:order_id>/', views.get_order_items, name='get_order_items'),
+    path('order/itemsforrefund/<int:order_id>/', views.get_order_items_for_refund, name='get_order_items_for_refund'),
     path('order/', views.get_order, name='get_order'),
     path('order/history/', views.order_history, name='order_history'),
     path('request-refund/', views.request_refund, name="request_refund"),

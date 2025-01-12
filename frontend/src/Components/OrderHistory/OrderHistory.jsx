@@ -205,17 +205,15 @@ const OrderHistory = () => {
                   Date: {new Date(order.date_ordered).toLocaleDateString()}
                 </span>
                 <span className="order-total">
-                  Order Total:{" "}
+                  Order Total: {" "}
                   {order.items
                     .reduce((total, item) => {
-                      // Use discount_subtotal if available; otherwise, fallback to subtotal
                       const itemTotal = parseFloat(
                         item.discount_subtotal || item.subtotal
                       );
                       return total + itemTotal;
                     }, 0)
-                    .toFixed(2)}{" "}
-                  TL
+                    .toFixed(2)}{" "}TL
                 </span>
 
                 <button
@@ -241,18 +239,22 @@ const OrderHistory = () => {
                       Quantity: {item.quantity}
                     </span>
                     <span className="item-price">
-                      Total:{" "}
-                      {parseFloat(
+                      Total: {parseFloat(
                         item.discount_subtotal || item.subtotal
-                      ).toFixed(2)}{" "}
-                      TL
+                      ).toFixed(2)}{" "}TL
                     </span>
-                    <button
-                      className="refund-button"
-                      onClick={() => openRefundModal(item.id, order.order_id)}
-                    >
-                      Request Refund
-                    </button>
+                    {item.refund_status && item.refund_status !== "None" ? (
+                      <span className="refund-status">
+                        Refund Status: {item.refund_status}
+                      </span>
+                    ) : (
+                      <button
+                        className="refund-button"
+                        onClick={() => openRefundModal(item.id, order.order_id)}
+                      >
+                        Request Refund
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

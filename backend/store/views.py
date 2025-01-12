@@ -652,6 +652,18 @@ def get_order_items(request, order_id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_order_items_for_refund(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, customer=request.user)
+        order_items = order.order_items.all() 
+        serializer = OrderItemSerializer(order_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
 def get_subtotal(request):
     """
     API to calculate and return the subtotal of all products in an active order's order items,
@@ -742,7 +754,7 @@ def order_history(request):
                         "discount_subtotal": str(item.discount_subtotal),
                         "date_added": item.date_added,
                         # Default to "None" for refund status
-                        "refund_status": "Noneasda"
+                        "refund_status": None
                     }
                     for item in order.order_items.all()
                 ]
@@ -1150,14 +1162,16 @@ def apply_discount(request):
             print(order_item.discount_subtotal)
             order_item.save()
 
+    
     # Notify all users with this product in their wishlist
     wishlist_entries = Wishlist.objects.filter(product=product).select_related('user')
-    
+    """
     if not wishlist_entries.exists():
         return Response(
             {"error": "No users found with this product in their wishlist."},
             status=status.HTTP_404_NOT_FOUND
         )
+    """
 
     for entry in wishlist_entries:
         if entry.user.email:  # Ensure email exists before sending

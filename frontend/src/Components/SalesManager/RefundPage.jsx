@@ -91,12 +91,12 @@ const RefundRequests = () => {
           {refundRequests.map((request) => (
             <li key={request.id} className="refund-request-item">
               <div className="refund-request-details">
-                <p><strong>Product:</strong> {request.order_item.product}</p>
-                <p><strong>Quantity:</strong> {request.order_item.quantity}</p>
+                <p><strong>Product:</strong> {request.product_name}</p>
+                <p><strong>Quantity:</strong> {request.quantity}</p>
                 <p><strong>Reason:</strong> {request.reason}</p>
                 <p>
                   <strong>Date Requested:</strong>{" "}
-                  {new Date(request.date_requested).toLocaleDateString()}
+                  {new Date(request.request_date).toLocaleDateString()}
                 </p>
               </div>
               <div className="refund-actions">
