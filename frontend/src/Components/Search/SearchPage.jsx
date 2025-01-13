@@ -100,7 +100,11 @@ const SearchPage = () => {
           if (!response.ok) throw new Error("Failed to add item to cart!");
           return response.json();
         })
-        .then(() => {
+        .then((data) => {
+          if (data.order_id) {
+            localStorage.setItem("order_id", data.order_id);
+            console.log("Order ID saved locally.");
+          }
           showNotification("Product added to cart successfully!", "success");
         })
         .catch((error) => {
