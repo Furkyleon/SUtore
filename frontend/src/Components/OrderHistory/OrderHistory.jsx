@@ -213,15 +213,10 @@ const OrderHistory = () => {
                       );
                       return total + itemTotal;
                     }, 0)
-                    .toFixed(2)}{" "}TL
+                    .toFixed(2)}{" "}
+                  TL
                 </span>
 
-                <button
-                  className="view-invoice-button"
-                  onClick={() => viewInvoice(order.order_id)}
-                >
-                  View Invoice
-                </button>
                 {order.status === "Processing" && (
                   <button
                     className="cancel-order-button"
@@ -230,6 +225,13 @@ const OrderHistory = () => {
                     Cancel Order
                   </button>
                 )}
+
+                <button
+                  className="view-invoice-button"
+                  onClick={() => viewInvoice(order.order_id)}
+                >
+                  View Invoice
+                </button>
               </div>
               <ul className="order-items">
                 {order.items.map((item) => (
@@ -239,9 +241,11 @@ const OrderHistory = () => {
                       Quantity: {item.quantity}
                     </span>
                     <span className="item-price">
-                      Total: {parseFloat(
+                      Total:{" "}
+                      {parseFloat(
                         item.discount_subtotal || item.subtotal
-                      ).toFixed(2)}{" "}TL
+                      ).toFixed(2)}{" "}
+                      TL
                     </span>
                     {item.refund_status && item.refund_status !== "None" ? (
                       <span className="refund-status">

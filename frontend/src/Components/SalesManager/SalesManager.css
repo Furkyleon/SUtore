@@ -2,7 +2,7 @@
   padding: 40px;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-  width: 60%;
+  width: 50%;
   margin: 80px auto 20px;
   text-align: center;
   border-radius: 10px;
@@ -23,7 +23,7 @@
 }
 
 .sales-manager-container .section {
-  padding: 20px;
+  padding: 25px;
   border-radius: 25px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -45,12 +45,8 @@
   background-color: #ffebee; /* Light Red */
 }
 
-.sales-manager-container .section:nth-child(5) {
-  background-color: #feebff; /* Light Blue */
-}
-
 .sales-manager-container h2 {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
@@ -65,6 +61,30 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.sales-manager-container .action-button1 {
+  padding: 10px 15px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-right: 5px;
+}
+
+.sales-manager-container .action-button2 {
+  padding: 10px 15px;
+  background-color: #005da9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-left: 5px;
 }
 
 .sales-manager-container .action-button:hover {

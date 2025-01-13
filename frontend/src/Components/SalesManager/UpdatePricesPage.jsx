@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import TopRightNotification from "../NotificationModal/TopRightNotification"; // Adjust the path if necessary
 import "./UpdatePricesPage.css";
 
@@ -96,9 +97,9 @@ const UpdatePricesPage = () => {
       );
 
       showNotification(
-        `Price updated successfully: ${data.product.name} - ${data.product.price.toFixed(
-          2
-        )} TL`,
+        `Price updated successfully: ${
+          data.product.name
+        } - ${data.product.price.toFixed(2)} TL`,
         "success"
       );
     } catch (error) {
@@ -121,11 +122,15 @@ const UpdatePricesPage = () => {
         <div className="product-list">
           {products.map((product) => (
             <div key={product.id} className="product-card">
-              <img
-                src={`http://localhost:8000${product.image || "/placeholder.jpg"}`}
-                alt={product.name || "Unnamed Product"}
-              />
-              <h2>{product.name || "Unnamed Product"}</h2>
+              <Link to={`/product/${product.id}`} className="product-link">
+                <img
+                  src={`http://localhost:8000${
+                    product.image || "/placeholder.jpg"
+                  }`}
+                  alt={product.name || "Unnamed Product"}
+                />
+                <h2>{product.name || "Unnamed Product"}</h2>
+              </Link>
               <p className="current-price">
                 Current Price: {product.price.toFixed(2)} TL
               </p>

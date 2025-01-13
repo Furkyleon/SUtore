@@ -30,25 +30,22 @@ const SalesManagerPage = () => {
       <h1>Sales Manager Dashboard</h1>
       <div className="dashboard-grid">
         <div className="section">
-          <h2>Product Discount Page</h2>
+          <h2>Product Prices</h2>
           <button
-            className="action-button"
+            className="action-button1"
             onClick={handleNavigateToDiscountPage}
           >
-            Go to Discount Page
+            Go to Discount
           </button>
-        </div>
-        <div className="section">
-          <h2>Update Product Prices</h2>
           <button
-            className="action-button"
+            className="action-button2"
             onClick={handleNavigateToUpdatePricesPage}
           >
-            Go to Update Prices
+            Go to Update
           </button>
         </div>
         <div className="section">
-          <h2>Refund Request Evaluation</h2>
+          <h2>Refund Evaluation</h2>
           <button
             className="action-button"
             onClick={handleNavigateToRefundPage}
@@ -57,7 +54,7 @@ const SalesManagerPage = () => {
           </button>
         </div>
         <div className="section">
-          <h2>Revenue Calculation</h2>
+          <h2>Revenue</h2>
           <button
             className="action-button"
             onClick={handleNavigateToRevenuePage}
@@ -66,12 +63,12 @@ const SalesManagerPage = () => {
           </button>
         </div>
         <div className="section">
-          <h2>View Invoices</h2>
+          <h2>Invoices</h2>
           <button
             className="action-button"
             onClick={handleNavigateToInvoicesPage}
           >
-            Display Invoices
+            View Invoices
           </button>
         </div>
       </div>

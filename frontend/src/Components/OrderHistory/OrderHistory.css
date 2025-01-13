@@ -69,7 +69,7 @@
 
 .order-history-container .order-item-detail {
   display: grid;
-  grid-template-columns: 3fr 1.5fr 1.5fr 1fr;
+  grid-template-columns: 3fr 1.5fr 1.5fr 1.3fr;
   gap: 10px;
   align-items: center;
   font-size: 1.1rem;
@@ -83,10 +83,15 @@
 }
 
 .order-item-detail .item-quantity,
-.order-item-detail .item-price,
-.order-item-detail .refund-status {
+.order-item-detail .item-price {
   font-size: 1rem;
   color: #555;
+}
+
+.order-item-detail .refund-status {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ff9800;
 }
 
 .order-item-detail .refund-button {

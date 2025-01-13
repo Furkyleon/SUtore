@@ -49,6 +49,7 @@
 }
 
 .refund-actions {
+  margin-left: 40px;
   display: flex;
   gap: 10px;
 }

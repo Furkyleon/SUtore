@@ -91,9 +91,15 @@ const RefundRequests = () => {
           {refundRequests.map((request) => (
             <li key={request.id} className="refund-request-item">
               <div className="refund-request-details">
-                <p><strong>Product:</strong> {request.product_name}</p>
-                <p><strong>Quantity:</strong> {request.quantity}</p>
-                <p><strong>Reason:</strong> {request.reason}</p>
+                <p>
+                  <strong>Product:</strong> {request.product_name}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {request.quantity}
+                </p>
+                <p>
+                  <strong>Reason:</strong> {request.reason}
+                </p>
                 <p>
                   <strong>Date Requested:</strong>{" "}
                   {new Date(request.request_date).toLocaleDateString()}
@@ -117,7 +123,9 @@ const RefundRequests = () => {
           ))}
         </ul>
       ) : (
-        <p className="no-refunds-message">No pending refund requests available.</p>
+        <p className="no-refunds-message">
+          No pending refund requests available.
+        </p>
       )}
 
       <TopRightNotification
