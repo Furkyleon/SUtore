@@ -235,7 +235,7 @@ const PaymentPage = () => {
           </div>
         </div>
         <div className="form-group">
-          <label htmlFor="billingAddress">Address</label>
+          <label htmlFor="billingAddress">Delivery Address</label>
           <textarea
             id="billingAddress"
             name="billingAddress"

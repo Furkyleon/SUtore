@@ -87,6 +87,16 @@
   margin-left: 5px;
 }
 
+.sales-manager-container .action-button1:hover {
+  background-color: #01236a;
+  transform: scale(1.1);
+}
+
+.sales-manager-container .action-button2:hover {
+  background-color: #01236a;
+  transform: scale(1.1);
+}
+
 .sales-manager-container .action-button:hover {
   background-color: #01236a;
   transform: scale(1.1);

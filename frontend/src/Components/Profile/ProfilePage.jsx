@@ -144,7 +144,7 @@ const ProfilePage = () => {
         </div>
         <div className="profile-page-form-group">
           <label htmlFor="address" className="profile-page-label">
-            Address:
+            Home Address:
           </label>
           <input
             type="text"
