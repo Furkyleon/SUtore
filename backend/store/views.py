@@ -2143,7 +2143,6 @@ def update_invoice_date(request, invoice_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
-   
     # Get the new date from the request
     new_date = request.data.get('date')
 
@@ -2167,6 +2166,12 @@ def update_invoice_date(request, invoice_id):
     # Update the invoice date
     invoice.date = new_date_parsed
     invoice.save()
+
+    # Update the related order's date_ordered
+    order = invoice.order  # Assuming there's a foreign key from Invoice to Order
+    if order:
+        order.date_ordered = new_date_parsed
+        order.save()
 
     return Response(
         {"message": "Invoice date updated successfully.", "invoice_id": invoice.id, "new_date": invoice.date},
